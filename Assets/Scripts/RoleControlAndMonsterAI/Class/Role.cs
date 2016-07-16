@@ -3,7 +3,14 @@ using System.Collections;
 
 public class Role {
 
-    private string carceer;      //職業名稱
+    public enum Carceer {
+        Warrior,
+        Chef,
+        Engineer,
+        Explorer
+    }
+
+    private Carceer carceerName;      //職業名稱
 
     private int hp;              //血量(顯示現在血量)
     private int maxHp;           //血量(顯示遊戲中血量上限)
@@ -43,9 +50,9 @@ public class Role {
     private float baseBeTiredAtNight;    //夜間疲勞值耗損速度(基礎數據)
     private float baseBeFearAtNight;     //夜間精神值耗損速度(基礎數據)
 
-    public string Carceer {
-        set { carceer = value; }
-        get { return carceer; }
+    public Carceer CarceerName {
+        set { carceerName = value; }
+        get { return carceerName; }
     }
     public int Hp {
         set { hp = value; }
