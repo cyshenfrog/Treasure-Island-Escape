@@ -77,6 +77,7 @@ public class Inventory : MonoBehaviour {
         {
             CreateBankLayout();
         }
+        
         foreach(GameObject slot in allSlots)
         {
             btn = slot.GetComponent<Button>();
@@ -93,15 +94,15 @@ public class Inventory : MonoBehaviour {
         if (Input.GetMouseButtonUp(0))
         {
             if (!eventSystem.IsPointerOverGameObject(-1) && from != null)
-            {
-                Debug.Log(from);
+            {               
                 from.GetComponent<Image>().color = Color.white;
                 
                 dropItem = from.currentItem.dropItem;
+                
                 if (dropItem != null)
                 {
                     float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
-                    Vector3 v = new Vector3(Mathf.Sin(angle), 0f, Mathf.Cos(angle));
+                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0.0f);
                     foreach (Item item in from.Items)
                     {
                         Instantiate(dropItem, player.transform.position - 3 * v, Quaternion.identity);
@@ -145,7 +146,7 @@ public class Inventory : MonoBehaviour {
         inventoryWidth = (slots / rows) * (slotSize + slotPaddingLeft) + slotPaddingLeft;
 
         inventoryRect = GetComponent<RectTransform>();
-        inventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inventoryWidth*5 +40);
+        inventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inventoryWidth +40);
         inventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, inventoryHeight);
 
         int cols = slots / rows;
@@ -188,7 +189,7 @@ public class Inventory : MonoBehaviour {
         arrowUpRect.transform.SetParent(this.transform);
         //---------set parent to manager-----------------//
         inventoryRect.transform.SetParent(manager.transform);
-        inventoryRect.SetAsFirstSibling();
+        inventoryRect.SetAsLastSibling();
     }
 
     private void CreateBankLayout()
