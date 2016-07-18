@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-public class Slot : MonoBehaviour, IPointerClickHandler {
+public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+{
 
     public Stack<Item> items;
     public Stack<Item> Items
@@ -145,7 +146,14 @@ public class Slot : MonoBehaviour, IPointerClickHandler {
             inventory.setStackInfo(items.Count);
         }
     }
-
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        showToolTip();
+    }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        hideToolTip();
+    }
     public bool isEmpty
     {
         get { return items.Count == 0; }
