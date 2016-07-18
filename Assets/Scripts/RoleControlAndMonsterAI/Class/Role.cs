@@ -1,16 +1,18 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-public class Role {
+
+public class Role : Monolog {
 
     public enum Carceer {
+        None,
         Warrior,
         Chef,
         Engineer,
         Explorer
     }
 
-    private Carceer carceerName;      //職業名稱
+    public static Carceer carceerName = Carceer.None;      //職業名稱
 
     private int hp;              //血量(顯示現在血量)
     private int maxHp;           //血量(顯示遊戲中血量上限)
@@ -18,6 +20,15 @@ public class Role {
 
     private float attack;        //攻擊(遊戲中腳色攻擊力)
     private float baseAttack;    //攻擊(基礎數值)
+
+    private float defence;       //防禦(遊戲中)
+    private float baseDefence;   //防禦(基礎數值)
+
+    private int load;            //負重(遊戲中)
+    private int baseLoad;        //負重(基礎數值)
+
+    private float attackSpeed;      //攻擊速度(遊戲中)
+    private float baseAttackSpeed;  //攻擊速度(基礎數值)
 
     private float hungry;        //飢餓值(顯示現在飢餓值)
     private float tired;         //疲勞值(顯示現在疲勞值)
@@ -50,7 +61,14 @@ public class Role {
     private float baseBeTiredAtNight;    //夜間疲勞值耗損速度(基礎數據)
     private float baseBeFearAtNight;     //夜間精神值耗損速度(基礎數據)
 
-    public Carceer CarceerName {
+    private Dictionary<Log, string> logSet;  //獨白字典
+
+    public Dictionary<Log, string> LogSet {
+        set { logSet = value; }
+        get { return logSet; }
+    }
+
+    public static Carceer CarceerName {
         set { carceerName = value; }
         get { return carceerName; }
     }
@@ -73,6 +91,30 @@ public class Role {
     public float BaseAttack {
         set { baseAttack = value; }
         get { return baseAttack; }
+    }
+    public float Defence {
+        set { defence = value; }
+        get { return defence; }
+    }
+    public float BaseDefence{
+        set { baseDefence = value; }
+        get { return baseDefence; }
+    }
+    public int Load {
+        set { load = value; }
+        get { return load; }
+    }
+    public int BaseLoad {
+        set { baseLoad = value; }
+        get { return baseLoad; }
+    }
+    public float AttackSpeed {
+        set { attackSpeed = value; }
+        get { return attackSpeed; }
+    }
+    public float BaseAttackSpeed {
+        set { baseAttackSpeed = value; }
+        get { return baseAttackSpeed; }
     }
     public float Hungry {
         set { hungry = value; }
@@ -159,5 +201,13 @@ public class Role {
         get { return baseBeFearAtNight; }
     }
 
+
+    //查詢獨白字典
+    public string LogString(Log log) {
+        foreach (var item in logSet) {
+            if (item.Key == log) return item.Value;
+        }
+        return null;
+    }
     
 }

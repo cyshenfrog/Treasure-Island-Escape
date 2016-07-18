@@ -7,10 +7,9 @@ public class MonsterController : MonoBehaviour {
     public float Speed;
     public float Distance;
     private GameObject RolePrefab;
-	public string aaa;
 
     void Awake() {
-
+        
     }
 
 	void Start () {
