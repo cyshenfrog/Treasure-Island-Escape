@@ -13,33 +13,29 @@ public class Tile
     }
 }
 
+public class 
+
 public class Ellipse
 {
     Vector2 center;
-    int a, b, k, a2, b2, k2, sid;
+    int sid;
+    float a, b, a2, b2;
 
     Vector3 rotate;
     World world;
     MapConstants.MaterialType mt;
 
-    public Ellipse(Vector2 center, int a, int b, int k, MapConstants.MaterialType mt, int sid)
+    public Ellipse(Vector2 center, float a, float b, MapConstants.MaterialType mt, int sid)
     {
         Debug.Log("YO");
         this.center = center;
         this.a = a;
         this.b = b;
-        this.k = k;
         this.mt = mt;
         this.sid = sid;
-
-        if (k < 2*a)
-        {
-            Debug.LogError("Ellipse ctor - k value is too small");
-        }
         
         a2 = a * a;
         b2 = b * b;
-        k2 = k * k;
     }
 
     public void FillToWorlid(World world)
@@ -62,13 +58,24 @@ public class Ellipse
             for(int i = 0; i < 4; ++i)
             {
                 TileData td = world.GetTileDataAt(data.Po+ MapConstants.bfs[i]);
-                int x = td.X - (int)center.x, y = td.Y - (int)center.y;
-                if (td.SearchID != sid && ((x * x) / a2 + (y * y) / b2 < k2))
+                if(td != null)
                 {
-                    //has not found yet
-                    td.SearchID = sid;
-                    data.MaterialType = mt;
-                    q.Enqueue(td);
+                    float x = td.X - center.x, y = td.Y - center.y;
+                    if (td.SearchID != sid)
+                    {
+                        if ((x * x) / a2 + (y * y) / b2 < 1)
+                        {
+                            //has not found yet
+                            td.SearchID = sid;
+                            data.MaterialType = mt;
+                            q.Enqueue(td);
+                        }
+                        else
+                        {
+                            //outside
+                            
+                        }
+                    }
                 }
             }
         }
@@ -89,21 +96,18 @@ public class WorldController : MonoBehaviour
         int ww = world.Width, wh = world.Height;
 
         //to change the tiledata
-        /*
-        Ellipse ep = new Ellipse(new Vector2(Random.Range(40, 60), Random.Range(40, 60)), Random.Range(5, 10), Random.Range(1, 5), Random.Range(20, 25), MapConstants.MaterialType.Forest, 1);
+        Ellipse ep = new Ellipse(new Vector2(Random.Range(40, 60), Random.Range(40, 60)), Random.Range(15, 20), Random.Range(10, 15), MapConstants.MaterialType.Forest, 1);
         ep.FillToWorlid(world);
-        */
+        
+
         //to create a gameobject for each of our tiles, so they show visually.
         tiles = new Tile[ww, wh];
-
-        Debug.Log("ww = " + ww + " wh = " + wh);
-        
         for (int x = 0; x < ww; ++x)
         {
             for(int y = 0; y < wh; ++y)
             {
                 TileData data = world.GetTileDataAt(x, y);
-                /*
+                
                 GameObject go = new GameObject();
                 go.name = "Tile_" + data.X + "_" + data.Y;
                 go.transform.localPosition = new Vector3(data.X * 3, data.Y * 3);
@@ -115,7 +119,7 @@ public class WorldController : MonoBehaviour
                 //to add action
                 data.AddMtChanged((tile) => { OnMtChanged(tile, go); });
 
-                tiles[x, y] = new Tile(data, go);*/
+                tiles[x, y] = new Tile(data, go);
             }
         }
     }

@@ -21,7 +21,7 @@ public class World
         this.width = width;
         this.height = height;
 
-        tiledata = new TileData[width, height];
+        tiledata = new Sea[width, height];
         for(int x = 0; x < width; ++x)
         {
             for(int y = 0; y < height; ++y)
@@ -33,20 +33,18 @@ public class World
 
     public TileData GetTileDataAt(int x, int y)
     {
-        /*
-        if (x > width || x < 0 || y > height || y < 0)
+        if (x >= width || x < 0 || y >= height || y < 0)
         {
             Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
             return null;
         }
         else
         {
-            Debug.Log(x + " " + y);
             return tiledata[x, y];
-        }*/
-        Debug.Log("x = " + x + " y = " + y);
-        return null;
+        }
     }
+
+
 
     public TileData GetTileDataAt(Vector2 v)
     {
