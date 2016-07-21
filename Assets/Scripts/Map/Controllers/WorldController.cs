@@ -13,7 +13,7 @@ public class Tile
     }
 }
 
-public class 
+//public class 
 
 public class Ellipse
 {
