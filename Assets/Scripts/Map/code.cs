@@ -1,10 +1,10 @@
 ﻿
 using UnityEngine;
 using System.Collections.Generic;
-
+/*
 using csDelaunay;
 
-public class VoronoiDiagram : MonoBehaviour
+public class code : MonoBehaviour
 {
 
     // The number of polygons/sites we want
@@ -17,28 +17,28 @@ public class VoronoiDiagram : MonoBehaviour
     void Start()
     {
         // Create your sites (lets call that the center of your polygons)
-        List<Vector2f> points = CreateRandomPoint();
+        //List<Vector2f> points = CreateRandomPoint();
 
         // Create the bounds of the voronoi diagram
         // Use Rectf instead of Rect; it's a struct just like Rect and does pretty much the same,
         // but like that it allows you to run the delaunay library outside of unity (which mean also in another tread)
-        Rectf bounds = new Rectf(0, 0, 512, 512);
+        //Rectf bounds = new Rectf(0, 0, 512, 512);
 
         // There is a two ways you can create the voronoi diagram: with or without the lloyd relaxation
         // Here I used it with 2 iterations of the lloyd relaxation
-        Voronoi voronoi = new Voronoi(points, bounds, 5);
+        //Voronoi voronoi = new Voronoi(points, bounds, 5);
 
         // But you could also create it without lloyd relaxtion and call that function later if you want
         //Voronoi voronoi = new Voronoi(points,bounds);
         //voronoi.LloydRelaxation(5);
 
         // Now retreive the edges from it, and the new sites position if you used lloyd relaxtion
-        sites = voronoi.SitesIndexedByLocation;
-        edges = voronoi.Edges;
+        //sites = voronoi.SitesIndexedByLocation;
+        //edges = voronoi.Edges;
 
-        DisplayVoronoiDiagram();
+        //DisplayVoronoiDiagram();
     }
-
+    
     private List<Vector2f> CreateRandomPoint()
     {
         // Use Vector2f, instead of Vector2
@@ -106,4 +106,4 @@ public class VoronoiDiagram : MonoBehaviour
             }
         }
     }
-}
+}*/
