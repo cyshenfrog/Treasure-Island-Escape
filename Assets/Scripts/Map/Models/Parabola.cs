@@ -3,9 +3,16 @@ using System.Collections.Generic;
 
 public class Parabola
 {
+    public enum Boundary
+    {
+        Up,
+        Down
+    }
+
     //function: (y - center.y)^2 = -4c(x - center.x)
 
-    List<Vertex> vertexes;
+    List<TwoLooseEdge> twolooseedges = new List<TwoLooseEdge>();
+    float[] boundary = new float[2];
     Vector2 focus, center;
     int directrix, siteindex;
 
@@ -38,38 +45,43 @@ public class Parabola
         }
     }
 
-    public Parabola(Vector2 focus, int siteindex, int directrix, List<Parabola> parabolas)
+    //public Parabola(Vector2 focus, int siteindex, int directrix, List<Parabola> parabolas)
+    public Parabola(Vector2 focus, int siteindex, List<Parabola> parabolas)
     {
         this.focus = focus;
-        center = focus;
+        //center = focus;
         this.siteindex = siteindex;
-        this.directrix = directrix;
-
+        //this.directrix = directrix;
+        
         int count = parabolas.Count, interindex = -1;
+        Vector2 intersection = Vector2.zero;
         //biggest
-        float x = 10000f, y = center.y;
+        float x = 10000f;
         for(int i = 0; i < count; ++i)
         {
-            Vector2 inter = InterSection(parabolas[i], y);
+            intersection = InterSection(parabolas[i], focus.y);
 
-            if(inter.x != -1f)
+            if(intersection.x != -1f && x > intersection.x)
             {
-                x = x > inter.x ? inter.x : x;
+                //reasonal and closer solution
+                x = intersection.x;
                 interindex = i;
             }
         }
 
-        if(interindex != -1)
+        if(interindex == -1)
         {
-            //is intersected
-            //vertexes.Add(new Vertex());
+            //沒有跟任何雙曲線相交!
+            boundary[(int)Boundary.Up] = focus.y;
+            boundary[(int)Boundary.Down] = focus.y;
         }
-
-
-        vertexes = new List<Vertex>();
-
-
-       // vertexes.Add(new Vertex())
+        else
+        {
+            //intersection
+            //vertexes.Add(new Vertex(intersection, parabolas[interindex].focus, parabolas[parabolas.Count].focus));
+            //vertexes.Add(new Vertex(intersection, parabolas[interindex].focus, parabolas[parabolas.Count].focus));
+        }
+        
     }
 
     //the distance between point and line

@@ -93,6 +93,7 @@ public class Voronoi
         for(int i = 0; i < scount; ++i)
         {
             directrix = sites[i].X;
+            //parabolas.Add(new Parabola(sites[i]));
 
             int pcount = parabolas.Count;
 
