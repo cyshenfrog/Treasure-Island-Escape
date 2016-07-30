@@ -8,7 +8,9 @@ public class RoleController : MonoBehaviour {
 
 	void Start () {
         RoleCamera = GameObject.Find("Main Camera");
-	}
+        
+        
+    }
 
 	void Update () {
         RoleCamera.transform.position = new Vector3(transform.position.x, transform.position.y, RoleCamera.transform.position.z);
