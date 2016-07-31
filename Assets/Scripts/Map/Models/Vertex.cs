@@ -3,16 +3,52 @@ using System.Collections.Generic;
 
 public class Vertex
 {
-    Vector2 center;
-    public List<Vector2> points = new List<Vector2>();
-    int m, reference = 0;
-    bool isloose = true;
-
-    public Vertex(Vector2 center, Vector2 p0, Vector2 p1)
+    public Vertex(Vector2 center, Parabola p0, Parabola p1)
     {
         this.center = center;
 
-        points.Add(p0);
-        points.Add(p1);
+        //always p0 is upper parabola
+        relatedparabolas.Add(p0);
+        relatedparabolas.Add(p1);
     }
+
+    public Vertex(Vector2 center, Parabola p0)
+    {
+        this.center = center;
+
+        relatedparabolas.Add(p0);
+    }
+
+    public Vertex(Vector2 center)
+    {
+        this.center = center;
+    }
+
+    public int CenterY
+    {
+        get { return (int)center.y; }
+    }
+
+    public Vector2 Center
+    {
+        get { return center; }
+        set { center = value; }
+    }
+
+    public List<Parabola> RelatedParabolas
+    {
+        get { return relatedparabolas; }
+    }
+
+    public void SwapParabola()
+    {
+        Parabola t = relatedparabolas[0];
+        relatedparabolas[0] = relatedparabolas[1];
+        relatedparabolas[1] = t;
+    }
+
+    Vector2 center;
+    List<Parabola> relatedparabolas = new List<Parabola>();
+    int m, reference = 0;
+    bool isloose = true;
 }
