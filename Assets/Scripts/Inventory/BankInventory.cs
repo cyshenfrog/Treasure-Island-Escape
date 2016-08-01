@@ -4,27 +4,21 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Inventory : InventoryManager {
-    
+public class BankInventory : InventoryManager
+{
+
     private List<GameObject> allSlots;
-    /*
-    private int emptySlot;
-    public int EmptySlot
-    {
-        set { emptySlot = value; }
-        get { return emptySlot; }
-    }
-    */
+    
     private Button btn;
     
     private EventSystem eventSystem;
     private GameObject dropItem;
-   
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-
-        CreateInventoryLayout();
+        
+        CreateBankLayout();
     }
     void Update()
     {
@@ -33,32 +27,29 @@ public class Inventory : InventoryManager {
             if (!eventSystem.IsPointerOverGameObject(-1) && from != null)
             {
                 from.GetComponent<Image>().color = Color.white;
-                
+
                 dropItem = from.currentItem.dropItem;
-                
+
                 if (dropItem != null)
                 {
-                    float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
-                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
+                    float angle = Random.Range(0.0f, Mathf.PI * 2);
+                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0.0f);
                     foreach (Item item in from.Items)
                     {
                         Instantiate(dropItem, player.transform.position - 3 * v, Quaternion.identity);
                     }
                 }
-                //from.transform.parent.GetComponent<Inventory>().emptySlot++;
                 from.clearSlot();
                 Destroy(hoverObj);
                 to = null;
                 from = null;
-                
-                //transform.parent.GetChild(2).GetComponent<Inventory>().emptySlot++; //效能有待加強
-                
+               
             }
-            else if(!eventSystem.IsPointerOverGameObject(-1) && !movingSlot.isEmpty)
+            else if (!eventSystem.IsPointerOverGameObject(-1) && !movingSlot.isEmpty)
             {
                 dropItem = movingSlot.currentItem.dropItem;
-                float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
-                Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f );
+                float angle = Random.Range(0.0f, Mathf.PI * 2);
+                Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
                 foreach (Item item in movingSlot.Items)
                 {
                     Instantiate(dropItem, player.transform.position - 3 * v, Quaternion.identity);
@@ -67,15 +58,30 @@ public class Inventory : InventoryManager {
                 Destroy(hoverObj);
             }
         }
-        if(hoverObj)
+        if (hoverObj)
         {
             Vector2 position;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition,canvas.worldCamera, out position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, canvas.worldCamera, out position);
             hoverObj.transform.position = canvas.transform.TransformPoint(position);
         }
     }
-	
-    private void CreateInventoryLayout()
+    /*
+    public void putItemBack()
+    {
+        if(from != null && from.transform.parent.tag=="Bank")
+            moveItem(click);
+        else if (!movingSlot.isEmpty)
+        {
+            foreach(Item item in movingSlot.items)
+            {
+                addItem(item);
+            }
+            movingSlot.clearSlot();
+            Destroy(hoverObj);
+        }
+        selectStackSize.SetActive(false);
+    }*/
+    private void CreateBankLayout()
     {
         allSlots = new List<GameObject>();
         foreach (Transform child in transform)
@@ -83,22 +89,17 @@ public class Inventory : InventoryManager {
             Slot slot = child.GetComponent<Slot>();
             if (slot != null)
             {
-                allSlots.Add(child.gameObject);
                 btn = slot.GetComponent<Button>();
                 GameObject temp = child.gameObject;
                 btn.onClick.AddListener(delegate { moveItem(temp); });
-            }
-            else if (child.name == "arrowUp")
-            {
-                btn = child.GetComponent<Button>();
-                btn.onClick.AddListener(() => gameObject.transform.SetAsFirstSibling());
+                allSlots.Add(child.gameObject);
             }
         }
     }
-    
+    /*
     public bool addItem(Item item)
     {
-        if(item.maxStackSize == 1)
+        if (item.maxStackSize == 1)
         {
             placeEmpty(item);
             return true;
@@ -108,21 +109,21 @@ public class Inventory : InventoryManager {
             foreach (GameObject slot in allSlots)
             {
                 Slot temp = slot.GetComponent<Slot>();
-                if ( (!temp.isEmpty) && (temp.currentItem.type == item.type) && (temp.isStackable) )
+                if ((!temp.isEmpty) && (temp.currentItem.type == item.type) && (temp.isStackable))
                 {
                     temp.addItem(item);
                     return true;
                 }
             }
-            
+
             return placeEmpty(item);
         }
     }
-    
+
     public bool placeEmpty(Item item)
     {
-        
-        foreach(GameObject slot in allSlots)
+
+        foreach (GameObject slot in allSlots)
         {
             Slot temp = slot.GetComponent<Slot>();
             if (temp.isEmpty)
@@ -130,8 +131,8 @@ public class Inventory : InventoryManager {
                 temp.addItem(item);
                 return true;
             }
-        }               
+        }
         return false;
-        
-    }
+
+    }*/
 }

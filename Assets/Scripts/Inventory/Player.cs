@@ -60,27 +60,20 @@ public class Player : MonoBehaviour {
                 bank.close();
         }
     }
-    private bool pickUpItem(Item item)
+    public bool pickUpItem(Item item)
     {
-        Inventory inventory = null;
-        
         if (item.maxStackSize == 1)
         {
-            if (!inventory1.isFull)
+            if (inventory1.placeEmpty(item))
             {
-                inventory = inventory1;
+                return true;
             }
-            else if (!inventory2.isFull)
+            else if (inventory2.placeEmpty(item))
             {
-                inventory = inventory2;
+                return true;
             }
-            else if (!inventory3.isFull)
+            else if (inventory3.placeEmpty(item))
             {
-                inventory = inventory3;
-            }
-            if (inventory != null)
-            {
-                inventory.placeEmpty(item);
                 return true;
             }
         }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum itemType {MANA, HEALTH};
+public enum itemType {MANA, HEALTH, GreenPotion};
 public enum Quality {NORMAL, RARE, EPIC, LEGENDARY};
 public class Item : MonoBehaviour {
 
