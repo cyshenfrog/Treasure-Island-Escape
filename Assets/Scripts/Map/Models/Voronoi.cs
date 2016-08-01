@@ -95,9 +95,6 @@ public class Voronoi
         {
             directrix = sites[i].X;
 
-            //to new the parabola
-            parabolas.Add(new Parabola(sites[i].Center, i, parabolas));
-
             int pcount = parabolas.Count;
 
             //from right to left
@@ -107,17 +104,16 @@ public class Voronoi
                 Parabola p = parabolas[j];
 
                 p.Directrix = directrix;
-
-                int count = p.Boundary.Count;
+                
                 //update function
                 if (p.Up.RelatedParabolas.Count == 1)
                 {
-                    p.UpdateBoundary(0, height);
+                    p.UpdateBoundary(true, height);
                 }
 
                 if (p.Down.RelatedParabolas.Count == 1)
                 {
-                    p.UpdateBoundary(count - 1, height);
+                    p.UpdateBoundary(false, height);
                 }
             }
 
@@ -128,52 +124,61 @@ public class Voronoi
                 {
                     Parabola p0 = parabolas[j], p1 = parabolas[k], p2, p3;
                     List<Vertex> intersections = Parabola.InterSection(p0, p1);
-                    int icount = intersections.Count;
 
+                    //intersection case
+                    int icount = intersections.Count;
                     switch(icount)
                     {
+                        //one intersection
                         case 1:
                             if(p0.UpDownParabolas[0] == null && p0.UpDownParabolas[1] == null)
                             {
+                                //1 intersection, p0 doesn't intersect any parabola
+
                                 //only happen when first stage
+
+                                /*
                                 p0.RelatedParabolas.Add(p1);
                                 //must!?
                                 p1.RelatedParabolas.Add(p0);
+                                */
 
                                 //to change up or down
-                                //to reduce the code?
-                                if (Mathf.Abs(intersections[0].CenterY - p0.Up.CenterY) < Mathf.Abs(intersections[0].CenterY - p0.Down.CenterY))
+                                if (p0.CenterY > p1.CenterY)
                                 {
-                                    //p0 up need update
-                                    //p0 is down p1 is up
-                                    p0.Up = intersections[0];
-                                    p0.UpDownParabolas[0] = p1;
-                                    p1.Down = intersections[0];
-                                    p1.UpDownParabolas[1] = p0;
-                                }
-                                else
-                                {
-                                    //p0 down need update
+                                    //p0 is up
                                     p0.Down = intersections[0];
                                     p0.UpDownParabolas[1] = p1;
                                     p1.Up = intersections[0];
                                     p1.UpDownParabolas[0] = p0;
                                 }
+                                else
+                                {
+                                    //p0 is down
+                                    p0.Up = intersections[0];
+                                    p0.UpDownParabolas[0] = p1;
+                                    p1.Down = intersections[0];
+                                    p1.UpDownParabolas[1] = p0;
+                                }
 
                                 //to add one loose edge
-                                onelooseedges.Add(new OneLooseEdge(FixedinOneLooseEdge(p0.Center, p1.Center, directrix), intersections[0]));
-
+                                onelooseedges.Add(new OneLooseEdge(FixedinOneLooseEdge(p0.Center, p1.Center), intersections[0]));
                             }
                             else if(p0.UpDownParabolas[0] != null && p1.UpDownParabolas[1] != null)
                             {
+                                //1 intersection, p0 intersects two parabolas
+
                                 p2 = p0.UpDownParabolas[0];
                                 p3 = p0.UpDownParabolas[1];
 
                                 if (p2 == p3)
                                 {
+                                    //p0 creates a two loose edge on other parabola
+
                                     if (p1 == p2)
                                     {
                                         //p0 <=> p2(p1) = 2  =>  p0 <=> p1(p2) = 1
+
                                         //to update the intersection
                                         if (p0.CenterY > p1.CenterY)
                                         {
@@ -192,16 +197,23 @@ public class Voronoi
                                     {
                                         //p0 <=> p1 = 1(new) p0 <=> p2 = 1(2=>1)
 
-                                        //new vertex in the center of p0, p0related, and p1
+                                        //new vertex in the center of p0, p2, and p1
+                                        //vertex => vector2?
                                         Vertex center = new Vertex(CenterinThreePoints(p0.Focus, p1.Focus, p2.Focus));
                                         vertexes.Add(center);
+
+                                        //for debug?
+                                        if(center.Center.x > directrix || center.Center.x < 0f || center.CenterY > height || center.CenterY < 0f)
+                                            Debug.LogError("CenterinThreePoints Error: unreasonal center");
+
+                                        //p1 <=> p2 = ???
 
                                         //to decide new up and down
                                         if (p1.CenterY > p2.CenterY)
                                         {
                                             //p1 is upper parabola
                                             //it must have only one intersection?
-                                            p1.Down = Parabola.InterSection(p1, p0)[0];
+                                            p1.Down = intersections[0];
                                             p1.UpDownParabolas[1] = p0;
                                             p2.Up = Parabola.InterSection(p2, p0)[0];
                                             p2.UpDownParabolas[0] = p0;
@@ -211,11 +223,11 @@ public class Voronoi
                                             //p2 is upper parabola
                                             p2.Down = Parabola.InterSection(p2, p0)[0];
                                             p2.UpDownParabolas[1] = p0;
-                                            p1.Up = Parabola.InterSection(p1, p0)[0];
+                                            p1.Up = intersections[0];
                                             p1.UpDownParabolas[0] = p0;
                                         }
-
-
+                                        
+                                        //dededebug
                                         //to drop the p2's two loose edge
 
                                         //to add edges
@@ -246,6 +258,7 @@ public class Voronoi
                             }
                             else
                             {
+                                //p0 has one boundary (up or down)
                                 int p0isup = p0.UpDownParabolas[0] == null ? 1 : 0;
                                 p2 = p0.UpDownParabolas[p0isup];
 
@@ -307,18 +320,18 @@ public class Voronoi
                                         //new vertex
                                         Vertex center = new Vertex(CenterinThreePoints(p0.Focus, p1.Focus, p2.Focus));
                                         vertexes.Add(center);
-                                        
+
                                         //center is destroyed
-                                        if(orderbyY[1] == p1)
-                                        {
-                                            //must one intersection?
-                                            Vertex intersection = Parabola.InterSection(p2, p0)[0];
-                                            orderbyY[0].Down = intersection;
-                                            orderbyY[0].UpDownParabolas[1] = orderbyY[2];
-                                            orderbyY[2].Up = intersection;
-                                            orderbyY[2].UpDownParabolas[0] = orderbyY[0];
-                                        }
+
+                                        //must one intersection?
+                                        Vertex intersection = orderbyY[1] == p1 ? Parabola.InterSection(p2, p0)[0] : Parabola.InterSection(p1, p0)[0];
+                                        orderbyY[0].Down = intersection;
+                                        orderbyY[0].UpDownParabolas[1] = orderbyY[2];
+                                        orderbyY[2].Up = intersection;
+                                        orderbyY[2].UpDownParabolas[0] = orderbyY[0];
                                     }
+
+
                                     /*
                                     Parabola pt0 = p1.CenterX > p2.CenterX ? p1 : p2;
                                     Parabola pt1 = pt0 == p1 ? p2 : p1;
@@ -397,7 +410,6 @@ public class Voronoi
                                     onelooseedges.Add(new OneLooseEdge(FixedinOneLooseEdge(p0.Center, p1.Center, directrix), intersections[0]));
                                     */
                                 }
-
                             }
 
 
@@ -599,7 +611,9 @@ public class Voronoi
 
                             break;
                         case 2:
-
+                            //to update the intersection
+                            p0.Up.Center = intersections[0].Center;
+                            p0.Down.Center = intersections[1].Center;
 
                             break;
                         default:
@@ -609,6 +623,8 @@ public class Voronoi
                 }
             }
             
+            //to new the parabola
+            parabolas.Add(new Parabola(sites[i].Center, i, parabolas));
         }
     }
 
@@ -633,17 +649,17 @@ public class Voronoi
         e2.Add(p2.x);
         e2.Add(-(p2.x * p2.x + p2.y + p2.y));
 
-        //f is 0
+        //to remove f
         List<float> e01 = EquationSubtraction(e0, e1);
         List<float> e12 = EquationSubtraction(e1, e2);
 
-        //f and e are 0
+        //to remover e
         List<float> e012 = EquationSubtraction(e01, e12);
 
         float x = e012[3] / e012[2];
         float y = (e01[3] - (e01[2] * x)) / e01[1];
 
-        return new Vector2(x, y);
+        return new Vector2(-x / 2, -y / 2);
     }
 
     List<float> EquationSubtraction(List<float> e0, List<float> e1)
@@ -654,13 +670,12 @@ public class Voronoi
         {
             if(e0[i] != e1[i])
             {
-                float n0 = e0[i], n1 = e1[i];
                 //doing
-                for(int j = 0; j < 3; ++j)
+                for(int j = 0; j < 4; ++j)
                 {
-                    e0[j] *= n0;
-                    e1[j] *= n1;
-                    ne.Add(e0[j] - e1[j]);
+                    float f0 = e0[j] * e1[i];
+                    float f1 = e1[j] * e0[i];
+                    ne.Add(f0 - f1);
                 }
 
                 return ne;
@@ -668,7 +683,7 @@ public class Voronoi
             else if (e0[i] != 0f)
             {
                 //directly substraction
-                for (int j = 0; j < 3; ++j)
+                for (int j = 0; j < 4; ++j)
                 {
                     ne.Add(e0[j] - e1[j]);
                 }
@@ -677,11 +692,12 @@ public class Voronoi
             }
         }
 
+        Debug.LogError("EquationSubtraction error: all coefficients are 0");
         //all 0f
         return e0;
     }
 
-    Vector2 FixedinOneLooseEdge(Vector2 p0, Vector2 p1, int directrix)
+    Vector2 FixedinOneLooseEdge(Vector2 p0, Vector2 p1)
     {
         float m = -((p1.x - p0.x) / (p1.y - p0.y));
         int best = m > 0f ? 0 : height;

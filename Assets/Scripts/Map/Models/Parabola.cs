@@ -6,7 +6,6 @@ public class Parabola
     //function: (y - center.y)^2 = -4c(x - center.x)
 
     List<TwoLooseEdge> twolooseedges = new List<TwoLooseEdge>();
-    List<Vertex> boundary = new List<Vertex>();
     //bool[] uplist = new bool[2];
     List<Parabola> relatedparabolas = new List<Parabola>();
     Parabola[] updownparabolas = new Parabola[2];
@@ -29,7 +28,7 @@ public class Parabola
 
     public int CenterX
     {
-        get { return (int)((directrix - focus.x) / 2); }
+        get { return (int)((directrix - focus.x) / 2 + focus.x); }
     }
 
     public int CenterY
@@ -71,10 +70,10 @@ public class Parabola
         set { updownparabolas = value; }
     }
 
-    public List<Vertex> Boundary
+    public List<TwoLooseEdge> TwoLooseEdges
     {
-        get { return boundary; }
-        set { boundary = value; }
+        get { return twolooseedges; }
+        set { twolooseedges = value; }
     }
 
     /*
@@ -92,19 +91,24 @@ public class Parabola
 
         //to init the parabola
         int count = parabolas.Count, interindex = -1;
-        Vector2 intersection = Vector2.zero;
+        Vertex intersection = null;
         //smallest
         float x = -1f;
 
         for (int i = 0; i < count; ++i)
         {
-            intersection = InterSection(parabolas[i], focus.y);
-
-            if (intersection.x != -1f && x < intersection.x)
+            List<Vertex> solution = InterSection(parabolas[i], this);
+            if (solution != null)
             {
-                //reasonal and closer solution
-                x = intersection.x;
-                interindex = i;
+                //must ont intersection
+                //intersection = InterSection(parabolas[i], this, true);
+                intersection = solution[0];
+                if (x < intersection.Center.x)
+                {
+                    //reasonal and closer solution
+                    x = intersection.Center.x;
+                    interindex = i;
+                }
             }
         }
 
@@ -122,17 +126,18 @@ public class Parabola
 
             Parabola p = parabolas[interindex];
 
-            up = new Vertex(intersection, this, p);
-            down = new Vertex(intersection, this, p);
+            up = intersection;
+            down = intersection;
             updownparabolas[0] = p;
             updownparabolas[1] = p;
 
+            /*
             relatedparabolas.Add(p);
             relatedparabolas.Add(p);
-        }
+            */
 
-        boundary.Add(up);
-        boundary.Add(down);
+            p.TwoLooseEdges.Add(new TwoLooseEdge(up, down));
+        }
     }
     
     //the distance between point and line
@@ -142,11 +147,8 @@ public class Parabola
     }
     
 
-    bool isreasonal(Vector2 v)
+    bool isreasonal(Vertex v)
     {
-        
-        int bcount = boundary.Count;
-
         /* non reasonal => drop!?
         if(bcount > 2)
         {
@@ -177,6 +179,42 @@ public class Parabola
         }
         */
 
+        int thisindex = v.RelatedParabolas[0] == this ? 0 : 1;
+        
+        if(thisindex == 0)
+        {
+            //this is up
+            if(down.RelatedParabolas.Count == 1)
+            {
+                if(down.CenterY < v.CenterY)
+                {
+                    return isintwolooseedge(v);
+                }
+            }
+            else if(down.RelatedParabolas[0] == v.RelatedParabolas[0] && down.RelatedParabolas[1] == v.RelatedParabolas[1])
+            {
+                //to update the intersection
+                return isintwolooseedge(v);
+            }
+        }
+        else
+        {
+            //this is down
+            if (up.RelatedParabolas.Count == 1)
+            {
+                if (up.CenterY > v.CenterY)
+                    return isintwolooseedge(v);
+            }
+            else if (up.RelatedParabolas[0] == v.RelatedParabolas[0] && up.RelatedParabolas[1] == v.RelatedParabolas[1])
+            {
+                //to update the intersection
+                return isintwolooseedge(v);
+            }
+        }
+
+        return false;
+
+        /*
         if (v.y <= boundary[0].CenterY && v.y >= boundary[bcount - 1].CenterY)
         {
             for (int i = 1; i < bcount - 1; i += 2)
@@ -190,7 +228,20 @@ public class Parabola
             return true;
         }
 
-        return false;
+        return false;*/
+    }
+
+    bool isintwolooseedge(Vertex v)
+    {
+        for (int i = 0; i < twolooseedges.Count; ++i)
+        {
+            if (v.CenterY <= twolooseedges[i].LoosePoint0.CenterY && v.CenterY >= twolooseedges[i].LoosePoint1.CenterY)
+            {
+                //in the twolooseedge
+                return false;
+            }
+        }
+        return true;
     }
 
     public static List<Vertex> InterSection(Parabola p0, Parabola p1)
@@ -213,14 +264,14 @@ public class Parabola
                 float y = solutions[i];
                 float x = -((y - y0) * (y - y0) - 4 * c0 * x0) / (4 * c0);
 
-                Vector2 intersection = new Vector2(x, y);
+                Vertex intersection = new Vertex(new Vector2(x, y), p0, p1);
 
                 //is reasonal?
                 if (p0.isreasonal(intersection) && p1.isreasonal(intersection))
                 {
                     //reasonal
                     ++i;
-                    intersections.Add(new Vertex(intersection, p0, p1));
+                    intersections.Add(intersection);
                 }
                 else
                 {
@@ -229,26 +280,42 @@ public class Parabola
                 }
             }
 
-            if (intersections.Count > 0)
+            if(intersections.Count == 2)
+            {
+                if(intersections[0].CenterY < intersections[1].CenterY)
+                {
+                    Vertex temp = intersections[0];
+                    intersections[0] = intersections[1];
+                    intersections[1] = temp;
+                }
+
                 return intersections;
+            }
+            else if(intersections.Count == 1)
+            {
+                return intersections;
+            }
         }
 
         return null;
     }
 
+    /*
     //only called when parabola created?
-    public static Vector2 InterSection(Parabola p, float y)
+    //can this merge with upper function?
+    public static Vector2 InterSection(Parabola p, Parabola self, bool n)
     {
+        float y = self.CenterY;
         int y0 = p.CenterY, x0 = p.CenterX, c0 = p.C;
         float x = -((y - y0) * (y - y0) - 4 * c0 * x0) / (4 * c0);
 
-        Vector2 inter = new Vector2(x, y);
+        Vertex inter = new Vertex(new Vector2(x, y), self, p);
 
         //is reasonal?
         if (p.isreasonal(inter))
         {
             //reasonal
-            return inter;
+            return inter.Center;
         }
         else
         {
@@ -256,6 +323,7 @@ public class Parabola
             return new Vector2(-1f, -1f);
         }
     }
+    */
 
     public static List<float> solutionFormula(int a, int b, int c)
     {
@@ -284,16 +352,19 @@ public class Parabola
         }
     }
 
-    public void UpdateBoundary(int index, int height)
+    public void UpdateBoundary(bool isup, int height)
     {
         //function: (y - center.y) ^ 2 = -4c(x - center.x)
-        int best = index == 0 ? height : 0;
+        int best = isup ? height : 0;
 
         //y = best
         float x1 = -(best - CenterY) * (best - CenterY) / 4 * C + CenterX;
         //x = 0
-        float y0 = index == 0 ? 4 * C * CenterX + CenterY : -(4 * C * CenterX) + CenterY;
+        float y0 = isup ? 4 * C * CenterX + CenterY : -(4 * C * CenterX) + CenterY;
         
-        boundary[index].Center = x1 >= 0f ? new Vector2(x1, best) : new Vector2(0, y0);
+        if(isup)
+            up.Center = x1 >= 0f ? new Vector2(x1, best) : new Vector2(0, y0);
+        else
+            down.Center = x1 >= 0f ? new Vector2(x1, best) : new Vector2(0, y0);
     }
 }

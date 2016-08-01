@@ -5,20 +5,20 @@ public class TwoLooseEdge
 {
     //function: 
 
-    Vector2 loosepoint0, loosepoint1;
+    Vertex loosepoint0, loosepoint1;
     int m;
 
-    public Vector2 LoosePoint0
+    public Vertex LoosePoint0
     {
         get { return loosepoint0; }
     }
 
-    public Vector2 LoosePoint1
+    public Vertex LoosePoint1
     {
         get { return loosepoint1; }
     }
 
-    public TwoLooseEdge(Vector2 loosepoint0, Vector2 loosepoint1)
+    public TwoLooseEdge(Vertex loosepoint0, Vertex loosepoint1)
     {
         this.loosepoint0 = loosepoint0;
         this.loosepoint1 = loosepoint1;
