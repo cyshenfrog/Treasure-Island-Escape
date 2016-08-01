@@ -7,7 +7,9 @@ public class Parabola
 
     List<TwoLooseEdge> twolooseedges = new List<TwoLooseEdge>();
     List<Vertex> boundary = new List<Vertex>();
+    //bool[] uplist = new bool[2];
     List<Parabola> relatedparabolas = new List<Parabola>();
+    Parabola[] updownparabolas = new Parabola[2];
     Vertex up, down;
 
 
@@ -45,10 +47,28 @@ public class Parabola
         get { return directrix - CenterX; }
     }
 
+    public Vertex Up
+    {
+        get { return up; }
+        set { up = value; }
+    }
+
+    public Vertex Down
+    {
+        get { return down; }
+        set { down = value; }
+    }
+
     public List<Parabola> RelatedParabolas
     {
         get { return relatedparabolas; }
         set { relatedparabolas = value; }
+    }
+
+    public Parabola[] UpDownParabolas
+    {
+        get { return updownparabolas; }
+        set { updownparabolas = value; }
     }
 
     public List<Vertex> Boundary
@@ -56,6 +76,13 @@ public class Parabola
         get { return boundary; }
         set { boundary = value; }
     }
+
+    /*
+    public bool[] UpList
+    {
+        get { return uplist; }
+        set { uplist = value; }
+    }*/
 
     //public Parabola(Vector2 focus, int siteindex, int directrix, List<Parabola> parabolas)
     public Parabola(Vector2 focus, int siteindex, List<Parabola> parabolas)
@@ -86,6 +113,8 @@ public class Parabola
             //沒有跟任何雙曲線相交!
             up = new Vertex(new Vector2(0f, focus.y), this);
             down = new Vertex(new Vector2(0f, focus.y), this);
+            updownparabolas[0] = null;
+            updownparabolas[1] = null;
         }
         else
         {
@@ -95,13 +124,16 @@ public class Parabola
 
             up = new Vertex(intersection, this, p);
             down = new Vertex(intersection, this, p);
+            updownparabolas[0] = p;
+            updownparabolas[1] = p;
+
+            relatedparabolas.Add(p);
             relatedparabolas.Add(p);
         }
 
         boundary.Add(up);
         boundary.Add(down);
     }
-
     
     //the distance between point and line
     public static int Distance(Vector2 p, int l)

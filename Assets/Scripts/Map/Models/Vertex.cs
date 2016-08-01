@@ -8,8 +8,27 @@ public class Vertex
         this.center = center;
 
         //always p0 is upper parabola
-        relatedparabolas.Add(p0);
-        relatedparabolas.Add(p1);
+        if(p0.CenterY > p1.CenterY)
+        {
+            relatedparabolas.Add(p0);
+            relatedparabolas.Add(p1);
+        }
+        else if(p0.CenterY < p1.CenterY)
+        {
+            relatedparabolas.Add(p1);
+            relatedparabolas.Add(p0);
+        }
+        else if(p0.CenterX > p1.CenterX)
+        {
+            //height is the same, so x is bigger => first add 
+            relatedparabolas.Add(p0);
+            relatedparabolas.Add(p1);
+        }
+        else
+        {
+            relatedparabolas.Add(p1);
+            relatedparabolas.Add(p0);
+        }
     }
 
     public Vertex(Vector2 center, Parabola p0)

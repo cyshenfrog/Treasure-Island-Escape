@@ -10,6 +10,8 @@ public class Test : MonoBehaviour
         Vector2 p0 = new Vector2(0f, 0f), p1 = new Vector2(1f, 1f), p2 = new Vector2(2f, 2f), p3 = new Vector2(3f, 3f);
 
         Edge e0 = new Edge(p0, p1), e1 = new Edge(p2, p3), e2 = new Edge(p1, p2);
+        
+
         /*
         Vertex v = new Vertex(p0, p1, p2);
 
