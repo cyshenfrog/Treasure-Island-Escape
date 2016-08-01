@@ -14,7 +14,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     }
 
     private Text stackText;
-    private Inventory inventory;
     public Sprite slotEmpty;
     // Use this for initialization
     //private Canvas canvas;
@@ -24,7 +23,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     private static Text visualText;
 
 	void Start () {
-        inventory = gameObject.transform.parent.GetComponent<Inventory>();
         stackText = gameObject.GetComponentInChildren<Text>();
         
         items = new Stack<Item>();
@@ -103,7 +101,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
             if (isEmpty)
             {
                 changeSprite(slotEmpty);
-                inventory.EmptySlot += 1;
             }
         }
     }
@@ -133,17 +130,17 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     }
     public void OnPointerClick(PointerEventData eventData)
     {
-        if(eventData.button == PointerEventData.InputButton.Right && !GameObject.Find("HoverIcon(Clone)") && transform.parent.transform.tag == "Inventory")
+        if(eventData.button == PointerEventData.InputButton.Right && !GameObject.Find("HoverIcon(Clone)") && transform.parent.transform.tag != "Bank" && transform.tag != "MaterialSlot" && transform.GetComponent<Image>().color!=Color.gray)
         {
             useItem();
         }
-        else if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftShift) && !isEmpty && !GameObject.Find("HoverIcon(Clone)"))
+        else if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftShift) && !isEmpty && !GameObject.Find("HoverIcon(Clone)") && transform.tag != "MaterialSlot" && transform.tag != "ResultSlot")
         {
             //Vector2 position;
             //RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, canvas.worldCamera, out position);
-            Inventory.SelectStackSize.SetActive(true);
+            InventoryManager.SelectStackSize.SetActive(true);
             //Inventory.SelectStackSize.transform.position = canvas.transform.TransformPoint(position);
-            inventory.setStackInfo(items.Count);
+            InventoryManager.setStackInfo(items.Count);
         }
     }
     public void OnPointerEnter(PointerEventData eventData)

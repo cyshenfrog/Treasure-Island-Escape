@@ -37,6 +37,7 @@ public class Bank : MonoBehaviour {
     }
     public void close()
     {
+        //bankInventory.GetComponent<BankInventory>().putItemBack();
         bankInventory.SetActive(false);
         isClose = true;
     }
