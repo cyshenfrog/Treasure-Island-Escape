@@ -7,6 +7,11 @@ using UnityEngine.EventSystems;
 public class Inventory : InventoryManager {
     
     private List<GameObject> allSlots;
+
+    public List<GameObject> AllSlots
+    {
+        get{ return allSlots;}
+    }
     /*
     private int emptySlot;
     public int EmptySlot
@@ -19,7 +24,7 @@ public class Inventory : InventoryManager {
     
     private EventSystem eventSystem;
     private GameObject dropItem;
-   
+    
     // Use this for initialization
     void Start () {
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
@@ -100,8 +105,7 @@ public class Inventory : InventoryManager {
     {
         if(item.maxStackSize == 1)
         {
-            placeEmpty(item);
-            return true;
+            return placeEmpty(item);
         }
         else
         {
