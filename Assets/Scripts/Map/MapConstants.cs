@@ -11,7 +11,8 @@ public static class MapConstants
         Grasslands,
         Marsh,
         Desert,
-        Volcano
+        Volcano,
+        None
     }
 
     public enum BuildingType
