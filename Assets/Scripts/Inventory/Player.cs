@@ -66,14 +66,47 @@ public class Player : MonoBehaviour {
         {
             if (inventory1.placeEmpty(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for(int i = 0; i < 5; ++i)
+                    {
+                        if(!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
             else if (inventory2.placeEmpty(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
             else if (inventory3.placeEmpty(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
         }
@@ -81,14 +114,47 @@ public class Player : MonoBehaviour {
         {
             if (inventory1.addItem(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
             else if (inventory2.addItem(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
             else if (inventory3.addItem(item))
             {
+                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
+                if (temp)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
+                        {
+                            temp.searchItemsInBag();
+                        }
+                    }
+                }
                 return true;
             }
         }

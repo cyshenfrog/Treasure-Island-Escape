@@ -7,8 +7,12 @@ using System;
 
 public class CraftInventory : InventoryManager
 {
-
+    public Inventory[] inventory = new Inventory[3];
     private List<Slot> allSlots;
+    public List<Slot> AllSlots
+    {
+        get { return allSlots; }
+    }
 
     private Button btn;
 
@@ -59,14 +63,16 @@ public class CraftInventory : InventoryManager
                         allSlots[i].clearSlot();
                     }
                     allSlots[i].addItem(material);
-                    allSlots[i].transform.GetComponent<Image>().color = Color.gray;
-                    allSlots[i].transform.GetChild(1).GetComponent<Text>().text = string.Concat("0/", split[i*2 + 1]);
+                    allSlots[i].transform.GetComponent<Image>().color = Color.white;
+                    allSlots[i].transform.GetChild(1).GetComponent<Text>().text = string.Concat("0/", split[i * 2 + 1]);
                 }
                 else
                 {
-                    allSlots[i].transform.GetChild(1).GetComponent<Text>().text = string.Concat("0/", split[i*2 + 1]);
+                    allSlots[i].transform.GetChild(1).GetComponent<Text>().text = "0/0";
                 }
             }
+            searchItemsInBag(); //check if user has enough material for itemToCraft
+
             path = string.Concat("Inventory/", itemToCraft);
             material = (Resources.Load(path, typeof(GameObject)) as GameObject).GetComponent<Item>();
             
@@ -80,45 +86,6 @@ public class CraftInventory : InventoryManager
     }
     public new void moveItem(GameObject clicked)
     {
-        if (!movingSlot.isEmpty)
-        {
-            Slot tmp = clicked.GetComponent<Slot>();
-
-            if (!tmp.isEmpty && tmp.tag!="ResultSlot" && tmp.currentItem.itemName == movingSlot.currentItem.itemName)
-            {
-                Text amount = tmp.transform.GetChild(1).GetComponent<Text>();
-                string[] split = amount.text.Split('/');
-                
-                Image toImg = clicked.GetComponent<Image>();
-                if (split[0] == "0")
-                {
-                    movingSlot.removeItem();
-                }
-
-                if (!hoverText)
-                    hoverText = hoverObj.transform.GetChild(0).GetComponent<Text>();
-                int acquireAmount = int.Parse(split[1]) - tmp.items.Count;
-                for (int i = 0; i < acquireAmount; i++)
-                {
-                    if (movingSlot.isEmpty)
-                        break;
-                    tmp.addItem(movingSlot.removeItem());
-                    hoverText.text = movingSlot.Items.Count > 1 ? movingSlot.Items.Count.ToString() : string.Empty;
-                }
-                if (movingSlot.Items.Count == 0)
-                {
-                    movingSlot.clearSlot();
-                    Destroy(hoverObj);
-                }
-
-                split[0] = tmp.items.Count.ToString();
-                amount.text = split[0] + "/" + split[1];
-                if (int.Parse(split[0]) >= int.Parse(split[1]))
-                {
-                    toImg.color = Color.white;
-                }
-            }
-        }
         if (movingSlot.isEmpty)
         {
             if (!GameObject.Find("MoveItemStackSize"))
@@ -134,97 +101,183 @@ public class CraftInventory : InventoryManager
                     hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
                 }
             }
-            else if (to == null && from != null && !temp.isEmpty && temp.tag!="ResultSlot" &&temp.currentItem.type == from.currentItem.type)
-            {
-                to = temp;
-            }
-
-            if (to != null && from != null)
-            {
-                if (!to.isEmpty && to.currentItem.type == from.currentItem.type)
-                {
-                    Text amount = to.transform.GetChild(1).GetComponent<Text>();
-                    string[] split = amount.text.Split('/');
-
-                    Image toImg = clicked.GetComponent<Image>();
-                    if (split[0] == "0")
-                    {
-                        from.removeItem();
-                    }
-
-                    if (!hoverText)
-                        hoverText = hoverObj.transform.GetChild(0).GetComponent<Text>();
-                    int acquireAmount = int.Parse(split[1]) - to.items.Count;
-                    for (int i = 0; i < acquireAmount; i++)
-                    {
-                        if (from.isEmpty)
-                            break;
-                        to.addItem(from.removeItem());
-                        hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
-                    }
-                    if (from.Items.Count == 0)
-                    {
-                        from.clearSlot();
-                        Destroy(hoverObj);
-                    }
-
-                    split[0] = to.items.Count.ToString();
-                    amount.text = split[0] + "/" + split[1];
-                    if (int.Parse(split[0]) >= int.Parse(split[1]))
-                    {
-                        toImg.color = Color.white;
-                    }
-                    from.GetComponent<Image>().color = Color.white;
-                    from = null;
-                    to = null;
-                    Destroy(hoverObj);
-                }
-            }
         }
     }
     public void craft()
     {
+        int[] need = new int[5];
         if (itemCrafting != null)
         {
             int i;
             for (i = 0; i < 5; i++)
             {
-                if (allSlots[i].GetComponent<Image>().color == Color.gray)
-                {
-                    break;
-                }
+                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                String[] split = temp.text.Split('/');  // owened / needed
+                need[i] = int.Parse(split[1]);
+                if (int.Parse(split[1]) > int.Parse(split[0]))  // if need > owned
+                    return;
             }
-            if (i == 5)
+            
+            //delete used material
+            for (int j = 0; j < 3; ++j)
             {
-                for (i = 0; i < 5; i++)
+                for (int k = 0; k < 10; ++k)
                 {
-                    allSlots[i].clearSlot();
+                    for (int l = 0; l < 5; ++l)
+                    {
+                        if (!allSlots[l].isEmpty)
+                        {
+                            Slot slot = inventory[j].AllSlots[k].GetComponent<Slot>();
+                            if (!slot.isEmpty && allSlots[l].currentItem.itemName == slot.currentItem.itemName && need[l] > 0)
+                            {
+                                if(need[l] >= slot.items.Count)
+                                {
+                                    need[l] -= slot.items.Count;
+                                    slot.clearSlot();
+                                }
+                                else
+                                {
+                                    slot.removeItems(need[l]);
+                                    need[l] = 0;
+                                }
+                            }
+                        }
+                    }
                 }
-                ShowCraftFormula(itemCrafting);
-                allSlots[5].GetComponent<Image>().color = Color.white;
             }
+
+            searchItemsInBag();
+            allSlots[5].GetComponent<Image>().color = Color.white;
         }
+        
     }
     void putBackMaterial()
     {
-        for (int i =0; i<5; ++i)
+        if (allSlots[5].GetComponent<Image>().color == Color.white && !allSlots[5].isEmpty)
         {
-            if(allSlots[i].items.Count > 1)
+            if ( BagIsAvailiable( allSlots[5].currentItem, allSlots[5].items.Count ) )
             {
-                while (!allSlots[i].isEmpty)
+                foreach (Item item in allSlots[5].Items)
                 {
-                    playerScript.pickUpItem(allSlots[i].removeItem());
+                    playerScript.pickUpItem(allSlots[5].currentItem);
                 }
-            }else if (allSlots[i].GetComponent<Image>().color == Color.white && !allSlots[i].isEmpty)
+                allSlots[5].clearSlot();
+            }
+            else
             {
-                playerScript.pickUpItem(allSlots[i].items.Pop());
+                float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
+                Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
+                foreach (Item item in allSlots[5].Items)
+                {
+                    Instantiate(allSlots[5].currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
+                }
+                allSlots[5].clearSlot();
+            }
+        }
+    }
+
+    public void searchItemsInBag()
+    {
+        int[] count = new int [5];
+        for (int i=0; i < 5; ++i)
+        {
+            count[i] = 0;
+        }
+
+        for(int i = 0; i < 3; ++i)
+        {
+            for(int j = 0; j < 10; ++j)
+            {
+                for(int k = 0; k < 5; k++)
+                {
+                    if (!allSlots[k].isEmpty)
+                    {
+                        Slot slot = inventory[i].AllSlots[j].GetComponent<Slot>();
+                        if (!slot.isEmpty && allSlots[k].currentItem.itemName == slot.currentItem.itemName)
+                        {
+                            count[k] += slot.items.Count;
+                        }
+                    }
+                }
             }
         }
 
-        if (allSlots[5].GetComponent<Image>().color == Color.white && !allSlots[5].isEmpty)
+        for(int i = 0; i < 5; ++i)
         {
-            while (!allSlots[5].isEmpty)
-                playerScript.pickUpItem(allSlots[5].items.Pop());
+            if (!allSlots[i].isEmpty)
+            {
+                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                String[] split = temp.text.Split('/');
+                temp.text = string.Concat(count[i].ToString(), "/");
+                temp.text = string.Concat(temp.text, split[1] );
+            }
+        }
+    }
+
+    private bool BagIsAvailiable(Item item, int count)
+    {
+        if(item.maxStackSize == 1)
+        {
+            for(int i = 0; i < 3; ++i)
+            {
+                for (int j = 0; j < 10; ++j)
+                {
+                    if (inventory[i].AllSlots[j].GetComponent<Slot>().isEmpty)
+                        return true;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                for (int j = 0; j < 10; ++j)
+                {
+                    Slot temp = inventory[i].AllSlots[j].GetComponent<Slot>();
+                    if (temp.isEmpty)
+                        return true;
+                    if (!temp.isEmpty && temp.currentItem.itemName == item.itemName && temp.isStackable)
+                    {
+                        count -= (item.maxStackSize - temp.items.Count);
+                        if (count <= 0)
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void RightArrowClicked()
+    {
+        if (!allSlots[5].isEmpty && allSlots[5].isStackable)
+        {
+            for(int i =0; i< 5; ++i)
+            {
+                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                String[] split = temp.text.Split('/');
+                int need = int.Parse(split[1]);
+                need += need / allSlots[5].items.Count;
+                temp.text = string.Concat(split[0], "/");
+                temp.text = string.Concat(temp.text, need);
+            }
+            allSlots[5].addItem(allSlots[5].currentItem);
+        }
+    }
+    public void LeftArrowClicked()
+    {
+        if (allSlots[5].items.Count > 1)
+        {
+            for (int i = 0; i < 5; ++i)
+            {
+                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                String[] split = temp.text.Split('/');
+                int need = int.Parse(split[1]);
+                need -= need / allSlots[5].items.Count;
+                temp.text = string.Concat(split[0], "/");
+                temp.text = string.Concat(temp.text, need);
+            }
+            allSlots[5].removeItem();
         }
     }
 }
