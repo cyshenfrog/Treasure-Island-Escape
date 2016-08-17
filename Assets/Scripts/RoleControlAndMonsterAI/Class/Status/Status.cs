@@ -22,10 +22,6 @@ public class Status {
         Blessing,
         Fury,
     }
-    public enum Objects {
-        Player,
-        Monster
-    }
 
 
     private static Dictionary<string, Dictionary<StatusPool, float>> statusCollections = new Dictionary<string, Dictionary<StatusPool, float>>();
@@ -63,7 +59,7 @@ public class Status {
         }
     }
 
-    public static bool ContainStatus(string id, StatusPool stat) {
+    public static bool IsContainStatus(string id, StatusPool stat) {
         return statusCollections.ContainsKey(id) && statusCollections[id].ContainsKey(stat);       
     }
 

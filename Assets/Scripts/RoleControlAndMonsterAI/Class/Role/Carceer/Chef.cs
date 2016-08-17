@@ -120,6 +120,16 @@ public class Chef : Role {
         set { baseAttackSpeed = value; }
         get { return baseAttackSpeed; }
     }
+    public override float MoveSpeed
+    {
+        set { moveSpeed = value; }
+        get { return moveSpeed; }
+    }
+    public override float BaseMoveSpeed
+    {
+        set { baseMoveSpeed = value; }
+        get { return baseMoveSpeed; }
+    }
     public override float Hungry
     {
         set { hungry = value; }

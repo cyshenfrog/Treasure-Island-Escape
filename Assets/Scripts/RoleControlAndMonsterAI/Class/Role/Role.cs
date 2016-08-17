@@ -114,6 +114,15 @@ public class Role : Monolog {
         set { baseAttackSpeed = value; }
         get { return baseAttackSpeed; }
     }
+    public virtual float MoveSpeed {
+        set { moveSpeed = value; }
+        get { return moveSpeed; }
+    }
+    public virtual float BaseMoveSpeed
+    {
+        set { baseMoveSpeed = value; }
+        get { return baseMoveSpeed; }
+    }
     public virtual float Hungry {
         set { hungry = value; }
         get { return hungry; }
@@ -200,6 +209,21 @@ public class Role : Monolog {
     }
 
 
+    public static Role GetRoleData(Carceer c) {
+
+        switch (c) {
+            case Carceer.Chef:
+                return new Chef();
+            case Carceer.Engineer:
+                return new Engineer();
+            case Carceer.Explorer:
+                return new Explorer();
+            case Carceer.Warrior:
+                return new Warrior();
+            default:
+                return new Role();
+        }
+    }
     
     
 }

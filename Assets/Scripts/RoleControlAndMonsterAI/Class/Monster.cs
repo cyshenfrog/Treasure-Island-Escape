@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 public class Monster : Monolog{
 
-    public static int Id = 0;
+    private int id = 0;
+
+    private string name;
 
     private int hp;
     private int baseHp;
@@ -26,12 +28,19 @@ public class Monster : Monolog{
     private float baseBeHungry;
 
     private Dictionary<Log, string> logSet;  //獨白字典
+
     public Dictionary<Log, string> LogSet
     {
         set { logSet = value; }
         get { return logSet; }
     }
 
+    public int Id {
+        get { return id; }
+    }
+    public string Name {
+        get { return name; }
+    }
     public int Hp {
         set { hp = value; }
         get { return hp; }

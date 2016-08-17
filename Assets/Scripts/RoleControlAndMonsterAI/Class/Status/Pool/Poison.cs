@@ -3,47 +3,59 @@ using System.Collections;
 
 public class Poison : MonoBehaviour {
 
+    private int timer = 10;
 
-    public Status.Objects Objects = Status.Objects.Player;
-    public float Timer = 10;
+    private Role role;
+    private Monster monster;
 
-    private Role r;
+    private string id;
 
-	void Start () {
-        /*bool checkStat = Status.CheckStat(Status.StatusPool.Poison);
-        if (checkStat) {
-            Destroy(this);
-        }
-        else {
-            Status.Use(Status.StatusPool.Poison);
-
-            if(Objects == Status.Objects.Player) StartCoroutine(poison(r));
-        }*/
-	}
+    private bool isRole = true;
 	
-    public void posion(string monsterId) {
+    public void SetStatus(string monsterId) {
+        id = monsterId;
+        isRole = false;
+        //Monster = Monster.GetMonsterData(id);
+        StartCoroutine(poison());
+    }
 
+    public void SetStatus(Carceer c) {
+        id = c.ToString();
+        role = Role.GetRoleData(c);
+        
+        StartCoroutine(poison());
+    }
+
+    public void SetStatus(Carceer c, int time)
+    {
+        timer = time;
+        id = c.ToString();
+        role = Role.GetRoleData(c);
+        StartCoroutine(poison());
     }
 
     void OnDestroy() {
-        Debug.Log("destroy");
+        Status.Remove(id, Status.StatusPool.Poison);
     }
 
-    void Update() {
-        if (Timer < 5) Destroy(this);
+    IEnumerator poison() {
+        int run = 0;
+        Status.Add(id, Status.StatusPool.Poison, timer);
 
-        Timer -= Time.deltaTime;
-    }
+        while (timer != run) {
 
-    /*IEnumerator poison(Role r) {
-        while (Timer > 0) {
-            r.Hp -= (int)(r.MaxHp * 0.02f);
+            if (isRole) {
+                role.Hp -= (int)(role.MaxHp * 0.02f);
+            }
+            else {
+                //怪物扣血////
+            }
             yield return new WaitForSeconds(1);
-            Timer--;
+            run++;
         }
-        Status.Remove(Status.StatusPool.Poison);
+        Status.Remove(id, Status.StatusPool.Poison);
         Destroy(this);
-    }*/
+    }
 
     
 
