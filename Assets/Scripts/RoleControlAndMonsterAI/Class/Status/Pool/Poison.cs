@@ -3,22 +3,26 @@ using System.Collections;
 
 public class Poison : MonoBehaviour {
 
-    private int timer = 10;
+    private int timer = 10;    /// # preset durtion to 10 sec
 
+    /// # the object 
     private Role role;
     private Monster monster;
+  
+    private string id;          /// # the id of object 
+    private bool isRole = true; /// # chect the object is role
 
-    private string id;
-
-    private bool isRole = true;
-	
+    /// # api that start a status to a monster
     public void SetStatus(string monsterId) {
         id = monsterId;
         isRole = false;
-        //Monster = Monster.GetMonsterData(id);
+        //
+        /// # Monster = Monster.GetMonsterData(id);
+        //
         StartCoroutine(poison());
     }
 
+    /// # api that start a status to the role
     public void SetStatus(Carceer c) {
         id = c.ToString();
         role = Role.GetRoleData(c);
@@ -26,6 +30,7 @@ public class Poison : MonoBehaviour {
         StartCoroutine(poison());
     }
 
+    /// # start a status to the role with a custom time
     public void SetStatus(Carceer c, int time)
     {
         timer = time;
@@ -39,12 +44,16 @@ public class Poison : MonoBehaviour {
     }
 
     IEnumerator poison() {
-        int run = 0;
+        int run = 0; /// # record the duration of status 
+
+        /// # record the status and the object
         Status.Add(id, Status.StatusPool.Poison, timer);
 
         while (timer != run) {
 
             if (isRole) {
+
+                /// # reduce hp by seconds
                 role.Hp -= (int)(role.MaxHp * 0.02f);
             }
             else {
@@ -53,6 +62,8 @@ public class Poison : MonoBehaviour {
             yield return new WaitForSeconds(1);
             run++;
         }
+
+        /// # status finish 
         Status.Remove(id, Status.StatusPool.Poison);
         Destroy(this);
     }

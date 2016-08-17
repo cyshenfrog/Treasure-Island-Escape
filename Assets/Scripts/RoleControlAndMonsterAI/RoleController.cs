@@ -2,12 +2,14 @@
 
 public class RoleController : MonoBehaviour {
 
+    /// # basic data
     public float Speed;
 
-    private GameObject RoleCamera;
 
-    private bool triggerToMove = false;
-    private Vector3 coordinateTarget = Vector3.zero;
+    private GameObject RoleCamera;       /// # main camera
+
+    private bool triggerToMove = false;               /// # check that moveToTarget is call
+    private Vector3 coordinateTarget = Vector3.zero;  /// # be used to moveToTarget, decide where role will move to 
 
 	void Start () {
         RoleCamera = GameObject.Find("Main Camera");
@@ -15,8 +17,12 @@ public class RoleController : MonoBehaviour {
 
 	void Update () {
         //Speed = Role.GetRoleData(Carceer.None).MoveSpeed;
+
+        /// # let camera follow role  
         RoleCamera.transform.position = new Vector3(transform.position.x, transform.position.y, RoleCamera.transform.position.z);
 
+        /// # two ways to move
+        /// # moveToTarget when trigger is true
         if (!triggerToMove) {
             move();
         }
@@ -28,19 +34,20 @@ public class RoleController : MonoBehaviour {
         
     }
 
-    //腳色移動
+    //role move by keyboard
     private void move() {
 
-        Vector3 pos;
+        Vector3 pos;                             /// # record the position of role
         bool w = Input.GetKey("w");        
         bool a = Input.GetKey("a");
         bool s = Input.GetKey("s");
         bool d = Input.GetKey("d");
-        string key = w.GetHashCode().ToString() 
+        string key = w.GetHashCode().ToString()  /// # change key code to a string key
             + a.GetHashCode().ToString() 
             + s.GetHashCode().ToString() 
             + d.GetHashCode().ToString();
 
+        /// # according string key decide role's movement
         switch (key) {
             case "1000":
                 pos = transform.position;
@@ -50,6 +57,7 @@ public class RoleController : MonoBehaviour {
                 pos = transform.position;
                 transform.position = new Vector3(pos.x - Time.deltaTime * Speed, pos.y, pos.z);
                 break;
+            /// # below deal with moving diagonally
             case "0010":
                 pos = transform.position;
                 transform.position = new Vector3(pos.x, pos.y - Time.deltaTime * Speed, pos.z);
@@ -76,6 +84,9 @@ public class RoleController : MonoBehaviour {
                 break;
         }
     }
+
+
+    /// # let role move to target
     private void moveToTarget() {
         if (transform.position == coordinateTarget || Input.GetKey("w") || Input.GetKey("a") || Input.GetKey("s") || Input.GetKey("d")) triggerToMove = false;
         else {
@@ -100,13 +111,13 @@ public class RoleController : MonoBehaviour {
         
     }
 
-    //移動到指定座標
+    /// # api that let role move to target
     public void MoveToTarget(Vector3 target) {
         triggerToMove = true;
         coordinateTarget = target;
     }
 
-    //取消自動移動
+    /// # api that cancel to let role move to target
     public void CancelTarget() {
         triggerToMove = false;
     }

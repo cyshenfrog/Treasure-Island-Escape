@@ -28,11 +28,16 @@ public class Monster : Monolog{
     private float baseBeHungry;
 
     private Dictionary<Log, string> logSet;  //獨白字典
+    private Dictionary<string, float> drop;
 
-    public Dictionary<Log, string> LogSet
-    {
+    public Dictionary<Log, string> LogSet {
         set { logSet = value; }
         get { return logSet; }
+    }
+
+    public Dictionary<string, float> Drop {
+        set { drop = value; }
+        get { return drop; }
     }
 
     public int Id {

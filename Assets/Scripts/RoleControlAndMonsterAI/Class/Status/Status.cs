@@ -23,14 +23,14 @@ public class Status {
         Fury,
     }
 
-
+    /// # record all status of all the animal(include role) in the game
     private static Dictionary<string, Dictionary<StatusPool, float>> statusCollections = new Dictionary<string, Dictionary<StatusPool, float>>();
     public static Dictionary<string, Dictionary<StatusPool, float>> StatusCollectios {
         set { statusCollections = value; }
         get { return statusCollections; }
     }
 
-
+    /// # add a new status of a animal(include role)
     public static void Add(string id, StatusPool stat, float time) {
 
         if (!statusCollections.ContainsKey(id)) {
@@ -44,12 +44,14 @@ public class Status {
         }        
     }
 
+    /// # update status for a animal(include role)
     public static void Update(string id, StatusPool stat, float time) {
         if (statusCollections.ContainsKey(id) && statusCollections[id].ContainsKey(stat)) {
             statusCollections[id][stat] = time;
         }
     }
 
+    /// # remove a status of a animal(include role)
     public static void Remove(string id, StatusPool stat) {
         if (statusCollections.ContainsKey(id) && statusCollections[id].ContainsKey(stat)) {
             statusCollections[id].Remove(stat);
