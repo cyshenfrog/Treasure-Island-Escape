@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+/*
 public abstract class TileData
 {
-    /*
+    
     public enum TileType
     {
         Floor,
@@ -12,7 +12,7 @@ public abstract class TileData
         BuildingCenter,
         Border
     }
-    */
+    
 
     //based on Sea
     //protected TileType type = TileType.Floor;
@@ -101,3 +101,4 @@ public class Building : TileData
         
     }
 }
+*/

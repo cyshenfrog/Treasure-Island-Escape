@@ -4,35 +4,37 @@ using System.Collections.Generic;
 
 public class WorldRandomer : MonoBehaviour
 {
-    public int Width, Height;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight;
     public float DistanceThreshold;
-    public Sprite Image0, Image1, Image2, Image3, Image4;
-    public Texture2D Image00, Image11, Image22, Image33, Image44;
+    public Texture2D Image0, Image1, Image2, Image3, Image4;
 
     void Awake()
     {
-        widthcount = Width / 128;
-        heightcount = Height / 128;
+        widthcount = WorldWidth / CellWidth;
+        heightcount = WorldHeight / CellHeight;
         Vector2[] centers = RandomSites();
         TileData2[][] world = new TileData2[widthcount][];
-        Texture2D[] textures = new Texture2D[] { Image00, Image11, Image22, Image33, Image44 };
-        //Sprite[] images = new Sprite[] { Image0, Image1, Image2, Image3, Image4 };
+        Texture2D[] textures = new Texture2D[] { Image0, Image1, Image2, Image3, Image4 };
         List<TileData2> selectedtds = new List<TileData2>();
 
         //world initialization
         for(int i = 0; i < widthcount; ++i)
         {
             world[i] = new TileData2[heightcount];
+
+            //to reduce ?
+            
             for(int j = 0; j < heightcount; ++j)
             {
                 world[i][j] = new TileData2(new Vector2(i, j));
             }
+            
         }
 
         Sprite[] images = new Sprite[5];
         for (int i = 0; i < 5; ++i)
         {
-            images[i] = Sprite.Create(textures[i], new Rect(200, 200, 128, 128), Vector2.one / 2);
+            images[i] = Sprite.Create(textures[i], new Rect(200, 200, CellWidth, CellHeight), Vector2.one / 2);
         }
 
         //dfs generator
@@ -49,6 +51,7 @@ public class WorldRandomer : MonoBehaviour
             if (TileData2.DFS(selectedtds, selected, world))
             {
                 //success
+                //out of range
                 if (++selected >= selectedtds.Count)
                 {
                     selected = 0;
@@ -57,6 +60,7 @@ public class WorldRandomer : MonoBehaviour
             else
             {
                 //failure
+                //out of range
                 selectedtds.RemoveAt(selected);
                 if(selected >= selectedtds.Count)
                 {
@@ -67,39 +71,41 @@ public class WorldRandomer : MonoBehaviour
 
 
         //to display the random map
-        for(int i = 0; i < widthcount; ++i)
+        float cellWidthInWC = CellWidth / 100f, cellHeightInWC = CellHeight / 100f, halfCellWidthInWC = cellWidthInWC / 2, halfCellHeightInWC = cellHeightInWC / 2;
+
+        for (int i = 0; i < widthcount; ++i)
         {
             for(int j = 0; j < heightcount; ++j)
             {
                 GameObject go = new GameObject();
                 go.transform.parent = transform;
                 go.transform.localScale = Vector3.one;
-                go.transform.localPosition = new Vector3(i * 1.28f + .64f, j * 1.28f + .64f);
+                //1 pixel = 0.01 in world coordinates
+                go.transform.localPosition = new Vector3(i * cellWidthInWC + halfCellWidthInWC, j * cellHeightInWC + halfCellHeightInWC);
 
                 TileData2 td = world[i][j];
                 SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
                 go.name = "Tile" + i + ", " + j;
+                //do??
                 if(td.MaterialTypes[1] != MapConstants.MaterialType.None)
                 {
                     //this is an edge
-                    go.name += " edge";
+                    go.name += " edge with " + td.MaterialTypes[0].ToString() + " and " + td.MaterialTypes[1];
                     
                     //noise!!
-                    float[][] noise = GenerateWhiteNoise(128, 128);
+                    float[][] noise = GenerateWhiteNoise(CellWidth, CellHeight);
                     float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
-                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]];
-
-                    Texture2D blendedimage = new Texture2D(128, 128);
-                    for(int k = 0; k < 128; ++k)
+                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(128, 128);
+                    for(int k = 0; k < CellWidth; ++k)
                     {
-                        for(int l = 0; l < 128; ++l)
+                        for(int l = 0; l < CellHeight; ++l)
                         {
                             blendedimage.SetPixel(k, l, Interpolate(t0.GetPixel(k, l), t1.GetPixel(k, l), perlinNoise[k][l]));
                         }
                     }
 
                     blendedimage.Apply();
-                    sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, 128, 128), Vector2.one / 2);
+                    sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, CellWidth, CellHeight), Vector2.one / 2);
                 }
                 else
                 {
@@ -225,8 +231,22 @@ public class WorldRandomer : MonoBehaviour
 
     Color Interpolate(Color c0, Color c1, float alpha)
     {
-        float u = 1 - alpha;
-        return new Color(c0.r * u + c1.r * alpha, c0.g * u + c1.g * alpha, c0.b * u + c1.b * alpha);
+        //return new Color(c0.r * u + c1.r * alpha, c0.g * u + c1.g * alpha, c0.b * u + c1.b * alpha);
+
+        if(alpha > .5f)
+        {
+            return c1;
+        }
+        else
+        {
+            return c0;
+        }
+
+        /*
+        else
+        {
+            return c0 * (1 - alpha) + c1 * alpha;
+        }*/
     }
 
     float[][] GeneratePerlinNoise(float[][] baseNoise, int octaveCount)
