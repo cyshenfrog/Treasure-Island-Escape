@@ -67,7 +67,15 @@ public class Engineer : Role {
     }
     public override int Hp
     {
-        set { hp = value; }
+        set
+        {
+            if (hp > maxHp)
+                hp = maxHp;
+            else if (hp < 0)
+                hp = 0;
+            else
+                hp = value;
+        }
         get { return hp; }
     }
     public override int MaxHp
@@ -120,19 +128,53 @@ public class Engineer : Role {
         set { baseAttackSpeed = value; }
         get { return baseAttackSpeed; }
     }
+    public override float MoveSpeed
+    {
+        set { moveSpeed = value; }
+        get { return moveSpeed; }
+    }
+    public override float BaseMoveSpeed
+    {
+        set { baseMoveSpeed = value; }
+        get { return baseMoveSpeed; }
+    }
     public override float Hungry
     {
-        set { hungry = value; }
+        set
+        {
+            if (hungry > maxHungry)
+                hungry = maxHungry;
+            else if (hungry < 0)
+                hungry = 0;
+            else
+                hungry = value;
+        }
         get { return hungry; }
     }
     public override float Tired
     {
-        set { tired = value; }
+        set
+        {
+            if (tired > maxTired)
+                tired = maxTired;
+            else if (tired < 0)
+                tired = 0;
+            else
+                tired = value;
+        }
         get { return tired; }
     }
     public override float Spirit
     {
-        set { spirit = value; }
+        set
+        {
+            if (spirit > maxSpirit)
+                spirit = maxSpirit;
+            else if (tired < 0)
+                spirit = 0;
+            else
+                spirit = value;
+        }
         get { return spirit; }
     }
     public override float MaxHungry

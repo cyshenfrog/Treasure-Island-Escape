@@ -71,7 +71,14 @@ public class Role : Monolog {
         get { return carceerName; }
     }
     public virtual int Hp {
-        set { hp = value; }
+        set {
+            if (hp > maxHp)
+                hp = maxHp;
+            else if (hp < 0)
+                hp = 0;
+            else
+                hp = value;
+        }
         get { return hp; }
     }
     public virtual int MaxHp {
@@ -114,16 +121,46 @@ public class Role : Monolog {
         set { baseAttackSpeed = value; }
         get { return baseAttackSpeed; }
     }
+    public virtual float MoveSpeed {
+        set { moveSpeed = value; }
+        get { return moveSpeed; }
+    }
+    public virtual float BaseMoveSpeed
+    {
+        set { baseMoveSpeed = value; }
+        get { return baseMoveSpeed; }
+    }
     public virtual float Hungry {
-        set { hungry = value; }
+        set {
+            if (hungry > maxHungry)
+                hungry = maxHungry;
+            else if (hungry < 0)
+                hungry = 0;
+            else
+                hungry = value;
+        }
         get { return hungry; }
     }
     public virtual float Tired {
-        set { tired = value; }
+        set {
+            if (tired > maxTired)
+                tired = maxTired;
+            else if (tired < 0)
+                tired = 0;
+            else
+                tired = value;
+        }
         get { return tired; }
     }
     public virtual float Spirit {
-        set { spirit = value; }
+        set {
+            if (spirit > maxSpirit)
+                spirit = maxSpirit;
+            else if (tired < 0)
+                spirit = 0;
+            else
+                spirit = value;
+        }
         get { return spirit; }
     }
     public virtual float MaxHungry {
@@ -200,6 +237,21 @@ public class Role : Monolog {
     }
 
 
+    public static Role GetRoleData(Carceer c) {
+
+        switch (c) {
+            case Carceer.Chef:
+                return new Chef();
+            case Carceer.Engineer:
+                return new Engineer();
+            case Carceer.Explorer:
+                return new Explorer();
+            case Carceer.Warrior:
+                return new Warrior();
+            default:
+                return new Role();
+        }
+    }
     
     
 }

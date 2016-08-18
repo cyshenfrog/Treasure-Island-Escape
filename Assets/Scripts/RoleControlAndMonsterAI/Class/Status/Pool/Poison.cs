@@ -3,47 +3,70 @@ using System.Collections;
 
 public class Poison : MonoBehaviour {
 
+    private int timer = 10;    /// # preset durtion to 10 sec
 
-    public Status.Objects Objects = Status.Objects.Player;
-    public float Timer = 10;
+    /// # the object 
+    private Role role;
+    private Monster monster;
+  
+    private string id;          /// # the id of object 
+    private bool isRole = true; /// # chect the object is role
 
-    private Role r;
+    /// # api that start a status to a monster
+    public void SetStatus(string monsterId) {
+        id = monsterId;
+        isRole = false;
+        //
+        /// # Monster = Monster.GetMonsterData(id);
+        //
+        StartCoroutine(poison());
+    }
 
-	void Start () {
-        /*bool checkStat = Status.CheckStat(Status.StatusPool.Poison);
-        if (checkStat) {
-            Destroy(this);
-        }
-        else {
-            Status.Use(Status.StatusPool.Poison);
+    /// # api that start a status to the role
+    public void SetStatus(Carceer c) {
+        id = c.ToString();
+        role = Role.GetRoleData(c);
+        
+        StartCoroutine(poison());
+    }
 
-            if(Objects == Status.Objects.Player) StartCoroutine(poison(r));
-        }*/
-	}
-	
-    public void posion(string monsterId) {
-
+    /// # start a status to the role with a custom time
+    public void SetStatus(Carceer c, int time)
+    {
+        timer = time;
+        id = c.ToString();
+        role = Role.GetRoleData(c);
+        StartCoroutine(poison());
     }
 
     void OnDestroy() {
-        Debug.Log("destroy");
+        Status.Remove(id, Status.StatusPool.Poison);
     }
 
-    void Update() {
-        if (Timer < 5) Destroy(this);
+    IEnumerator poison() {
+        int run = 0; /// # record the duration of status 
 
-        Timer -= Time.deltaTime;
-    }
+        /// # record the status and the object
+        Status.Add(id, Status.StatusPool.Poison, timer);
 
-    /*IEnumerator poison(Role r) {
-        while (Timer > 0) {
-            r.Hp -= (int)(r.MaxHp * 0.02f);
+        while (timer != run) {
+
+            if (isRole) {
+
+                /// # reduce hp by seconds
+                role.Hp -= (int)(role.MaxHp * 0.02f);
+            }
+            else {
+                //怪物扣血////
+            }
             yield return new WaitForSeconds(1);
-            Timer--;
+            run++;
         }
-        Status.Remove(Status.StatusPool.Poison);
+
+        /// # status finish 
+        Status.Remove(id, Status.StatusPool.Poison);
         Destroy(this);
-    }*/
+    }
 
     
 
