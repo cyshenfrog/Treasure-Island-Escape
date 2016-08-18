@@ -32,7 +32,7 @@ public class WorldRandomer : MonoBehaviour
         Sprite[] images = new Sprite[5];
         for (int i = 0; i < 5; ++i)
         {
-            images[i] = Sprite.Create(textures[i], new Rect(200, 200, 128, 128), Vector2.one / 2);
+            images[i] = Sprite.Create(textures[i], new Rect(0, 0, 128, 128), Vector2.one / 2);
         }
 
         //dfs generator
