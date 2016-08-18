@@ -47,6 +47,7 @@ public class Ellipse
         //BFS
         Queue q = new Queue();
         TileData data = world.GetTileDataAt(center);
+        /*
         data.SearchID = sid;
         data.MaterialType = mt;
         q.Enqueue(data);
@@ -78,7 +79,7 @@ public class Ellipse
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -109,8 +110,8 @@ public class WorldController : MonoBehaviour
                 TileData data = world.GetTileDataAt(x, y);
                 
                 GameObject go = new GameObject();
-                go.name = "Tile_" + data.X + "_" + data.Y;
-                go.transform.localPosition = new Vector3(data.X * 3, data.Y * 3);
+                //go.name = "Tile_" + data.X + "_" + data.Y;
+                //go.transform.localPosition = new Vector3(data.X * 3, data.Y * 3);
                 go.AddComponent<SpriteRenderer>();
 
                 //first use
@@ -135,6 +136,6 @@ public class WorldController : MonoBehaviour
         SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
 
         sr.sprite = BaseSprite;
-        sr.color = MapConstants.materialColors[(int)data.MaterialType];
+        //sr.color = MapConstants.materialColors[(int)data.MaterialType];
     }
 }

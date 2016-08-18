@@ -13,20 +13,20 @@ public class WorldRandomer : MonoBehaviour
         widthcount = WorldWidth / CellWidth;
         heightcount = WorldHeight / CellHeight;
         Vector2[] centers = RandomSites();
-        TileData2[][] world = new TileData2[widthcount][];
+        TileData[][] world = new TileData[widthcount][];
         Texture2D[] textures = new Texture2D[] { Image0, Image1, Image2, Image3, Image4 };
-        List<TileData2> selectedtds = new List<TileData2>();
+        List<TileData> selectedtds = new List<TileData>();
 
         //world initialization
         for(int i = 0; i < widthcount; ++i)
         {
-            world[i] = new TileData2[heightcount];
+            world[i] = new TileData[heightcount];
 
             //to reduce ?
             
             for(int j = 0; j < heightcount; ++j)
             {
-                world[i][j] = new TileData2(new Vector2(i, j));
+                //world[i][j] = new TileData(new Vector2(i, j));
             }
             
         }
@@ -34,11 +34,7 @@ public class WorldRandomer : MonoBehaviour
         Sprite[] images = new Sprite[5];
         for (int i = 0; i < 5; ++i)
         {
-<<<<<<< HEAD
             images[i] = Sprite.Create(textures[i], new Rect(200, 200, CellWidth, CellHeight), Vector2.one / 2);
-=======
-            images[i] = Sprite.Create(textures[i], new Rect(0, 0, 128, 128), Vector2.one / 2);
->>>>>>> 4ccfb05948587836a2c40c6a843a351dc5dd9460
         }
 
         //dfs generator
@@ -52,7 +48,7 @@ public class WorldRandomer : MonoBehaviour
         int selected = 0;
         while (selectedtds.Count != 0)
         {
-            if (TileData2.DFS(selectedtds, selected, world))
+            if (TileData.DFS(selectedtds, selected, world))
             {
                 //success
                 //out of range
@@ -87,7 +83,7 @@ public class WorldRandomer : MonoBehaviour
                 //1 pixel = 0.01 in world coordinates
                 go.transform.localPosition = new Vector3(i * cellWidthInWC + halfCellWidthInWC, j * cellHeightInWC + halfCellHeightInWC);
 
-                TileData2 td = world[i][j];
+                TileData td = world[i][j];
                 SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
                 go.name = "Tile" + i + ", " + j;
                 //do??

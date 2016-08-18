@@ -84,7 +84,7 @@ public class Test : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite = s;
     }
 
-    void func(TileData2 td)
+    void func(TileData td)
     {
         td.MaterialTypes[0] = MapConstants.MaterialType.Desert;
     }

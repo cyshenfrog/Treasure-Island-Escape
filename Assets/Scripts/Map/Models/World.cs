@@ -26,7 +26,7 @@ public class World
         {
             for(int y = 0; y < height; ++y)
             {
-                tiledata[x, y] = new Sea(x, y);
+                //tiledata[x, y] = new Sea(x, y);
             }
         }
     }
