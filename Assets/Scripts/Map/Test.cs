@@ -79,9 +79,19 @@ public class Test : MonoBehaviour
         Debug.Log(e0.p0[0].points[0]);
         Debug.Log(e1.p0[0].points[0]);
         */
-        
-        Sprite s = Sprite.Create(Image2, new Rect(0, 0, 128, 128), new Vector2(.5f, .5f), 40f);
-        GetComponent<SpriteRenderer>().sprite = s;
+
+        //Sprite s = Sprite.Create(Image2, new Rect(0, 0, 128, 128), new Vector2(.5f, .5f), 40f);
+        //GetComponent<SpriteRenderer>().sprite = s;
+
+        TileData[] world = new TileData[2];
+        world[0] = new Sea(Vector2.zero);
+        TileData td = world[0];
+        td.MaterialTypes[1] = MapConstants.MaterialType.Desert;
+        Debug.Log(world[0].MaterialTypes[1]);
+
+        TileData td1 = world[1];
+        td1 = new Sea(Vector2.zero);
+        Debug.Log(world[1].MaterialTypes[0].ToString());
     }
 
     void func(TileData td)

@@ -1,141 +1,186 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tile
-{
-    TileData data;
-    GameObject go;
-
-    public Tile(TileData data, GameObject go)
-    {
-        this.data = data;
-        this.go = go;
-    }
-}
-
-//public class 
-
-public class Ellipse
-{
-    Vector2 center;
-    int sid;
-    float a, b, a2, b2;
-
-    Vector3 rotate;
-    World world;
-    MapConstants.MaterialType mt;
-
-    public Ellipse(Vector2 center, float a, float b, MapConstants.MaterialType mt, int sid)
-    {
-        Debug.Log("YO");
-        this.center = center;
-        this.a = a;
-        this.b = b;
-        this.mt = mt;
-        this.sid = sid;
-        
-        a2 = a * a;
-        b2 = b * b;
-    }
-
-    public void FillToWorlid(World world)
-    {
-        this.world = world;
-        //Matrix4x4 ro = Matrix4x4.Scale(new Vector3(20f, 0f));
-        //Vector3 v = ro * Vector3.one;
-
-        //BFS
-        Queue q = new Queue();
-        TileData data = world.GetTileDataAt(center);
-        /*
-        data.SearchID = sid;
-        data.MaterialType = mt;
-        q.Enqueue(data);
-
-        while (q.Count != 0)
-        {
-            data = (TileData)q.Dequeue();
-            
-            for(int i = 0; i < 4; ++i)
-            {
-                TileData td = world.GetTileDataAt(data.Po+ MapConstants.bfs[i]);
-                if(td != null)
-                {
-                    float x = td.X - center.x, y = td.Y - center.y;
-                    if (td.SearchID != sid)
-                    {
-                        if ((x * x) / a2 + (y * y) / b2 < 1)
-                        {
-                            //has not found yet
-                            td.SearchID = sid;
-                            data.MaterialType = mt;
-                            q.Enqueue(td);
-                        }
-                        else
-                        {
-                            //outside
-                            
-                        }
-                    }
-                }
-            }
-        }*/
-    }
-}
-
 public class WorldController : MonoBehaviour
 {
-    World world;
-    Tile[,] tiles;
-
-    public Sprite BaseSprite, BuildingSprite;
-    
-	void Start ()
+    void Awake ()
     {
-        //to create a world with all sea tiledata
-        world = new World();
-        int ww = world.Width, wh = world.Height;
+        textures = new Texture2D[] { Sea, Vestige, Forest, Grasslands, Marsh, Desert, Volcano };
 
-        //to change the tiledata
-        Ellipse ep = new Ellipse(new Vector2(Random.Range(40, 60), Random.Range(40, 60)), Random.Range(15, 20), Random.Range(10, 15), MapConstants.MaterialType.Forest, 1);
-        ep.FillToWorlid(world);
+        sprites = new Sprite[materialTypeAmount];
+        for (int i = 0; i < materialTypeAmount; ++i)
+            sprites[i] = Sprite.Create(textures[i], new Rect(20, 20, CellWidth, CellHeight), Vector2.one / 2);
+
+        int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
+        //to get random world
+        worldData = new WorldRandomer(widthCount, heightCount, DistanceThreshold).World;
         
+        //to display the random map
+        float cellWidthInWC = CellWidth / 100f, cellHeightInWC = CellHeight / 100f, halfCellWidthInWC = cellWidthInWC / 2, halfCellHeightInWC = cellHeightInWC / 2;
+        displayWorld = new Transform[widthCount][];
 
-        //to create a gameobject for each of our tiles, so they show visually.
-        tiles = new Tile[ww, wh];
-        for (int x = 0; x < ww; ++x)
+        for (int i = 0; i < widthCount; ++i)
         {
-            for(int y = 0; y < wh; ++y)
+            displayWorld[i] = new Transform[heightCount];
+            for (int j = 0; j < heightCount; ++j)
             {
-                TileData data = world.GetTileDataAt(x, y);
-                
-                GameObject go = new GameObject();
-                //go.name = "Tile_" + data.X + "_" + data.Y;
-                //go.transform.localPosition = new Vector3(data.X * 3, data.Y * 3);
-                go.AddComponent<SpriteRenderer>();
+                Transform tf = displayWorld[i][j] = new GameObject().transform;
+                tf.parent = WorldList;
+                tf.localScale = Vector3.one;
+                //1 pixel = 0.01 in world coordinates
+                //the local position is at center;
+                tf.localPosition = new Vector3(i * cellWidthInWC + halfCellWidthInWC, j * cellHeightInWC + halfCellHeightInWC);
 
-                //first use
-                OnMtChanged(data, go);
+                TileData td = worldData[i][j];
+                SpriteRenderer sr = tf.gameObject.AddComponent<SpriteRenderer>();
+                tf.name = "Tile" + i + ", " + j;
 
-                //to add action
-                data.AddMtChanged((tile) => { OnMtChanged(tile, go); });
+                //Can an edge have two materialTypes only?
+                if (td.MaterialTypes[1] == MapConstants.MaterialType.None)
+                {
+                    //this is a simple materialType
+                    sr.sprite = sprites[(int)td.MaterialTypes[0]];
+                    tf.name += " " + td.MaterialTypes[0];
+                }
+                else
+                {
+                    //this is an edge
+                    tf.name += " edge with " + td.MaterialTypes[0] + " and " + td.MaterialTypes[1];
 
-                tiles[x, y] = new Tile(data, go);
+                    //noise!!
+                    float[][] noise = GenerateWhiteNoise(CellWidth, CellHeight);
+                    float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
+
+                    //to blend two textures
+                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellWidth, CellHeight);
+                    for (int k = 0; k < CellWidth; ++k)
+                        for (int l = 0; l < CellHeight; ++l)
+                            blendedimage.SetPixel(k, l, Interpolate(t0.GetPixel(k, l), t1.GetPixel(k, l), perlinNoise[k][l]));
+
+                    blendedimage.Apply();
+                    sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, CellWidth, CellHeight), Vector2.one / 2);
+                }
             }
         }
     }
-
-    // Update is called once per frame
-    void Update () {
-	
-	}
-
-    //????
-    public void OnMtChanged(TileData data, GameObject go)
+    
+    float[][] GenerateWhiteNoise(int width, int height)
     {
-        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+        float[][] noise = new float[width][];
+        for (int i = 0; i < width; ++i)
+        {
+            noise[i] = new float[height];
+            for (int j = 0; j < height; ++j)
+                noise[i][j] = Random.Range(0f, 1f);
+        }
 
-        sr.sprite = BaseSprite;
-        //sr.color = MapConstants.materialColors[(int)data.MaterialType];
+        return noise;
     }
+
+    float[][] GenerateSmoothNoise(float[][] baseNoise, int octave)
+    {
+        int width = baseNoise.Length, height = baseNoise[0].Length;
+
+        float[][] smoothNoise = new float[width][];
+
+        int samplePeriod = 1 << octave;
+        float sampleFrequency = 1f / samplePeriod;
+
+        for (int i = 0; i < width; ++i)
+        {
+            smoothNoise[i] = new float[height];
+
+            //to calculate the horizontal sampling indices
+            int sample_i0 = (i / samplePeriod) * samplePeriod;
+            int sample_i1 = (sample_i0 + samplePeriod) % width;
+            float horizontal_blend = (i - sample_i0) * sampleFrequency;
+
+            for (int j = 0; j < height; ++j)
+            {
+                //to calculate the vertical sampling indices
+                int sample_j0 = (j / samplePeriod) * samplePeriod;
+                int sample_j1 = (sample_j0 + samplePeriod) % height;
+                float vertical_blend = (j - sample_j0) * sampleFrequency;
+
+                //to blend the top of two corners
+                float top = Interpolate(baseNoise[sample_i0][sample_j0], baseNoise[sample_i1][sample_j0], horizontal_blend);
+                //to blend the bottom two corners
+                float bottom = Interpolate(baseNoise[sample_i0][sample_j1], baseNoise[sample_i1][sample_j1], horizontal_blend);
+
+                //final blend
+                smoothNoise[i][j] = Interpolate(top, bottom, vertical_blend);
+            }
+        }
+
+        return smoothNoise;
+    }
+
+    float Interpolate(float x0, float x1, float alpha)
+    {
+        return x0 * (1 - alpha) + x1 * alpha;
+    }
+
+    Color Interpolate(Color c0, Color c1, float alpha)
+    {
+        /*
+        if (alpha > .5f)
+            return c1;
+        else
+            return c0;
+        */
+        //return c0 * (1 - alpha) + c1 * alpha;
+        float u = 1f - alpha;
+        return new Color(c0.r * u + c1.r * alpha, c0.g * u + c1.g * alpha, c0.b * u + c1.b * alpha);
+    }
+
+    float[][] GeneratePerlinNoise(float[][] baseNoise, int octaveCount)
+    {
+        int width = baseNoise.Length, height = baseNoise[0].Length;
+
+        float[][][] smoothNoise = new float[octaveCount][][];
+        float persistance = .5f;
+
+        //to generate smooth noise
+        for (int i = 0; i < octaveCount; ++i)
+            smoothNoise[i] = GenerateSmoothNoise(baseNoise, i);
+
+        float[][] perlinNoise = new float[width][];
+        for(int i = 0; i < width; ++i)
+            perlinNoise[i] = new float[height];
+
+        float amplitude = 1f, totalAmplitude = 0f;
+
+        //to blend noise together
+        for (int octave = octaveCount - 1; octave >= 0; --octave)
+        {
+            amplitude *= persistance;
+            totalAmplitude += amplitude;
+
+            for (int i = 0; i < width; ++i)
+                for (int j = 0; j < height; ++j)
+                    perlinNoise[i][j] += smoothNoise[octave][i][j] * amplitude;
+        }
+
+        //normalization
+        for (int i = 0; i < width; ++i)
+        {
+            for (int j = 0; j < height; ++j)
+            {
+                perlinNoise[i][j] /= totalAmplitude;
+            }
+        }
+
+        return perlinNoise;
+    }
+    
+    public Transform WorldList;
+    public Texture2D Sea, Vestige, Forest, Grasslands, Marsh, Desert, Volcano;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight;
+    public float DistanceThreshold;
+
+    Sprite[] sprites;
+    Texture2D[] textures;
+    Transform[][] displayWorld;
+    TileData[][] worldData;
+    int materialTypeAmount = (int)MapConstants.MaterialType.None;
 }
