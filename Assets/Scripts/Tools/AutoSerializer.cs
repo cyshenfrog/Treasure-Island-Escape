@@ -9,14 +9,14 @@ public static class AutoSerializer {
     {
         CreateXML(SerializeObject<T>(obj), path);
     }
-    public static T Load<T>(string path, Type type)
+    public static T Load<T>(string path)
     {
         string data = LoadXML(path);
         if (data == null)
         {
             return default(T);
         }
-        return (DeserializeObject<T>(data, type));
+        return (DeserializeObject<T>(data, typeof(T)));
     }
 
     public static string SerializeObject<T>(object pObject)
