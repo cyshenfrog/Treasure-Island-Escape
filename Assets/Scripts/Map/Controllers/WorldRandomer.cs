@@ -9,7 +9,7 @@ public class WorldRandomer
         this.height = height;
         this.distanceThreshold = distanceThreshold;
 
-        islandForm = new Ellipse(new Vector2(width / 2, height / 2), width / 2 - 10, height / 2 - 15);
+        islandForm = new Ellipse(new Vector2(width / 2, height / 2), width / 2 - 50, height / 2 - 55);
 
         GenerateWorld();
     }
@@ -18,7 +18,7 @@ public class WorldRandomer
     {
         Vector2[] positions = RandomSites();
         worldData = new TileData[width][];
-        List<TileData> selected = new List<TileData>(), Volcano = new List<TileData>(), Snowfield = new List<TileData>();
+        List<TileData> selected = new List<TileData>(), Volcanos = new List<TileData>(), Snowfields = new List<TileData>();
 
         //world initialization
         for(int i = 0; i < width; ++i)
@@ -33,35 +33,24 @@ public class WorldRandomer
         }
 
         worldData[(int)positions[0].x][(int)positions[0].y] = TileData.Factory(0, positions[0]);
-        Volcano.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
+        Volcanos.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
         worldData[(int)positions[1].x][(int)positions[1].y] = TileData.Factory((MapConstants.LandformType)1, positions[1]);
-        Snowfield.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
+        Snowfields.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
 
         int index = 0;
         while (selected.Count != 0)
         {
-            if (TileData.DFS(selected, index, worldData, islandForm))
-            {
-                //success
-                //out of range
-                if (++index >= selected.Count)
-                {
-                    index = 0;
-                    //TileData.BFS(Volcano, worldData, islandForm);
-                    //TileData.BFS(Snowfield, worldData, islandForm);
-                }
-            }
-            else
+            if (!TileData.DFS(selected, index, worldData, islandForm))
             {
                 //failure
-                //out of range
                 selected.RemoveAt(index);
-                if(index >= selected.Count)
-                {
-                    index = 0;
-                    //TileData.BFS(Volcano, worldData, islandForm);
-                    //TileData.BFS(Snowfield, worldData, islandForm);
-                }
+            }
+
+            if (++index >= selected.Count)
+            {
+                index = 0;
+                TileData.BFS(Volcanos, worldData, islandForm);
+                TileData.BFS(Snowfields, worldData, islandForm);
             }
         }
     }

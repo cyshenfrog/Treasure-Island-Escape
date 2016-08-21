@@ -4,9 +4,9 @@ using System;
 
 public abstract class TileData
 {
-    public static bool DFS(List<TileData> selectedDFS, int index, TileData[][] worldData, Ellipse islandForm)
+    public static bool DFS(List<TileData> selected, int index, TileData[][] worldData, Ellipse islandForm)
     {
-        TileData td = selectedDFS[index];
+        TileData td = selected[index];
 
         while (td.Directions.Count != 0)
         {
@@ -16,15 +16,15 @@ public abstract class TileData
             //to remove the direction in td
             td.Directions.RemoveAt(random);
 
-            //to get nexttd
-            if(islandForm.Inside(nextPosition))
+            //inside or randomly outside
+            if((nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
             {
-                //inside
+                //Debug.Log(islandForm.Inside(nextPosition));
                 //to check if the nexttd has benn found
                 if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
                 {
                     //first found
-                    selectedDFS[index] = CreateNext(nextPosition, direction, td, worldData, true);
+                    selected[index] = CreateNext(nextPosition, direction, td, worldData, true);
                     return true;
                 }
                 else
@@ -33,29 +33,35 @@ public abstract class TileData
                     CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                 }
             }
+
+            /*
+            //to get nexttd
+            if(islandForm.Inside(nextPosition))
+            {
+                
+            }
             else
             {
                 //randomly outside
                 if (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
                 {
                     //reasonable world coordinates
-
                     //to check if the nexttd has benn found
                     if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
                     {
                         //first found
-                        /*
+                        
                         TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, td);
                         next.MaterialDirections[0] = direction;
                         next.Directions.Remove(-direction);
-                        */
+                        
                         selectedDFS[index] = CreateNext(nextPosition, direction, td, worldData, true);
                         return true;
                     }
                     else
                     {
                         //it has been found before
-                        /*
+                        
                         TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y];
                         if (next.MaterialTypes[0] != td.MaterialTypes[0])
                         {
@@ -71,19 +77,19 @@ public abstract class TileData
                                 }
                             }
                         }
-                        */
+                        
                         CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                     }
                 }
-            }
+            }*/
         }
 
         //all directions in td have been found
         if(td != td.fromTile)
         {
             //back to fromTile
-            selectedDFS[index] = selectedDFS[index].fromTile;
-            return DFS(selectedDFS, index, worldData, islandForm);
+            selected[index] = selected[index].fromTile;
+            return DFS(selected, index, worldData, islandForm);
         }
         else
         {
@@ -92,7 +98,7 @@ public abstract class TileData
         }
     }
 
-    public static void BFS(List<TileData> selected, TileData[][] worldData)
+    public static void BFS(List<TileData> selected, TileData[][] worldData, Ellipse islandForm)
     {
         int times = selected.Count > maxBFSTimes ? maxBFSTimes : selected.Count;
 
@@ -107,6 +113,24 @@ public abstract class TileData
                 //to remove the direction in td
                 td.Directions.RemoveAt(0);
 
+                //inside or randomly outside
+                //if (islandForm.Inside(nextPosition) || (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+                if ((nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+                {
+                    //to check if the nexttd has benn found
+                    if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                    {
+                        //first found
+                        selected.Add(CreateNext(nextPosition, direction, td, worldData, false));
+                    }
+                    else
+                    {
+                        //it has been found before
+                        CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
+                    }
+                }
+
+                /*
                 //to get nexttd
                 if (nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
                 {
@@ -129,6 +153,7 @@ public abstract class TileData
                         CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                     }
                 }
+                */
             }
             
             selected.RemoveAt(0);
