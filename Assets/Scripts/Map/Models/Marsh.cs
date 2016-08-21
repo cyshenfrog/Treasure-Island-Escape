@@ -11,6 +11,6 @@ public class Marsh : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.MaterialType.Marsh;
+        materialTypes[0] = MapConstants.LandformType.Marsh;
     }
 }

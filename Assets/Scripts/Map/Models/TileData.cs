@@ -4,9 +4,9 @@ using System;
 
 public abstract class TileData
 {
-    public static bool DFS(List<TileData> selected, int index, TileData[][] worldData)
+    public static bool DFS(List<TileData> selectedDFS, int index, TileData[][] worldData, Ellipse islandForm)
     {
-        TileData td = selected[index];
+        TileData td = selectedDFS[index];
 
         while (td.Directions.Count != 0)
         {
@@ -17,38 +17,62 @@ public abstract class TileData
             td.Directions.RemoveAt(random);
 
             //to get nexttd
-            if(nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
+            if(islandForm.Inside(nextPosition))
             {
-                //reasonable world coordinates
-                
+                //inside
                 //to check if the nexttd has benn found
                 if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
                 {
                     //first found
-                    TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, td);
-                    
-                    next.MaterialDirections[0] = direction;
-                    next.Directions.Remove(-direction);
-                    selected[index] = next;
+                    selectedDFS[index] = CreateNext(nextPosition, direction, td, worldData, true);
                     return true;
                 }
                 else
                 {
                     //it has been found before
-                    TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y];
-                    if (next.MaterialTypes[0] != td.MaterialTypes[0])
+                    CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
+                }
+            }
+            else
+            {
+                //randomly outside
+                if (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
+                {
+                    //reasonable world coordinates
+
+                    //to check if the nexttd has benn found
+                    if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
                     {
-                        //nexttd is an edge!!
-                        for (int i = 1; i < 4; ++i)
+                        //first found
+                        /*
+                        TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, td);
+                        next.MaterialDirections[0] = direction;
+                        next.Directions.Remove(-direction);
+                        */
+                        selectedDFS[index] = CreateNext(nextPosition, direction, td, worldData, true);
+                        return true;
+                    }
+                    else
+                    {
+                        //it has been found before
+                        /*
+                        TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y];
+                        if (next.MaterialTypes[0] != td.MaterialTypes[0])
                         {
-                            if (next.MaterialTypes[i] == MapConstants.MaterialType.None)
+                            //nexttd is an edge!!
+                            for (int i = 1; i < 4; ++i)
                             {
-                                next.MaterialTypes[i] = td.MaterialTypes[0];
-                                next.MaterialDirections[i] = direction;
-                                next.Directions.Remove(-direction);
-                                break;
+                                if (next.MaterialTypes[i] == MapConstants.LandformType.Sea)
+                                {
+                                    next.MaterialTypes[i] = td.MaterialTypes[0];
+                                    next.MaterialDirections[i] = direction;
+                                    next.Directions.Remove(-direction);
+                                    break;
+                                }
                             }
                         }
+                        */
+                        CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                     }
                 }
             }
@@ -58,8 +82,8 @@ public abstract class TileData
         if(td != td.fromTile)
         {
             //back to fromTile
-            selected[index] = selected[index].fromTile;
-            return DFS(selected, index, worldData);
+            selectedDFS[index] = selectedDFS[index].fromTile;
+            return DFS(selectedDFS, index, worldData, islandForm);
         }
         else
         {
@@ -68,37 +92,98 @@ public abstract class TileData
         }
     }
 
-    public static TileData Factory(MapConstants.MaterialType mt, Vector2 position, TileData fromTile = null)
+    public static void BFS(List<TileData> selected, TileData[][] worldData)
+    {
+        int times = selected.Count > maxBFSTimes ? maxBFSTimes : selected.Count;
+
+        while(--times >= 0)
+        {
+            TileData td = selected[0];
+
+            while (td.Directions.Count != 0)
+            {
+                Vector2 direction = td.Directions[0], nextPosition = td.Position + direction;
+
+                //to remove the direction in td
+                td.Directions.RemoveAt(0);
+
+                //to get nexttd
+                if (nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
+                {
+                    //reasonable world coordinates
+
+                    //to check if the nexttd has benn found
+                    if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                    {
+                        //first found
+                        //fromTile are not needed
+                        TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, td);
+
+                        next.MaterialDirections[0] = direction;
+                        next.Directions.Remove(-direction);
+                        selected.Add(next);
+                    }
+                    else
+                    {
+                        //it has been found before
+                        CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
+                    }
+                }
+            }
+            
+            selected.RemoveAt(0);
+        }
+    }
+
+    public static TileData Factory(MapConstants.LandformType mt, Vector2 position, TileData fromTile = null)
     {
         switch(mt)
         {
-            case MapConstants.MaterialType.Sea:
-                return new Sea(position, fromTile);
-            case MapConstants.MaterialType.Vestige:
-                return new Vestige(position, fromTile);
-            case MapConstants.MaterialType.Forest:
-                return new Forest(position, fromTile);
-            case MapConstants.MaterialType.Grasslands:
-                return new Grasslands(position, fromTile);
-            case MapConstants.MaterialType.Marsh:
-                return new Marsh(position, fromTile);
-            case MapConstants.MaterialType.Desert:
-                return new Desert(position, fromTile);
-            case MapConstants.MaterialType.Volcano:
+            case MapConstants.LandformType.Volcano:
                 return new Volcano(position, fromTile);
-            case MapConstants.MaterialType.None:
-                Debug.LogError("TileData Factory Error: MaterialType is None");
-                return null;
+            case MapConstants.LandformType.Snowfield:
+                return new Snowfield(position, fromTile);
+            case MapConstants.LandformType.Marsh:
+                return new Marsh(position, fromTile);
+            case MapConstants.LandformType.Desert:
+                return new Desert(position, fromTile);
+            case MapConstants.LandformType.Forest:
+                return new Forest(position, fromTile);
+            case MapConstants.LandformType.Grasslands:
+                return new Grasslands(position, fromTile);
+            case MapConstants.LandformType.Sea:
+                return new Sea(position, fromTile);
             default:
                 Debug.LogError("TileData Factory Error: Unreasonable MaterialType");
                 return null;
         }
     }
 
+    static void CreateEdge(Vector2 direction, TileData td, TileData next)
+    {
+        if (next.MaterialTypes[0] != td.MaterialTypes[0])
+            for (int i = 1; i < 4; ++i)
+                if (next.MaterialTypes[i] == MapConstants.LandformType.Sea)
+                {
+                    next.MaterialTypes[i] = td.MaterialTypes[0];
+                    next.MaterialDirections[i] = direction;
+                    next.Directions.Remove(-direction);
+                    return;
+                }
+    }
+
+    static TileData CreateNext(Vector2 nextPosition, Vector2 direction, TileData td, TileData[][] worldData, bool DFS)
+    {
+        TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, DFS ? td : null);
+        next.MaterialDirections[0] = direction;
+        next.Directions.Remove(-direction);
+        return next;
+    }
+
     //public components
     //public int SearchID = 0;
 
-    public MapConstants.MaterialType[] MaterialTypes
+    public MapConstants.LandformType[] MaterialTypes
     {
         get { return materialTypes; }
         set
@@ -109,7 +194,7 @@ public abstract class TileData
             }
             else
             {
-                MapConstants.MaterialType[] oldmt = materialTypes;
+                MapConstants.LandformType[] oldmt = materialTypes;
                 materialTypes = value;
 
                 //?????
@@ -195,13 +280,15 @@ public abstract class TileData
     protected List<Vector2> directions = new List<Vector2>() { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
     //used for blending images
     protected Vector2[] materialDirections = new Vector2[4];
-    protected MapConstants.MaterialType[] materialTypes = new MapConstants.MaterialType[] { MapConstants.MaterialType.None, MapConstants.MaterialType.None, MapConstants.MaterialType.None, MapConstants.MaterialType.None};
+    protected MapConstants.LandformType[] materialTypes = new MapConstants.LandformType[] { MapConstants.LandformType.Sea, MapConstants.LandformType.Sea, MapConstants.LandformType.Sea, MapConstants.LandformType.Sea };
     //unknown
     protected MapConstants.BuildingType buildingType;
     protected TileData center, fromTile, buildingCenter;
     protected Vector2 position, buildingPosition;
     protected Action<TileData> mtChanged;
     protected bool isRunable, isConstructable, isConstructed = false;
+
+    static int maxBFSTimes = (int)MapConstants.LandformType.Sea - 5;
 
     //constructedObj
     //looseObj

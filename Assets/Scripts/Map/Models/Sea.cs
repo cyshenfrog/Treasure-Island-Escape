@@ -11,6 +11,6 @@ public class Sea : TileData
         isRunable = false;
         isConstructable = false;
 
-        materialTypes[0] = MapConstants.MaterialType.Sea;
+        materialTypes[0] = MapConstants.LandformType.Sea;
     }
 }

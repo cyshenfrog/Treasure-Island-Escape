@@ -11,6 +11,6 @@ public class Desert : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.MaterialType.Desert;
+        materialTypes[0] = MapConstants.LandformType.Desert;
     }
 }

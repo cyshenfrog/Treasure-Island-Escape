@@ -5,7 +5,7 @@ public class WorldController : MonoBehaviour
 {
     void Awake ()
     {
-        textures = new Texture2D[] { Sea, Vestige, Forest, Grasslands, Marsh, Desert, Volcano };
+        textures = new Texture2D[] { Volcano, Snowfield, Marsh, Desert, Forest, Grasslands, Vestige, Sea, };
 
         sprites = new Sprite[materialTypeAmount];
         for (int i = 0; i < materialTypeAmount; ++i)
@@ -13,7 +13,7 @@ public class WorldController : MonoBehaviour
 
         int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
         //to get random world
-        worldData = new WorldRandomer(widthCount, heightCount, DistanceThreshold).World;
+        worldData = new WorldRandomer(widthCount, heightCount, DistanceThreshold).WorldData;
         
         //to display the random map
         float cellWidthInWC = CellWidth / 100f, cellHeightInWC = CellHeight / 100f, halfCellWidthInWC = cellWidthInWC / 2, halfCellHeightInWC = cellHeightInWC / 2;
@@ -36,7 +36,7 @@ public class WorldController : MonoBehaviour
                 tf.name = "Tile" + i + ", " + j;
 
                 //Can an edge have two materialTypes only?
-                if (td.MaterialTypes[1] == MapConstants.MaterialType.None)
+                if (td.MaterialTypes[1] == MapConstants.LandformType.Sea)
                 {
                     //this is a simple materialType
                     sr.sprite = sprites[(int)td.MaterialTypes[0]];
@@ -122,15 +122,18 @@ public class WorldController : MonoBehaviour
 
     Color Interpolate(Color c0, Color c1, float alpha)
     {
-        /*
+        
         if (alpha > .5f)
             return c1;
         else
             return c0;
-        */
+        
         //return c0 * (1 - alpha) + c1 * alpha;
+
+        /*
         float u = 1f - alpha;
         return new Color(c0.r * u + c1.r * alpha, c0.g * u + c1.g * alpha, c0.b * u + c1.b * alpha);
+        */
     }
 
     float[][] GeneratePerlinNoise(float[][] baseNoise, int octaveCount)
@@ -174,7 +177,7 @@ public class WorldController : MonoBehaviour
     }
     
     public Transform WorldList;
-    public Texture2D Sea, Vestige, Forest, Grasslands, Marsh, Desert, Volcano;
+    public Texture2D Volcano, Snowfield, Marsh, Desert, Forest, Grasslands, Vestige, Sea;
     public int WorldWidth, WorldHeight, CellWidth, CellHeight;
     public float DistanceThreshold;
 
@@ -182,5 +185,5 @@ public class WorldController : MonoBehaviour
     Texture2D[] textures;
     Transform[][] displayWorld;
     TileData[][] worldData;
-    int materialTypeAmount = (int)MapConstants.MaterialType.None;
+    int materialTypeAmount = (int)MapConstants.LandformType.Sea;
 }

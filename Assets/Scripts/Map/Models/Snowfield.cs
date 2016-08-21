@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Vestige : TileData
+public class Snowfield : TileData
 {
-    public Vestige(Vector2 position, TileData fromTile = null)
+    public Snowfield(Vector2 position, TileData fromTile = null)
     {
         this.position = position;
         this.fromTile = fromTile != null ? fromTile : this;
@@ -11,6 +11,6 @@ public class Vestige : TileData
         isRunable = true;
         isConstructable = true;
 
-        //materialTypes[0] = MapConstants.MaterialType.Vestige;
+        materialTypes[0] = MapConstants.LandformType.Snowfield;
     }
 }

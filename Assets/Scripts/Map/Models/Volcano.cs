@@ -11,6 +11,6 @@ public class Volcano : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.MaterialType.Volcano;
+        materialTypes[0] = MapConstants.LandformType.Volcano;
     }
 }

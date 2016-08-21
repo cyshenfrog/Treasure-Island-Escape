@@ -13,7 +13,7 @@ public class Center
         directions.Add(Vector2.right);
     }
 
-    public MapConstants.MaterialType MaterialType
+    public MapConstants.LandformType MaterialType
     {
         get { return materialtype; }
         set { materialtype = value; }
@@ -28,6 +28,6 @@ public class Center
     }
 
     List<Vector2> directions = new List<Vector2>();
-    MapConstants.MaterialType materialtype;
+    MapConstants.LandformType materialtype;
     Vector2 position;
 }

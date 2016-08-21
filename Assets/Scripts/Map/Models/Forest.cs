@@ -11,6 +11,6 @@ public class Forest : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.MaterialType.Forest;
+        materialTypes[0] = MapConstants.LandformType.Forest;
     }
 }

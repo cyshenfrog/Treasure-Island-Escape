@@ -83,6 +83,7 @@ public class Test : MonoBehaviour
         //Sprite s = Sprite.Create(Image2, new Rect(0, 0, 128, 128), new Vector2(.5f, .5f), 40f);
         //GetComponent<SpriteRenderer>().sprite = s;
 
+        /*
         TileData[] world = new TileData[2];
         world[0] = new Sea(Vector2.zero);
         TileData td = world[0];
@@ -92,11 +93,12 @@ public class Test : MonoBehaviour
         TileData td1 = world[1];
         td1 = new Sea(Vector2.zero);
         Debug.Log(world[1].MaterialTypes[0].ToString());
+        */
     }
 
     void func(TileData td)
     {
-        td.MaterialTypes[0] = MapConstants.MaterialType.Desert;
+        //td.MaterialTypes[0] = MapConstants.MaterialType.Desert;
     }
 	
 	// Update is called once per frame

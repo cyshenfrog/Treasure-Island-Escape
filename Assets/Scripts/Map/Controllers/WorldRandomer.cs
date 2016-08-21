@@ -9,46 +9,47 @@ public class WorldRandomer
         this.height = height;
         this.distanceThreshold = distanceThreshold;
 
+        islandForm = new Ellipse(new Vector2(width / 2, height / 2), width / 2 - 10, height / 2 - 15);
+
         GenerateWorld();
     }
 
     void GenerateWorld()
     {
         Vector2[] positions = RandomSites();
-        world = new TileData[width][];
-        List<TileData> selected = new List<TileData>();
+        worldData = new TileData[width][];
+        List<TileData> selected = new List<TileData>(), Volcano = new List<TileData>(), Snowfield = new List<TileData>();
 
         //world initialization
         for(int i = 0; i < width; ++i)
-        {
-            world[i] = new TileData[height];
+            worldData[i] = new TileData[height];
 
-            /*
-            //to reduce ?
-            for(int j = 0; j < heightcount; ++j)
-            {
-                //world[i][j] = new TileData(new Vector2(i, j));
-            }
-            */
-        }
-
-        //dfs generator
+        //DFS and BFS generator
         //first selected are positions points
-        for (int i = 0; i < materialTypeAmount; ++i)
+        for (int i = 2; i < materialTypeAmount; ++i)
         {
-            world[(int)positions[i].x][(int)positions[i].y] = TileData.Factory((MapConstants.MaterialType)i, positions[i]);
-            selected.Add(world[(int)positions[i].x][(int)positions[i].y]);
+            worldData[(int)positions[i].x][(int)positions[i].y] = TileData.Factory((MapConstants.LandformType)i, positions[i]);
+            selected.Add(worldData[(int)positions[i].x][(int)positions[i].y]);
         }
+
+        worldData[(int)positions[0].x][(int)positions[0].y] = TileData.Factory(0, positions[0]);
+        Volcano.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
+        worldData[(int)positions[1].x][(int)positions[1].y] = TileData.Factory((MapConstants.LandformType)1, positions[1]);
+        Snowfield.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
 
         int index = 0;
         while (selected.Count != 0)
         {
-            if (TileData.DFS(selected, index, world))
+            if (TileData.DFS(selected, index, worldData, islandForm))
             {
                 //success
                 //out of range
                 if (++index >= selected.Count)
+                {
                     index = 0;
+                    //TileData.BFS(Volcano, worldData, islandForm);
+                    //TileData.BFS(Snowfield, worldData, islandForm);
+                }
             }
             else
             {
@@ -56,7 +57,11 @@ public class WorldRandomer
                 //out of range
                 selected.RemoveAt(index);
                 if(index >= selected.Count)
+                {
                     index = 0;
+                    //TileData.BFS(Volcano, worldData, islandForm);
+                    //TileData.BFS(Snowfield, worldData, islandForm);
+                }
             }
         }
     }
@@ -76,6 +81,17 @@ public class WorldRandomer
             //to check if these sites is too close
             conti = UnReasonableDistance(positions);
         }
+        
+        if(positions[0].y < positions[1].y)
+            Swap(positions, 0, 1);
+
+        for(int i = 2; i < materialTypeAmount; ++i)
+        {
+            if (positions[i].y > positions[0].y)
+                Swap(positions, i, 0);
+            else if (positions[i].y < positions[1].y)
+                Swap(positions, i, 1);
+        }
 
         return positions;
     }
@@ -90,12 +106,20 @@ public class WorldRandomer
         return false;
     }
 
-    public TileData[][] World
+    void Swap<T>(T[] positions, int i, int j)
     {
-        get { return world; }
+        T temp = positions[i];
+        positions[i] = positions[j];
+        positions[j] = temp;
     }
 
-    TileData[][] world;
-    int materialTypeAmount = (int)MapConstants.MaterialType.None, width, height;
+    public TileData[][] WorldData
+    {
+        get { return worldData; }
+    }
+
+    TileData[][] worldData;
+    Ellipse islandForm;
+    int materialTypeAmount = (int)MapConstants.LandformType.Sea, width, height;
     float distanceThreshold;
 }

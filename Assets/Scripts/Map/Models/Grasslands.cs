@@ -11,6 +11,6 @@ public class Grasslands : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.MaterialType.Grasslands;
+        materialTypes[0] = MapConstants.LandformType.Grasslands;
     }
 }
