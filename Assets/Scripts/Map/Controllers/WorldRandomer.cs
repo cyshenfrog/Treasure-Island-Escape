@@ -18,10 +18,14 @@ public class WorldRandomer
     {
         Vector2[] positions = RandomSites();
         worldData = new TileData[width][];
-        List<TileData> selected = new List<TileData>(), Volcanos = new List<TileData>(), Snowfields = new List<TileData>();
+        List<TileData> selected = new List<TileData>(), volcanoList = new List<TileData>(), snowfieldList = new List<TileData>();
+
+        //to record the max and min x , y coordinates
+        //List<TileData> marshList = new List<TileData>(), desertList = new List<TileData>(), forestList = new List<TileData>(), grasslandList = new List<TileData>(), seaList = new List<TileData>(); 
+        //List<Vector2>[] DFSLists = new List<Vector2>[5];
 
         //world initialization
-        for(int i = 0; i < width; ++i)
+        for (int i = 0; i < width; ++i)
             worldData[i] = new TileData[height];
 
         //DFS and BFS generator
@@ -33,9 +37,9 @@ public class WorldRandomer
         }
 
         worldData[(int)positions[0].x][(int)positions[0].y] = TileData.Factory(0, positions[0]);
-        Volcanos.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
+        volcanoList.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
         worldData[(int)positions[1].x][(int)positions[1].y] = TileData.Factory((MapConstants.LandformType)1, positions[1]);
-        Snowfields.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
+        snowfieldList.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
 
         int index = 0;
         while (selected.Count != 0)
@@ -49,8 +53,8 @@ public class WorldRandomer
             if (++index >= selected.Count)
             {
                 index = 0;
-                TileData.BFS(Volcanos, worldData, islandForm);
-                TileData.BFS(Snowfields, worldData, islandForm);
+                TileData.BFS(volcanoList, worldData, islandForm);
+                TileData.BFS(snowfieldList, worldData, islandForm);
             }
         }
     }

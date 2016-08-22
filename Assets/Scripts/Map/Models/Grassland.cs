@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Grasslands : TileData
+public class Grassland : TileData
 {
-    public Grasslands(Vector2 position, TileData fromTile = null)
+    public Grassland(Vector2 position, TileData fromTile = null)
     {
         this.position = position;
         this.fromTile = fromTile != null ? fromTile : this;
@@ -11,6 +11,6 @@ public class Grasslands : TileData
         isRunable = true;
         isConstructable = true;
 
-        materialTypes[0] = MapConstants.LandformType.Grasslands;
+        materialTypes[0] = MapConstants.LandformType.Grassland;
     }
 }

@@ -10,7 +10,7 @@ public static class MapConstants
         Marsh,
         Desert,
         Forest,
-        Grasslands,
+        Grassland,
         Sea
     }
 

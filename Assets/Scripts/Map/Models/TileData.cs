@@ -174,8 +174,8 @@ public abstract class TileData
                 return new Desert(position, fromTile);
             case MapConstants.LandformType.Forest:
                 return new Forest(position, fromTile);
-            case MapConstants.LandformType.Grasslands:
-                return new Grasslands(position, fromTile);
+            case MapConstants.LandformType.Grassland:
+                return new Grassland(position, fromTile);
             case MapConstants.LandformType.Sea:
                 return new Sea(position, fromTile);
             default:
