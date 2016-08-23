@@ -16,22 +16,28 @@ public class Test : MonoBehaviour
         Debug.Log(Image.width);
         Debug.Log(Image.height);
 
-        ResizeCanvas(Image, 123, 650);
+        ResizeCanvas(Image, 1234, 65);
 
         //Debug.Log(Image.Resize(tWidth * ((int)times + 1), tHeight * ((int)times + 1)));
         //Image.Apply();
 
-        GetComponent<SpriteRenderer>().sprite = Sprite.Create(Image, new Rect(0, 0, 128, 128), Vector2.one / 2);
+
+        Debug.Log(Image.width);
+        Debug.Log(Image.height);
+        GetComponent<SpriteRenderer>().sprite = Sprite.Create(Image, new Rect(0, 0, Image.width, Image.height), Vector2.one / 2);
     }
 
     public static Color32[] ResizeCanvas(Texture2D texture, int width, int height)
     {
-        int tWidth = texture.width, tHeight = texture.height;
-        float times = width / tWidth > height / tHeight ? width / tWidth : height / tHeight;
+        float oldWidth = texture.width, oldHeight = texture.height;
+        float newWR = width / oldWidth, newHR = height / oldHeight, times = newWR > newHR ? newWR : newHR;
+        Debug.Log(times);
+        times = (int)times + 1;
+        Debug.Log(times);
 
-        var newPixels = ResizeCanvas(texture.GetPixels32(), tWidth, tHeight, tWidth * ((int)times + 1), tHeight * ((int)times + 1));
+        var newPixels = ResizeCanvas(texture.GetPixels32(), (int)oldWidth, (int)oldHeight, (int)(oldWidth * times), (int)(oldHeight * times));
 
-        texture.Resize(tWidth * ((int)times + 1), tHeight * ((int)times + 1));
+        texture.Resize((int)(oldWidth * times), (int)(oldHeight * times));
         texture.SetPixels32(newPixels);
         texture.Apply();
         return newPixels;
