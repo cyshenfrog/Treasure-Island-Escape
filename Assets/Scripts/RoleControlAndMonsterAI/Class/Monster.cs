@@ -27,18 +27,22 @@ public class Monster : Monolog{
     private float beHungry;
     private float baseBeHungry;
 
-    private Dictionary<Log, string> logSet;  //獨白字典
-    private Dictionary<string, float> drop;
+    private Dictionary<Log, string> logSet = new Dictionary<Log, string>();                       //獨白
+    private Dictionary<string, float> drop = new Dictionary<string, float>();                     //掉落物
+    private Dictionary<Status.StatusPool, int> status = new Dictionary<Status.StatusPool, int>(); //狀態
 
     public Dictionary<Log, string> LogSet {
         set { logSet = value; }
         get { return logSet; }
-    }
-
+    }   
     public Dictionary<string, float> Drop {
         set { drop = value; }
         get { return drop; }
-    }
+    }  
+    public Dictionary<Status.StatusPool, int> Status {
+        set { status = value; }
+        get{ return status; }
+    } 
 
     public int Id {
         get { return id; }

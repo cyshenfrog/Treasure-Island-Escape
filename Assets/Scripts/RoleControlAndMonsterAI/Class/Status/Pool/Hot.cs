@@ -36,13 +36,13 @@ public class Hot : MonoBehaviour {
 
     void OnDestroy()
     {
-        Status.Remove(id, Status.StatusPool.Cold);
+        //Status.Remove(id, Status.StatusPool.Cold);
     }
 
     IEnumerator hot()
     {
         int run = 0;
-        Status.Add(id, Status.StatusPool.Hot, timer);
+        //Status.Add(id, Status.StatusPool.Hot, timer);
 
         //移動速度減少??
         if (isRole)
@@ -67,7 +67,7 @@ public class Hot : MonoBehaviour {
             yield return new WaitForSeconds(1);
             run++;
         }
-        Status.Remove(id, Status.StatusPool.Hot);
+        //Status.Remove(id, Status.StatusPool.Hot);
         Destroy(this);
     }
 }

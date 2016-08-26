@@ -22,7 +22,7 @@ public class Status {
         Blessing,
         Fury,
     }
-
+    /*
     /// # record all status of all the animal(include role) in the game
     private static Dictionary<string, Dictionary<StatusPool, float>> statusCollections = new Dictionary<string, Dictionary<StatusPool, float>>();
     public static Dictionary<string, Dictionary<StatusPool, float>> StatusCollectios {
@@ -64,6 +64,7 @@ public class Status {
     public static bool IsContainStatus(string id, StatusPool stat) {
         return statusCollections.ContainsKey(id) && statusCollections[id].ContainsKey(stat);       
     }
+    */
 
 }
 

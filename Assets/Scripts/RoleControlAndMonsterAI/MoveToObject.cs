@@ -14,8 +14,15 @@ public class MoveToObject : MonoBehaviour {
         role.GetComponent<RoleController>().MoveToTarget(transform.position);
     }
 
-    void OnDestroy() {
+    void OnCollisionEnter() {
         if (role != null)
             role.GetComponent<RoleController>().CancelTarget();
     }
+
+    void OnDestroy()
+    {
+        if (role != null)
+            role.GetComponent<RoleController>().CancelTarget();
+    }
+
 }

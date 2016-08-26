@@ -40,14 +40,14 @@ public class Poison : MonoBehaviour {
     }
 
     void OnDestroy() {
-        Status.Remove(id, Status.StatusPool.Poison);
+        //Status.Remove(id, Status.StatusPool.Poison);
     }
 
     IEnumerator poison() {
         int run = 0; /// # record the duration of status 
 
         /// # record the status and the object
-        Status.Add(id, Status.StatusPool.Poison, timer);
+        //Status.Add(id, Status.StatusPool.Poison, timer);
 
         while (timer != run) {
 
@@ -64,7 +64,7 @@ public class Poison : MonoBehaviour {
         }
 
         /// # status finish 
-        Status.Remove(id, Status.StatusPool.Poison);
+        //Status.Remove(id, Status.StatusPool.Poison);
         Destroy(this);
     }
 

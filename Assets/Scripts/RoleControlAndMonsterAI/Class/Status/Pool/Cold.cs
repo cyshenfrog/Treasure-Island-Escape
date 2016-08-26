@@ -34,13 +34,13 @@ public class Cold : MonoBehaviour {
     }
 
     void OnDestroy() {
-        Status.Remove(id, Status.StatusPool.Cold);
+        //Status.Remove(id, Status.StatusPool.Cold);
     }
 
     IEnumerator cold() {
 
         int run = 0;
-        Status.Add(id, Status.StatusPool.Cold, timer);
+        //Status.Add(id, Status.StatusPool.Cold, timer);
 
         //移動速度減少??
         if (isRole) {
@@ -61,7 +61,7 @@ public class Cold : MonoBehaviour {
             yield return new WaitForSeconds(1);
             run++;
         }
-        Status.Remove(id, Status.StatusPool.Cold);
+        //Status.Remove(id, Status.StatusPool.Cold);
         Destroy(this);
     }
 
