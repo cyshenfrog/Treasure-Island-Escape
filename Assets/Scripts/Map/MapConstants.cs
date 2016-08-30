@@ -11,7 +11,8 @@ public static class MapConstants
         Desert,
         Forest,
         Grassland,
-        Sea
+        Sea,
+        None
     }
 
     public enum BuildingType
@@ -19,5 +20,7 @@ public static class MapConstants
         Vestige
     }
     
-    public static Vector2[] bfs = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+    public static Vector2[] SearchDirections = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+
+    public static int LandformTypeAmount = (int)LandformType.None;
 }
