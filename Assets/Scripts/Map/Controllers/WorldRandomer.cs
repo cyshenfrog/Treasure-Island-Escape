@@ -30,16 +30,18 @@ public class WorldRandomer
 
         //DFS and BFS generator
         //to initialize DFSList and two BFSLists
-        for (int i = 2; i < landformTypeAmount; ++i)
+        //temp is the count of landformType except for snowfield and volcano
+        int temp = landformTypeAmount - 2;
+        for (int i = 0; i < temp; ++i)
         {
-            worldData[(int)positions[i].x][(int)positions[i].y] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]);
-            DFSList.Add(worldData[(int)positions[i].x][(int)positions[i].y]);
+            worldData[(int)positions[i].y][(int)positions[i].x] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]);
+            DFSList.Add(worldData[(int)positions[i].y][(int)positions[i].x]); 
         }
 
-        worldData[(int)positions[0].x][(int)positions[0].y] = TileDataManager.Factory(0, positions[0]);
-        volcanoBFSList.Add(worldData[(int)positions[0].x][(int)positions[0].y]);
-        worldData[(int)positions[1].x][(int)positions[1].y] = TileDataManager.Factory((MapConstants.LandformType)1, positions[1]);
-        snowfieldBFSList.Add(worldData[(int)positions[1].x][(int)positions[1].y]);
+        worldData[(int)positions[5].y][(int)positions[5].x] = TileDataManager.Factory((MapConstants.LandformType)5, positions[5]);
+        snowfieldBFSList.Add(worldData[(int)positions[5].y][(int)positions[5].x]);
+        worldData[(int)positions[6].y][(int)positions[6].x] = TileDataManager.Factory((MapConstants.LandformType)6, positions[6]);
+        volcanoBFSList.Add(worldData[(int)positions[6].y][(int)positions[6].x]);
 
         //to generate map
         int index = 0;
@@ -55,10 +57,10 @@ public class WorldRandomer
                 index = 0;
 
                 if (isVolcanoBFSContinued && (isVolcanoBFSContinued = TileDataManager.BFS(volcanoBFSList, worldData, islandForm)))
-                    landformList[0].Add(volcanoBFSList[volcanoBFSList.Count - 1]);
+                    landformList[5].Add(volcanoBFSList[volcanoBFSList.Count - 1]);
 
                 if (isSnowfieldContinued && (isSnowfieldContinued = TileDataManager.BFS(snowfieldBFSList, worldData, islandForm)))
-                    landformList[1].Add(snowfieldBFSList[snowfieldBFSList.Count - 1]);
+                    landformList[6].Add(snowfieldBFSList[snowfieldBFSList.Count - 1]);
             }
         }
     }
@@ -80,16 +82,17 @@ public class WorldRandomer
             conti = UnReasonableDistance(positions);
         }
         
-        //to ensure that position[0] has max y value and position[1] has min y value
-        if(positions[0].y < positions[1].y)
-            Swap(positions, 0, 1);
+        //to ensure that position[5] has max y value and position[6] has min y value
+        if(positions[5].y < positions[6].y)
+            Swap(positions, 5, 6);
 
-        for(int i = 2; i < landformTypeAmount; ++i)
+        int temp = landformTypeAmount - 2;
+        for(int i = 0; i < temp; ++i)
         {
-            if (positions[i].y > positions[0].y)
-                Swap(positions, i, 0);
-            else if (positions[i].y < positions[1].y)
-                Swap(positions, i, 1);
+            if (positions[i].y > positions[5].y)
+                Swap(positions, i, 5);
+            else if (positions[i].y < positions[6].y)
+                Swap(positions, i, 6);
         }
 
         return positions;
@@ -123,6 +126,7 @@ public class WorldRandomer
         set { landformList = value; }
     }
 
+    // height width 
     TileData[][] worldData;
     List<TileData>[] landformList = new List<TileData>[MapConstants.LandformTypeAmount];
     Ellipse islandForm;

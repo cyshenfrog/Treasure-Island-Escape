@@ -6,7 +6,7 @@ public class WorldController : MonoBehaviour
 {
     void Awake ()
     {
-        textures = new Texture2D[] { Volcano, Snowfield, Marsh, Desert, Forest, Grassland, Sea };
+        textures = new Texture2D[] { Sea, Grassland, Forest, Desert, Marsh, Snowfield, Volcano };
 
         /*
         sprites = new Sprite[materialTypeAmount];
@@ -15,11 +15,77 @@ public class WorldController : MonoBehaviour
         */
         
         int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
-
+        
         //to get random world
         WorldRandomer wr = new WorldRandomer(widthCount, heightCount, DistanceThreshold);
         worldData = wr.WorldData;
 
+        
+        for (int i = 0; i < landformTypeAmount; ++i)
+            ResizeCanvas(textures[i], WorldWidth, WorldHeight);
+        
+
+        
+        //to display the random map
+        
+        //1 pixel = 0.01 in world coordinates
+        float cellWidthInWC = CellWidth * .01f, cellHeightInWC = CellHeight * .01f, halfCellWidthInWC = cellWidthInWC * .5f, halfCellHeightInWC = cellHeightInWC * .5f;
+        Transform tf = ((GameObject)Resources.Load(@"Map\Tile")).transform;
+        SpriteRenderer sr;
+        
+        displayWorld = new Transform[heightCount][];
+        for (int i = 0; i < heightCount; ++i)
+        {
+            displayWorld[i] = new Transform[widthCount];
+            for (int j = 0; j < widthCount; ++j)
+            {
+                displayWorld[i][j] = tf = Instantiate(tf);
+                sr = tf.GetComponent<SpriteRenderer>();
+
+                tf.parent = WorldList;
+                tf.localScale = Vector3.one;
+                //the local position is at center;
+                tf.localPosition = new Vector3(j * cellWidthInWC, i * cellHeightInWC);
+                tf.name = "Tile " + j + ", " + i;
+
+                TileData td = worldData[i][j];
+
+                //Can an edge have two materialTypes only?
+                if (td.MaterialTypes[1] == MapConstants.LandformType.None)
+                {
+                    //this is a simple materialType
+                    int type = (int)td.MaterialTypes[0];
+
+                    sr.sprite = Sprite.Create(textures[type], new Rect(j * CellWidth, i * CellHeight, CellWidth, CellHeight), Vector2.zero);
+                    
+                    //sr.sprite = sprites[(int)td.MaterialTypes[0]];
+                    tf.name += " " + td.MaterialTypes[0];
+                }
+                else
+                {
+                    //this is an edge
+                    tf.name += " edge with " + td.MaterialTypes[0] + " and " + td.MaterialTypes[1];
+
+                    int type = (int)td.MaterialTypes[0];
+
+                    //noise!!
+                    float[][] noise = GenerateWhiteNoise(CellHeight, CellWidth);
+                    float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
+
+                    //to blend two textures
+                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellHeight, CellWidth);
+                    int firstPixelX = j * CellWidth, firstPixelY = i * CellHeight;
+                    for (int k = 0; k < CellHeight; ++k)
+                        for (int l = 0; l < CellWidth; ++l)
+                            blendedimage.SetPixel(l, k, Interpolate(t0.GetPixel(firstPixelX + l, firstPixelY + k), t1.GetPixel(firstPixelX + l, firstPixelY + k), perlinNoise[l][k]));
+
+                    blendedimage.Apply();
+                    sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
+                }
+            }
+        }
+        
+        /*
         //to find the max and min x , y coordinates in respective landform
         Vector2[][] boundaries = new Vector2[landformTypeAmount][];
         for (int i = 0; i < landformTypeAmount; ++i)
@@ -57,15 +123,16 @@ public class WorldController : MonoBehaviour
             int reWidth = (int)(boundaries[i][0].x - boundaries[i][1].x + 1) * CellWidth, reHeight = (int)(boundaries[i][2].y - boundaries[i][3].y + 1) * CellHeight;
             ResizeCanvas(textures[i], reWidth, reHeight);
 
-            /*
-            int tWidth = textures[i].width, tHeight = textures[i].height;
             
-            float times = reWidth / tWidth > reHeight / tHeight ? reWidth / tWidth : reHeight / tHeight;
+            //int tWidth = textures[i].width, tHeight = textures[i].height;
             
-            Debug.Log(textures[i].Resize(tWidth * ((int)times + 1), tHeight * ((int)times + 1)));
-            textures[i].Apply();
-            */
+            //float times = reWidth / tWidth > reHeight / tHeight ? reWidth / tWidth : reHeight / tHeight;
+            
+            //Debug.Log(textures[i].Resize(tWidth * ((int)times + 1), tHeight * ((int)times + 1)));
+            //textures[i].Apply();
+            
         }
+        
 
         Vector2[] coordinates = new Vector2[landformTypeAmount];
         for(int i = 0; i < landformTypeAmount; ++i)
@@ -73,69 +140,9 @@ public class WorldController : MonoBehaviour
             coordinates[i] = new Vector2(boundaries[i][1].x, boundaries[i][3].y);
             Debug.Log(coordinates[i]);
         }
-
-
-        //to display the random map
-
-        /*
-        //1 pixel = 0.01 in world coordinates
-        float cellWidthInWC = CellWidth * .01f, cellHeightInWC = CellHeight * .01f, halfCellWidthInWC = cellWidthInWC * .5f, halfCellHeightInWC = cellHeightInWC * .5f;
-        Transform tf = ((GameObject)Resources.Load(@"Map\Tile")).transform;
-        SpriteRenderer sr;
-
-        displayWorld = new Transform[heightCount][];
-        for (int i = 0; i < heightCount; ++i)
-        {
-            displayWorld[i] = new Transform[widthCount];
-            for (int j = 0; j < widthCount; ++j)
-            {
-                tf = displayWorld[j][i] = new GameObject().transform;
-                sr = tf.GetComponent<SpriteRenderer>();
-
-                tf.parent = WorldList;
-                tf.localScale = Vector3.one;
-                //the local position is at center;
-                tf.localPosition = new Vector3(j * cellWidthInWC, i * cellHeightInWC);
-
-                TileData td = worldData[i][j];
-                tf.name = "Tile" + j.ToString() + ", " + i;
-
-                //Can an edge have two materialTypes only?
-                if (td.MaterialTypes[1] == MapConstants.LandformType.None)
-                {
-                    //this is a simple materialType
-                    int type = (int)td.MaterialTypes[0];
-
-                    sr.sprite = Sprite.Create(textures[type], new Rect((j - coordinates[type].x) * CellWidth, (i - coordinates[type].y) * CellHeight, CellWidth, CellHeight), Vector2.zero);
-                    
-                    //sr.sprite = sprites[(int)td.MaterialTypes[0]];
-                    tf.name += " " + td.MaterialTypes[0];
-                }
-                else
-                {
-                    //this is an edge
-                    tf.name += " edge with " + td.MaterialTypes[0] + " and " + td.MaterialTypes[1];
-
-                    int type = (int)td.MaterialTypes[0];
-
-                    //noise!!
-                    float[][] noise = GenerateWhiteNoise(CellWidth, CellHeight);
-                    float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
-
-                    //to blend two textures
-                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellWidth, CellHeight);
-                    int firstPixelX = (int)(j - coordinates[type].x) * CellWidth, firstPixelY = (int)(i - coordinates[type].y) * CellHeight;
-                    for (int k = 0; k < CellWidth; ++k)
-                        for (int l = 0; l < CellHeight; ++l)
-                            blendedimage.SetPixel(k, l, Interpolate(t0.GetPixel(firstPixelX + k, firstPixelY + l), t1.GetPixel(k, l), perlinNoise[k][l]));
-
-                    blendedimage.Apply();
-                    sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, CellWidth, CellHeight), Vector2.one / 2);
-                }
-            }
-        }*/
+        */
     }
-    
+
     float[][] GenerateWhiteNoise(int width, int height)
     {
         float[][] noise = new float[width][];
@@ -248,11 +255,14 @@ public class WorldController : MonoBehaviour
         return perlinNoise;
     }
 
+    
+    //used to change the size of texture 
     public static Color32[] ResizeCanvas(Texture2D texture, int width, int height)
     {
         float oldWidth = texture.width, oldHeight = texture.height;
         float newWR = width / oldWidth, newHR = height / oldHeight, times = newWR > newHR ? newWR : newHR;
         times = (int)times + 1;
+        Debug.Log(oldWidth + " " + oldHeight + " " + width + " " + height);
         Debug.Log(times);
 
         var newPixels = times == 1f ? texture.GetPixels32() : ResizeCanvas(texture.GetPixels32(), (int)oldWidth, (int)oldHeight, (int)(oldWidth * times), (int)(oldHeight * times), (int)times);
@@ -275,26 +285,39 @@ public class WorldController : MonoBehaviour
                 int newIndex = i * width * times + j * times;
                 int oldIndex = i * oldWidth + j;
 
-                try
-                {
-                    Color32 c = pixels[i * oldWidth + j];
+                Color32 c = pixels[i * oldWidth + j];
 
-                    newPixels[newIndex] = c;
-                    newPixels[newIndex + 1] = c;
-                    newPixels[newIndex + width] = c;
-                    newPixels[newIndex + width + 1] = c;
-                }
-                catch(IndexOutOfRangeException e)
+                newPixels[newIndex] = c;
+
+                int rightTemp, upTemp;
+                for (int k = 1; k < times; ++k)
                 {
-                    Debug.Log(i);
-                    Debug.Log(j);
-                    break;
+                    //the rightmost
+                    rightTemp = newIndex + 1 * k;
+                    newPixels[rightTemp] = c;
+                    //the upmost
+                    upTemp = newIndex + width * k;
+                    newPixels[upTemp] = c;
+
+                    for (int l = k - 1; l > 0; --l)
+                    {
+                        rightTemp += width;
+                        newPixels[rightTemp] = c;
+
+                        upTemp += 1;
+                        newPixels[upTemp] = c;
+                    }
+
+                    //the rightmost and upmost 
+                    rightTemp = newIndex + width * k + 1 * k;
+                    newPixels[rightTemp] = c;
                 }
             }
         }
 
         return newPixels;
     }
+    
 
     /*
     //test
@@ -340,7 +363,7 @@ public class WorldController : MonoBehaviour
     */
 
     public Transform WorldList;
-    public Texture2D Volcano, Snowfield, Marsh, Desert, Forest, Grassland, Sea;
+    public Texture2D Sea, Grassland, Forest, Desert, Marsh, Snowfield, Volcano;
     public int WorldWidth, WorldHeight, CellWidth, CellHeight;
     public float DistanceThreshold;
 

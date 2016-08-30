@@ -16,12 +16,12 @@ public class TileDataManager
             td.Directions.RemoveAt(random);
 
             //inside or randomly outside
-            if ((nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+            if ((nextPosition.x < worldData[0].Length && nextPosition.x >= 0 && nextPosition.y < worldData.Length && nextPosition.y >= 0))
             {
                 //Debug.Log(islandForm.Inside(nextPosition));
 
                 //to check if the nextTd has benn found
-                if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                if (worldData[(int)nextPosition.y][(int)nextPosition.x] == null)
                 {
                     //first found
                     DFSList[index] = CreateNext(nextPosition, direction, td, worldData, true);
@@ -30,7 +30,7 @@ public class TileDataManager
                 else
                 {
                     //it has been found before
-                    CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
+                    CreateEdge(direction, td, worldData[(int)nextPosition.y][(int)nextPosition.x]);
                 }
             }
 
@@ -126,10 +126,10 @@ public class TileDataManager
 
             //inside or randomly outside
             //if (islandForm.Inside(nextPosition) || (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
-            if ((nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+            if ((nextPosition.x < worldData[0].Length && nextPosition.x >= 0 && nextPosition.y < worldData.Length && nextPosition.y >= 0))
             {
                 //to check if the nexttd has benn found
-                if (worldData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                if (worldData[(int)nextPosition.y][(int)nextPosition.x] == null)
                 {
                     //first found
                     BFSList.Add(CreateNext(nextPosition, direction, td, worldData, false));
@@ -138,7 +138,7 @@ public class TileDataManager
                 else
                 {
                     //it has been found before
-                    CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
+                    CreateEdge(direction, td, worldData[(int)nextPosition.y][(int)nextPosition.x]);
                 }
             }
 
@@ -216,7 +216,7 @@ public class TileDataManager
 
     static TileData CreateNext(Vector2 nextPosition, Vector2 direction, TileData td, TileData[][] worldData, bool DFS)
     {
-        TileData next = worldData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, DFS ? td : null);
+        TileData next = worldData[(int)nextPosition.y][(int)nextPosition.x] = Factory(td.MaterialTypes[0], nextPosition, DFS ? td : null);
         next.MaterialDirections[0] = direction;
         next.Directions.Remove(-direction);
         return next;

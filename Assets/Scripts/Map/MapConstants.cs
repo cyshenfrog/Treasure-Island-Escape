@@ -3,15 +3,16 @@ using System.Collections;
 
 public static class MapConstants
 {
+    //sea = 0, which is represented to index in landformList
     public enum LandformType
     {
-        Volcano,
-        Snowfield,
-        Marsh,
-        Desert,
-        Forest,
-        Grassland,
         Sea,
+        Grassland,
+        Forest,
+        Desert,
+        Marsh,
+        Snowfield,
+        Volcano,
         None
     }
 
