@@ -5,10 +5,15 @@ using System;
 public class Test : MonoBehaviour
 {
     public Texture2D Image;
+    public Sprite single;
 
 	// Use this for initialization
 	void Start ()
     {
+        //atlas
+       
+        
+
         /*
         int tWidth = Image.width, tHeight = Image.height;
         int reWidth = 1278, reHeight = 823;

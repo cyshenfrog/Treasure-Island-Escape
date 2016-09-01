@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class TileDataManager
 {
-    public static bool DFS(List<TileData> DFSList, ref int index, TileData[][] worldData, Ellipse islandForm)
+    public static bool DFS(List<TileData> DFSList, ref int index, TileData[][] worldData, Form islandForm)
     {
         TileData td = DFSList[index];
 
@@ -108,7 +108,7 @@ public class TileDataManager
         }
     }
 
-    public static bool BFS(List<TileData> BFSList, TileData[][] worldData, Ellipse islandForm)
+    public static bool BFS(List<TileData> BFSList, TileData[][] worldData, Form islandForm)
     {
         //int times = selected.Count > maxBFSTimes ? maxBFSTimes : selected.Count;
 

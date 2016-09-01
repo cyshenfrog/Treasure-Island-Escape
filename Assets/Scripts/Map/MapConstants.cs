@@ -16,6 +16,12 @@ public static class MapConstants
         None
     }
 
+    public enum FormType
+    {
+        Ellipse,
+        None
+    }
+
     public enum BuildingType
     {
         Vestige

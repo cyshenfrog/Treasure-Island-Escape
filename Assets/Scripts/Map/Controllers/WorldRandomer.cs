@@ -11,6 +11,8 @@ public class WorldRandomer
 
         //islandForm = new Ellipse(new Vector2(width / 2, height / 2), width / 2 - 50, height / 2 - 55);
 
+        islandForm = FormManager.Factory((MapConstants.FormType)Random.Range(0, (int)MapConstants.FormType.None), width, height);
+        
         GenerateWorld();
     }
 
@@ -22,25 +24,31 @@ public class WorldRandomer
         //world initialization
         worldData = new TileData[height][];
         for (int i = 0; i < height; ++i)
+        {
             worldData[i] = new TileData[width];
+            //for (int j = 0; j < width; ++j)
+                //worldData[i][j] = new Sea(new Vector2(j, i));
+        }
 
         //landformList initialization
         for (int i = 0; i < landformTypeAmount; ++i)
             landformList[i] = new List<TileData>();
+
+        //to create the TileData in the position of worldData
+        for(int i = 0; i < landformTypeAmount; ++i)
+        {
+            worldData[(int)positions[i].y][(int)positions[i].x] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]);
+            landformList[i].Add(worldData[(int)positions[i].y][(int)positions[i].x]);
+        }
 
         //DFS and BFS generator
         //to initialize DFSList and two BFSLists
         //temp is the count of landformType except for snowfield and volcano
         int temp = landformTypeAmount - 2;
         for (int i = 0; i < temp; ++i)
-        {
-            worldData[(int)positions[i].y][(int)positions[i].x] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]);
-            DFSList.Add(worldData[(int)positions[i].y][(int)positions[i].x]); 
-        }
+            DFSList.Add(worldData[(int)positions[i].y][(int)positions[i].x]);
 
-        worldData[(int)positions[5].y][(int)positions[5].x] = TileDataManager.Factory((MapConstants.LandformType)5, positions[5]);
         snowfieldBFSList.Add(worldData[(int)positions[5].y][(int)positions[5].x]);
-        worldData[(int)positions[6].y][(int)positions[6].x] = TileDataManager.Factory((MapConstants.LandformType)6, positions[6]);
         volcanoBFSList.Add(worldData[(int)positions[6].y][(int)positions[6].x]);
 
         //to generate map
@@ -129,7 +137,7 @@ public class WorldRandomer
     // height width 
     TileData[][] worldData;
     List<TileData>[] landformList = new List<TileData>[MapConstants.LandformTypeAmount];
-    Ellipse islandForm;
+    Form islandForm;
     int landformTypeAmount = MapConstants.LandformTypeAmount, width, height;
     float distanceThreshold;
 }
