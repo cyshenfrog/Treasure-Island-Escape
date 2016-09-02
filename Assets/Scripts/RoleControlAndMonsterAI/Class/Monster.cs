@@ -1,14 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
 
 public class Monster : Monolog{
-
+    
+    private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
     private int id = 0;
 
     private string name;
 
     private int hp;
     private int baseHp;
+
+    private int maxHp;
+    private int baseMaxHp;
 
     private float speed;
     private float baseSpeed;
@@ -27,9 +34,9 @@ public class Monster : Monolog{
     private float beHungry;
     private float baseBeHungry;
 
-    private Dictionary<Log, string> logSet = new Dictionary<Log, string>();                       //獨白
-    private Dictionary<string, float> drop = new Dictionary<string, float>();                     //掉落物
-    private Dictionary<Status.StatusPool, int> status = new Dictionary<Status.StatusPool, int>(); //狀態
+    private Dictionary<Log, string> logSet = new Dictionary<Log, string>();       //獨白
+    private Dictionary<string, float> drop = new Dictionary<string, float>();     //掉落物
+    private Dictionary<Status, int> status = new Dictionary<Status, int>();       //狀態
 
     public Dictionary<Log, string> LogSet {
         set { logSet = value; }
@@ -39,7 +46,7 @@ public class Monster : Monolog{
         set { drop = value; }
         get { return drop; }
     }  
-    public Dictionary<Status.StatusPool, int> Status {
+    public Dictionary<Status, int> Status {
         set { status = value; }
         get{ return status; }
     } 
@@ -51,12 +58,30 @@ public class Monster : Monolog{
         get { return name; }
     }
     public int Hp {
-        set { hp = value; }
+        set {
+            if (hp > maxHp)
+                hp = maxHp;
+            else if (hp < 0)
+                hp = 0;
+            else
+                hp = value;
+        }
         get { return hp; }
     }
     public int BaseHp {
         set { baseHp = value; }
         get { return baseHp; }
+    }
+
+    public int MaxHp
+    {
+        set { maxHp = value; }
+        get { return maxHp; }
+    }
+    public int BaseMaxHp
+    {
+        set { baseMaxHp = value; }
+        get { return baseMaxHp; }
     }
 
     public float Speed {
@@ -120,5 +145,25 @@ public class Monster : Monolog{
             if (item.Key == log) return item.Value;
         }
         return null;
+    }
+
+    public void Save() {
+        XmlSerializer serializer = new XmlSerializer(typeof(Monster));
+
+        using (var stream = new StreamWriter(filePath + id + ".xml", false, Encoding.UTF8)) {
+            serializer.Serialize(stream, this);
+        }
+    }
+
+    public static Monster Load(int id) {
+        var serializer = new XmlSerializer(typeof(Monster));
+        using (var stream = new FileStream(filePath + id + ".xml", FileMode.Open)) {
+            if (stream.Length <= 3) {
+                return new Monster();
+            }
+            else {
+                return (Monster)serializer.Deserialize(stream);
+            }
+        }
     }
 }

@@ -16,13 +16,13 @@ public class MoveToObject : MonoBehaviour {
 
     void OnCollisionEnter() {
         if (role != null)
-            role.GetComponent<RoleController>().CancelTarget();
+            role.GetComponent<RoleController>().State = RoleState.IDLE;
     }
 
     void OnDestroy()
     {
         if (role != null)
-            role.GetComponent<RoleController>().CancelTarget();
+            role.GetComponent<RoleController>().State = RoleState.IDLE;
     }
 
 }
