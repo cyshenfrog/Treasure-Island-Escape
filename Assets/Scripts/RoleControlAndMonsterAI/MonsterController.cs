@@ -6,7 +6,17 @@ public class MonsterController : MonoBehaviour {
     public string Role;
     public float Speed;
     public float Distance;
+
+
     private GameObject RolePrefab;
+    private Monster data;
+
+    public const int STATE_IDlE = 0;
+    public const int STATE_MOVE = 1;
+    public const int STATE_ATTACK = 2;
+    public const int STATE_NIGHT = 3;
+
+    private int enemyState;
 
     void Awake() {
         
@@ -14,25 +24,50 @@ public class MonsterController : MonoBehaviour {
 
 	void Start () {
         RolePrefab = GameObject.Find(Role);
+        enemyState = STATE_IDlE;
 	}
 	
 	void Update () {
-        if (Vector3.Distance(RolePrefab.transform.localPosition, transform.localPosition) <= Distance) {
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, RolePrefab.transform.localPosition, Speed * Time.deltaTime);
+        /*if (Vector3.Distance(RolePrefab.transform.localPosition, transform.localPosition) <= Distance) {
+            //transform.localPosition = Vector3.MoveTowards(transform.localPosition, RolePrefab.transform.localPosition, Speed * Time.deltaTime);
+            enemyState = STATE_MOVE;
+            
         }
         else {
             Move();
-        }
-	}
+        }*/
 
-    int moveTimes = 0;
+        if (lastTimes == 0) {
+            randomAction = Random.Range(0, 2);
+            randomDirection = Random.Range(0, 4);
+            lastTimes = Random.Range(10, 40);
+
+            enemyState = randomAction;
+        }
+
+        switch (enemyState) {
+            case STATE_IDlE:
+                Idle();
+                break;
+            case STATE_MOVE:
+                Move();
+                break;
+            case STATE_NIGHT:
+                break;
+            default:
+                break;
+        }
+
+
+    }
+
+    int lastTimes = 0;
     int randomDirection;
+    int randomAction;
+    
 
     public virtual void Move() {
-        if (moveTimes == 0) {
-            randomDirection = Random.Range(0, 4);
-            moveTimes = Random.Range(10, 40);
-        }
+        
         switch (randomDirection)
         {
             case 0:
@@ -50,7 +85,25 @@ public class MonsterController : MonoBehaviour {
             default:
                 break;
         }
-        moveTimes--;
+        lastTimes--;
+    }
+
+    public virtual void Idle() {
+
+        switch (randomDirection) {
+            case 0:
+                //play animation
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+        lastTimes--;
     }
 
     public virtual void Attack() {
