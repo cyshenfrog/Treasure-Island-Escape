@@ -29,7 +29,6 @@ public class MonsterController : MonoBehaviour {
 	}
 	
 	void Update () {
-
         if (lastTimes == 0) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);

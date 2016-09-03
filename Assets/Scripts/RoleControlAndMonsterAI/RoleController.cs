@@ -1,15 +1,20 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class RoleController : MonoBehaviour {
 
     //basic data
     public float Speed;
+
+    //constant
     public float AttackRange;
+    public float PickUpRange;
 
     private GameObject RoleCamera;       //main camera
     private Role data;                   //role data
 
     private Vector3 coordinateTarget = Vector3.zero;  //be used to moveToTarget, decide where role will move to 
+    private List<Vector2> objPosition = new List<Vector2>();
 
     public RoleState State { set; get; }
 
@@ -204,14 +209,35 @@ public class RoleController : MonoBehaviour {
     /// let role move to target
     /// </summary>
     /// <param name="target"></param>
-    public void MoveToTarget(Vector3 target) {
+    public void MoveToTarget(Vector2 target) {
         State = RoleState.PICKUP;
         coordinateTarget = target;
     }
 
+    public void SendObjPosition(Vector2 pos) {
+        objPosition.Add(pos);
+        float minDistance = 1000000;
+        int index = -1;
+        for (int i = 0;i < objPosition.Count;i++) {
+            if (Vector2.Distance(objPosition[i], transform.localPosition) < minDistance && Vector2.Distance(objPosition[i], transform.localPosition) <= PickUpRange) {
+                minDistance = Vector2.Distance(objPosition[i], transform.localPosition);
+                index = i;
+            }
+        }
+
+        if(index != -1)
+            MoveToTarget(objPosition[index]);
+
+    }
+
+    public void CancelMoveToTarget() {
+        State = RoleState.IDLE;
+        objPosition = new List<Vector2>();
+    }
+
     public bool Attack(Monster m, Vector3 target) {
 
-        State = RoleState.ATTACK;
+        //State = RoleState.ATTACK;
 
         if (Vector2.Distance(transform.localPosition, target) <= AttackRange) {
             m.Hp -= (int)data.Attack;

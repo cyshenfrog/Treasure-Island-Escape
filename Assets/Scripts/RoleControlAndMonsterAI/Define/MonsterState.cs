@@ -1,7 +1,7 @@
 ﻿public enum MonsterState {
-    ATTACK,
-    BEATTACK,
     IDlE,
     MOVE,
+    ATTACK,
+    BEATTACK,
     NIGHT,
 }
