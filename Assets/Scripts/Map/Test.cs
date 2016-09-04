@@ -4,15 +4,26 @@ using System;
 
 public class Test : MonoBehaviour
 {
-    public Texture2D Image;
-    public Sprite single;
-
 	// Use this for initialization
 	void Start ()
     {
+        /*
         //atlas
-       
-        
+        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+
+        Sprite[] s = Resources.LoadAll<Sprite>(@"Map\Grassland");
+        Debug.Log(s);
+
+        sr.sprite = s[4];
+
+        //sr.sprite.
+        Debug.Log(sr.sprite);
+        */
+
+        float[] arr = new float[] { 132, 204, 120, 97, 159, 87, 218, 228, 205, 165, 183, 150, 119, 183, 121, 192, 187, 187 };
+
+        for (int i = 0; i < arr.Length; ++i)
+            Debug.Log(arr[i] / 255f);
 
         /*
         int tWidth = Image.width, tHeight = Image.height;
@@ -138,4 +149,9 @@ public class Test : MonoBehaviour
 	void Update () {
 	
 	}
+
+
+    public Texture2D Image;
+    public Sprite single;
+    public GameObject go;
 }

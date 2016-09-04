@@ -23,8 +23,8 @@ public class WorldController : MonoBehaviour
         //Textures Processing
         for (int i = 0; i < landformTypeAmount; ++i)
             textures[i] = ResizeCanvas(textures[i], WorldWidth, WorldHeight);
-        
 
+        //Sprite[] grasslands = Resources.LoadAll<Sprite>(MapConstants.LandformPath);
 
 
         
@@ -96,21 +96,31 @@ public class WorldController : MonoBehaviour
         
         List<TileData>[] landformList = wr.LandformList;
 
-        for(int i = 0; i < landformList.Length; ++i)
+        float[][] worldNoise = GenerateWhiteNoise(WorldHeight, WorldWidth);
+        float[][] worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
+
+        /*
+        Debug.Log("x length = " + landformList[0].Count);
+
+        for (int i = 0; i < landformList.Length; ++i)
+            Debug.Log(landformList[i].Count);
+        */
+
+        for (int i = 0; i < landformList.Length; ++i)
         {
             for(int j = 0; j < landformList[i].Count; ++j)
             {
                 TileData td = landformList[i][j];
                 Vector3 position = td.Position;
 
-                displayWorld[(int)position.x][(int)position.y] = tf = Instantiate(tf);
+                displayWorld[(int)position.y][(int)position.x] = tf = Instantiate(tf);
                 sr = tf.GetComponent<SpriteRenderer>();
 
                 tf.parent = WorldList;
                 tf.localScale = Vector3.one;
                 //the local position is at center;
                 tf.localPosition = new Vector3(position.x * cellWidthInWC, position.y * cellHeightInWC);
-                tf.name = "Tile " + j + ", " + i;
+                tf.name = "Tile " + position.x + ", " + position.y;
 
                 //Can an edge have two materialTypes only?
                 if (td.MaterialTypes[1] == MapConstants.LandformType.None)
@@ -118,7 +128,33 @@ public class WorldController : MonoBehaviour
                     //this is a simple materialType
                     int type = (int)td.MaterialTypes[0];
 
-                    sr.sprite = Sprite.Create(textures[type], new Rect((int)position.x * CellWidth, (int)position.y * CellHeight, CellWidth, CellHeight), Vector2.zero);
+
+                    if(type != (int)MapConstants.LandformType.Grassland)
+                    {
+                        sr.sprite = Sprite.Create(textures[type], new Rect((int)position.x * CellWidth, (int)position.y * CellHeight, CellWidth, CellHeight), Vector2.zero);
+                    }
+                    else
+                    {
+                        Texture2D t = new Texture2D(CellWidth, CellHeight);
+
+                        for(int k = 0; k < CellHeight; ++k)
+                        {
+                            for(int l = 0; l < CellWidth; ++l)
+                            {
+                                t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
+                            }
+                        }
+                        t.Apply();
+
+                        sr.sprite = Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
+
+                        //Debug.Log(j + " " + i);
+                        //sr.sprite = grasslands[992 - (int)position.y * 32 + (int)position.x];
+                        //sr.sprite.
+                        //tf.name += " " + position.x + " " + position.y;
+                    }
+
+
                     //sr.sprite = Sprite.Create(textures[type], new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
                     
                     //sr.sprite = sprites[(int)td.MaterialTypes[0]];
@@ -136,7 +172,7 @@ public class WorldController : MonoBehaviour
                     float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
 
                     //to blend two textures
-                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellHeight, CellWidth);
+                    Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellWidth, CellHeight);
                     int firstPixelX = (int)position.x * CellWidth, firstPixelY = (int)position.y * CellHeight;
                     for (int k = 0; k < CellHeight; ++k)
                         for (int l = 0; l < CellWidth; ++l)
@@ -382,6 +418,26 @@ public class WorldController : MonoBehaviour
         }
 
         return newPixels;
+    }
+
+    Color ChooseColor(int lt, float value)
+    {
+        int index = -1;
+
+        if (value < .2f)
+            index = 0;
+        else if (value < .35f)
+            index = 1;
+        else if (value < .5f)
+            index = 2;
+        else if (value < .65f)
+            index = 3;
+        else if (value < .8f)
+            index = 4;
+        else
+            index = 5;
+
+        return MapConstants.GrasslandColor[index];
     }
     
 
