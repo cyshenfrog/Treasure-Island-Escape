@@ -6,10 +6,6 @@ public class RoleController : MonoBehaviour {
     //basic data
     public float Speed;
 
-    //constant
-    public float AttackRange;
-    public float PickUpRange;
-
     private GameObject RoleCamera;       //main camera
     private Role data;                   //role data
 
@@ -19,19 +15,21 @@ public class RoleController : MonoBehaviour {
     public RoleState State { set; get; }
 
     void Awake() {
-
+        data = new Role();
+        data.Attack = 100;
     }
 	void Start () {
         RoleCamera = GameObject.Find("Main Camera");
         State = RoleState.IDLE;
     }
 
+    /*void FixedUpdate() {
+        //let camera follow role  
+        RoleCamera.transform.position = transform.localPosition + new Vector3(0, 0, -10);
+    }*/
+
 	void Update () {
         //Speed = Role.GetRoleData(Carceer.None).MoveSpeed;
-
-        //let camera follow role  
-        RoleCamera.transform.position = new Vector3(transform.position.x, transform.position.y, RoleCamera.transform.position.z);
-
 
         switch (State) {
             case RoleState.IDLE:
@@ -219,7 +217,7 @@ public class RoleController : MonoBehaviour {
         float minDistance = 1000000;
         int index = -1;
         for (int i = 0;i < objPosition.Count;i++) {
-            if (Vector2.Distance(objPosition[i], transform.localPosition) < minDistance && Vector2.Distance(objPosition[i], transform.localPosition) <= PickUpRange) {
+            if (Vector2.Distance(objPosition[i], transform.localPosition) < minDistance && Vector2.Distance(objPosition[i], transform.localPosition) <= AnimalConstant.RolePickUpRange) {
                 minDistance = Vector2.Distance(objPosition[i], transform.localPosition);
                 index = i;
             }
@@ -239,7 +237,7 @@ public class RoleController : MonoBehaviour {
 
         //State = RoleState.ATTACK;
 
-        if (Vector2.Distance(transform.localPosition, target) <= AttackRange) {
+        if (Vector2.Distance(transform.localPosition, target) <= AnimalConstant.RoleAttackRange) {
             m.Hp -= (int)data.Attack;
             Debug.Log(m.Hp + "/" + m.MaxHp);
 
@@ -249,7 +247,7 @@ public class RoleController : MonoBehaviour {
             return true;
         }
         else {
-            State = RoleState.ATTACK;
+            //State = RoleState.ATTACK; ???
             return false;
         }
     }
