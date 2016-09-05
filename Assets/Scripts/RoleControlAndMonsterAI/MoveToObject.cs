@@ -9,6 +9,12 @@ public class MoveToObject : MonoBehaviour {
         role = GameObject.Find("Role");
     }
 
+    void Update() {
+        if (Input.GetKeyDown("space")) {
+            role.GetComponent<RoleController>().SendObjPosition(transform.localPosition);
+        }
+    }
+
     void OnMouseDown() {
         //call api to move the position of object 
         role.GetComponent<RoleController>().MoveToTarget(transform.position);
@@ -16,13 +22,16 @@ public class MoveToObject : MonoBehaviour {
 
     void OnCollisionEnter() {
         if (role != null)
-            role.GetComponent<RoleController>().CancelTarget();
+        {
+            role.GetComponent<RoleController>().CancelMoveToTarget();
+        }
     }
 
     void OnDestroy()
     {
-        if (role != null)
-            role.GetComponent<RoleController>().CancelTarget();
+        if (role != null) {
+            role.GetComponent<RoleController>().CancelMoveToTarget();
+        }
     }
 
 }

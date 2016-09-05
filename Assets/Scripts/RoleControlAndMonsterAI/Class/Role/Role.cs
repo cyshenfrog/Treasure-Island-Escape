@@ -1,13 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public enum Carceer {
-        None,
-        Warrior,
-        Chef,
-        Engineer,
-        Explorer
-}
 public class Role : Monolog {
 
     private static Carceer carceerName = Carceer.None;      //職業名稱

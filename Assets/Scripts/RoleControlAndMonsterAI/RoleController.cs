@@ -1,51 +1,58 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class RoleController : MonoBehaviour {
 
-    /// # basic data
+    //basic data
     public float Speed;
 
+    //constant
+    public float AttackRange;
+    public float PickUpRange;
 
-    private GameObject RoleCamera;       /// # main camera
+    private GameObject RoleCamera;       //main camera
+    private Role data;                   //role data
 
-    private bool triggerToMove = false;
-    private Vector3 coordinateTarget = Vector3.zero;  /// # be used to moveToTarget, decide where role will move to 
+    private Vector3 coordinateTarget = Vector3.zero;  //be used to moveToTarget, decide where role will move to 
+    private List<Vector2> objPosition = new List<Vector2>();
 
-    private bool isMouseHold = false;
+    public RoleState State { set; get; }
 
+    void Awake() {
+
+    }
 	void Start () {
         RoleCamera = GameObject.Find("Main Camera");
+        State = RoleState.IDLE;
     }
 
 	void Update () {
         //Speed = Role.GetRoleData(Carceer.None).MoveSpeed;
 
-        /// # let camera follow role  
+        //let camera follow role  
         RoleCamera.transform.position = new Vector3(transform.position.x, transform.position.y, RoleCamera.transform.position.z);
 
-        /// # two ways to move
-        /// # moveToTarget when trigger is true
 
-
-
-        if (!triggerToMove) {
-            if (Input.GetMouseButton(0))
-                mouseHold();
-            else
+        switch (State) {
+            case RoleState.IDLE:
                 move();
+                break;
+            case RoleState.MOUSEHOLD:
+                mouseHold();
+                break;
+            case RoleState.PICKUP:
+                moveToTarget();
+                break;
+            default:
+                break;
+
         }
-        else {
-            moveToTarget();
-        }
-        
-    }
-    void OnGUI() {
-        //Event e = Event.current;
-        //Debug.Log(e.mousePosition);
+
     }
 
     private void mouseHold() {
-        if (Input.GetMouseButton(0)) {
+        if (Input.GetMouseButton(0))
+        {
 
             Vector3 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             worldPoint.z = transform.position.z;
@@ -72,22 +79,24 @@ public class RoleController : MonoBehaviour {
                 move("0110");
 
         }
+        else
+            State = RoleState.IDLE;
     }
 
     //role move by keyboard
     private void move() {
 
-        Vector3 pos;                             /// # record the position of role
+        Vector3 pos;                             //record the position of role
         bool w = Input.GetKey("w");        
         bool a = Input.GetKey("a");
         bool s = Input.GetKey("s");
         bool d = Input.GetKey("d");
-        string key = w.GetHashCode().ToString()  /// # change key code to a string key
+        string key = w.GetHashCode().ToString()  //change key code to a string key
             + a.GetHashCode().ToString() 
             + s.GetHashCode().ToString() 
             + d.GetHashCode().ToString();
 
-        /// # according string key decide role's movement
+        //according string key decide role's movement
         switch (key) {
             case "1000":
                 pos = transform.position;
@@ -97,7 +106,7 @@ public class RoleController : MonoBehaviour {
                 pos = transform.position;
                 transform.position = new Vector3(pos.x - Time.deltaTime * Speed, pos.y, pos.z);
                 break;
-            /// # below deal with moving diagonally
+            //below deal with moving diagonally
             case "0010":
                 pos = transform.position;
                 transform.position = new Vector3(pos.x, pos.y - Time.deltaTime * Speed, pos.z);
@@ -128,9 +137,9 @@ public class RoleController : MonoBehaviour {
     private void move(string key)
     {
 
-        Vector3 pos;   /// # record the position of role
+        Vector3 pos;   //record the position of role
 
-        /// # according string key decide role's movement
+        //according string key decide role's movement
         switch (key) {
             case "1000":
                 pos = transform.position;
@@ -169,10 +178,10 @@ public class RoleController : MonoBehaviour {
     }
 
 
-    /// # let role move to target
+    //let role move to target
     private void moveToTarget() {
         if (transform.position == coordinateTarget || Input.GetKey("w") || Input.GetKey("a") || Input.GetKey("s") || Input.GetKey("d"))
-            triggerToMove = false;
+            State = RoleState.IDLE; //triggerToMove = false;
         else
         {
             if (coordinateTarget.x == transform.position.x || coordinateTarget.y == transform.position.y)
@@ -196,14 +205,52 @@ public class RoleController : MonoBehaviour {
         
     }
 
-    /// # api that let role move to target
-    public void MoveToTarget(Vector3 target) {
-        triggerToMove = true;
+    /// <summary>
+    /// let role move to target
+    /// </summary>
+    /// <param name="target"></param>
+    public void MoveToTarget(Vector2 target) {
+        State = RoleState.PICKUP;
         coordinateTarget = target;
     }
 
-    /// # api that cancel to let role move to target
-    public void CancelTarget() {
-        triggerToMove = false;
+    public void SendObjPosition(Vector2 pos) {
+        objPosition.Add(pos);
+        float minDistance = 1000000;
+        int index = -1;
+        for (int i = 0;i < objPosition.Count;i++) {
+            if (Vector2.Distance(objPosition[i], transform.localPosition) < minDistance && Vector2.Distance(objPosition[i], transform.localPosition) <= PickUpRange) {
+                minDistance = Vector2.Distance(objPosition[i], transform.localPosition);
+                index = i;
+            }
+        }
+
+        if(index != -1)
+            MoveToTarget(objPosition[index]);
+
+    }
+
+    public void CancelMoveToTarget() {
+        State = RoleState.IDLE;
+        objPosition = new List<Vector2>();
+    }
+
+    public bool Attack(Monster m, Vector3 target) {
+
+        //State = RoleState.ATTACK;
+
+        if (Vector2.Distance(transform.localPosition, target) <= AttackRange) {
+            m.Hp -= (int)data.Attack;
+            Debug.Log(m.Hp + "/" + m.MaxHp);
+
+            //play animation
+            //animation callback to unlock state;
+
+            return true;
+        }
+        else {
+            State = RoleState.ATTACK;
+            return false;
+        }
     }
 }

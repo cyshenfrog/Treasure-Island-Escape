@@ -3,56 +3,50 @@ using System.Collections;
 
 public class MonsterController : MonoBehaviour {
 
-    public string Role;
+    public int id;
+    public string RolePrefabName;
     public float Speed;
     public float Distance;
 
-
-    private GameObject RolePrefab;
+    private GameObject role;
     private Monster data;
 
-    public const int STATE_IDlE = 0;
-    public const int STATE_MOVE = 1;
-    public const int STATE_ATTACK = 2;
-    public const int STATE_NIGHT = 3;
+    private MonsterState enemyState;
 
-    private int enemyState;
+    int lastTimes = 0;
+    int randomDirection;
+    int randomAction;
 
     void Awake() {
-        
+        //data = Monster.Load(id);
+        /*data.MaxHp = 1000;
+        data.Hp = 1000;*/
     }
 
 	void Start () {
-        RolePrefab = GameObject.Find(Role);
-        enemyState = STATE_IDlE;
+        role = GameObject.Find(RolePrefabName);
+        enemyState = MonsterState.IDlE;
 	}
 	
 	void Update () {
-        /*if (Vector3.Distance(RolePrefab.transform.localPosition, transform.localPosition) <= Distance) {
-            //transform.localPosition = Vector3.MoveTowards(transform.localPosition, RolePrefab.transform.localPosition, Speed * Time.deltaTime);
-            enemyState = STATE_MOVE;
-            
-        }
-        else {
-            Move();
-        }*/
-
         if (lastTimes == 0) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);
             lastTimes = Random.Range(10, 40);
 
-            enemyState = randomAction;
+            enemyState = (MonsterState)randomAction;
         }
 
         switch (enemyState) {
-            case STATE_IDlE:
+            case MonsterState.IDlE:
                 Idle();
                 break;
-            case STATE_MOVE:
+            case MonsterState.MOVE:
                 Move();
                 break;
-            case STATE_NIGHT:
+            case MonsterState.NIGHT:
+                break;
+            case MonsterState.BEATTACK:
                 break;
             default:
                 break;
@@ -60,11 +54,6 @@ public class MonsterController : MonoBehaviour {
 
 
     }
-
-    int lastTimes = 0;
-    int randomDirection;
-    int randomAction;
-    
 
     public virtual void Move() {
         
@@ -110,7 +99,19 @@ public class MonsterController : MonoBehaviour {
 
     }
 
-    public virtual void Skill() {
 
+    void OnMouseDown() {
+        
+        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
+            //play animation
+            if (data.Hp == 0) {
+                //play animation
+                //remove data in monster collection
+                Debug.Log("monster die");
+                Destroy(gameObject);
+            }
+        }
+
+        
     }
 }
