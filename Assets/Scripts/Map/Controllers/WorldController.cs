@@ -34,10 +34,37 @@ public class WorldController : MonoBehaviour
         float cellWidthInWC = CellWidth * .01f, cellHeightInWC = CellHeight * .01f, halfCellWidthInWC = cellWidthInWC * .5f, halfCellHeightInWC = cellHeightInWC * .5f;
         Transform tf = ((GameObject)Resources.Load(@"Map\Tile")).transform;
         SpriteRenderer sr;
-        
+
+        int displayWidth = SightWidth / CellWidth + 1, displayHeight = SightHeight / CellHeight + 1;
+        float halfDisplayWidth = displayWidth / 2f, halfDisplayHeight = displayHeight / 2f;
+
+        displayWorld = new Transform[displayHeight][];
+        for (int i = 0; i < displayHeight; ++i)
+            displayWorld[i] = new Transform[displayWidth];
+
+
+
+        for(int i = 0; i < displayHeight; ++i)
+        {
+            for(int j = 0; j < displayWidth; ++j)
+            {
+                displayWorld[i][j] = tf = Instantiate(tf);
+                tf.parent = Role;
+
+                tf.localPosition = (i - halfDisplayWidth) * Vector3.right + (j - halfDisplayHeight) * Vector3.up;
+                tf.localScale = Vector3.one;
+
+                //tf.GetComponent<SpriteRenderer>().sprite = ChooseSprite(tf.position.x, tf.position.y);
+            }
+        }
+
+
+
+        /*
         displayWorld = new Transform[heightCount][];
         for (int i = 0; i < heightCount; ++i)
             displayWorld[i] = new Transform[widthCount];
+        */
 
         /*
         for (int i = 0; i < heightCount; ++i)
@@ -96,8 +123,8 @@ public class WorldController : MonoBehaviour
         
         List<TileData>[] landformList = wr.LandformList;
 
-        float[][] worldNoise = GenerateWhiteNoise(WorldHeight, WorldWidth);
-        float[][] worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
+        worldNoise = GenerateWhiteNoise(WorldHeight, WorldWidth);
+        worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
         /*
         Debug.Log("x length = " + landformList[0].Count);
@@ -168,8 +195,8 @@ public class WorldController : MonoBehaviour
                     int type = (int)td.MaterialTypes[0];
 
                     //noise!!
-                    float[][] noise = GenerateWhiteNoise(CellHeight, CellWidth);
-                    float[][] perlinNoise = GeneratePerlinNoise(noise, 6);
+                    noise = GenerateWhiteNoise(CellHeight, CellWidth);
+                    perlinNoise = GeneratePerlinNoise(noise, 6);
 
                     //to blend two textures
                     Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellWidth, CellHeight);
@@ -439,6 +466,44 @@ public class WorldController : MonoBehaviour
 
         return MapConstants.GrasslandColor[index];
     }
+
+    /*
+    Sprite ChooseSprite(float positionX, float positionY)
+    {
+        int x = (int)positionX * 100, y = (int)positionY * 100;
+
+        int type = (int)worldData[y][x].MaterialTypes[0];
+        Vector3 position = worldData[y][x].Position;
+
+        if(type != (int)MapConstants.LandformType.Grassland)
+        {
+            return Sprite.Create(textures[type], new Rect((int)position.x * CellWidth, (int)position.y * CellHeight, CellWidth, CellHeight), Vector2.zero);
+        }
+        else
+        {
+            
+            Texture2D t = new Texture2D(CellWidth, CellHeight);
+
+            for (int k = 0; k < CellHeight; ++k)
+            {
+                for (int l = 0; l < CellWidth; ++l)
+                {
+                    t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
+                }
+            }
+            t.Apply();
+
+            sr.sprite = Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
+        }
+    }
+    */
+
+    void Update()
+    {
+        Vector3 rolePosition = Role.transform.localPosition;
+
+
+    }
     
 
     /*
@@ -484,15 +549,19 @@ public class WorldController : MonoBehaviour
     }
     */
 
-    public Transform WorldList;
+    public Transform WorldList, Role;
     public Texture2D Sea, Grassland, Forest, Desert, Marsh, Snowfield, Volcano;
     public Sprite gra;
-    public int WorldWidth, WorldHeight, CellWidth, CellHeight;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight;
     public float DistanceThreshold;
 
     Sprite[] sprites;
     Texture2D[] textures;
     Transform[][] displayWorld;
     TileData[][] worldData;
+    float[][] noise;
+    float[][] perlinNoise;
+    float[][] worldNoise;
+    float[][] worldPerlinNoise;
     int landformTypeAmount = MapConstants.LandformTypeAmount;
 }

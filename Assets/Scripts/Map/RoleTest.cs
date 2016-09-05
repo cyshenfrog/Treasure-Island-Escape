@@ -7,6 +7,7 @@ public class RoleTest : MonoBehaviour
 
     void Update()
     {
-        //if(Input.)
+        transform.localPosition += Vector3.right * Input.GetAxis("Horizontal");
+        transform.localPosition += Vector3.up * Input.GetAxis("Vertical");
     }
 }

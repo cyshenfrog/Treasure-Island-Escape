@@ -4,154 +4,259 @@ using System;
 
 public class Test : MonoBehaviour
 {
-	// Use this for initialization
-	void Start ()
+	void Awake ()
     {
-        /*
-        //atlas
-        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+        int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
 
-        Sprite[] s = Resources.LoadAll<Sprite>(@"Map\Grassland");
-        Debug.Log(s);
+        //to get random world
+        WorldRandomer wr = new WorldRandomer(widthCount, heightCount, DistanceThreshold);
+        worldData = wr.WorldData;
 
-        sr.sprite = s[4];
+        //to display the random map
 
-        //sr.sprite.
-        Debug.Log(sr.sprite);
-        */
-
-        float[] arr = new float[] { 132, 204, 120, 97, 159, 87, 218, 228, 205, 165, 183, 150, 119, 183, 121, 192, 187, 187 };
-
-        for (int i = 0; i < arr.Length; ++i)
-            Debug.Log(arr[i] / 255f);
-
-        /*
-        int tWidth = Image.width, tHeight = Image.height;
-        int reWidth = 1278, reHeight = 823;
-        float times = reWidth / tWidth > reHeight / tHeight ? reWidth / tWidth : reHeight / tHeight;
-        */
-        /*
-        int newWidth = 1024, newHeight = 2048, cellWidth = 32, cellHeight = 32;
-        int widthCount = newWidth / cellWidth, heightCount = newHeight / cellHeight;
-
-        
-        Debug.Log(Image.width);
-        Debug.Log(Image.height);
-
-        ResizeCanvas(Image, newWidth, newHeight);
-
-        Debug.Log(Image.width);
-        Debug.Log(Image.height);
-
-
-        //Debug.Log(Image.Resize(tWidth * ((int)times + 1), tHeight * ((int)times + 1)));
-        //Image.Apply();
-
+        //something for new go
         Transform tf = ((GameObject)Resources.Load(@"Map\Tile")).transform;
-        SpriteRenderer sr;
+        //SpriteRenderer sr;
 
-        for(int i = 0; i < heightCount; ++i)
+        //to calculate how many go do this world have to
+        float cellWidthInWC = CellWidth * .01f, cellHeightInWC = CellHeight * .01f, halfCellWidthInWC = cellWidthInWC * .5f, halfCellHeightInWC = cellHeightInWC * .5f;
+        int displayWidth = SightWidth / CellWidth + 2, displayHeight = SightHeight / CellHeight + 2;
+        float halfDisplayWidth = displayWidth / 2f, halfDisplayHeight = displayHeight / 2f;
+
+        //to create the noise
+        worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
+        worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
+
+        //to display
+        displayWorld = new Transform[displayWidth][];
+        for (int i = 0; i < displayWidth; ++i)
+            displayWorld[i] = new Transform[displayHeight];
+
+        t = new Texture2D(WorldWidth, WorldHeight);
+
+        for (int k = 0; k < WorldHeight; ++k)
         {
-            for(int j = 0; j < widthCount; ++j)
+            for (int l = 0; l < WorldWidth; ++l)
+            {
+                t.SetPixel(l, k, ChooseColor(0, worldPerlinNoise[l][k]));
+            }
+        }
+        t.Apply();
+        BigTile.GetComponent<SpriteRenderer>().sprite = Sprite.Create(t, new Rect(0, 0, WorldWidth, WorldHeight), Vector2.zero);
+
+        //to decide the detail of new go
+        for (int i = 0; i < displayHeight; ++i)
+        {
+            for (int j = 0; j < displayWidth; ++j)
+            {
+                displayWorld[j][i] = tf = Instantiate(tf);
+                tf.parent = Role;
+
+                tf.localPosition = (j - halfDisplayWidth) * Vector3.right * cellWidthInWC  + (i - halfDisplayHeight) * Vector3.up * cellHeightInWC;
+                tf.localScale = Vector3.one;
+                tf.GetComponent<SpriteRenderer>().sprite = ChooseSprite1(tf.position.x, tf.position.y);
+            }
+        }
+
+        for (int i = 0; i < displayHeight; ++i)
+        {
+            for (int j = 0; j < displayWidth; ++j)
             {
                 tf = Instantiate(tf);
-                tf.name = "Tile " + j.ToString() + '_' + i.ToString();
-                tf.localPosition = Vector3.right * j * cellWidth * 0.01f + Vector3.up * i * cellHeight * 0.01f;
-                sr = tf.GetComponent<SpriteRenderer>();
-                sr.sprite = Sprite.Create(Image, new Rect(j * cellWidth, i * cellWidth, cellWidth, cellHeight), Vector2.zero);
-            }
-        }
-        */
-        //GetComponent<SpriteRenderer>().sprite = Sprite.Create(Image, new Rect(0, 0, Image.width, Image.height), Vector2.zero);
+                tf.parent = Role1;
 
-        /*
-        bool test = true;
-        for (int i = 0; i < 10; ++i)
-        {
-            if (test = func())
-            {
-                Debug.Log("enter");
-            }
-        }*/
-    }
-
-    public static Color32[] ResizeCanvas(Texture2D texture, int width, int height)
-    {
-        float oldWidth = texture.width, oldHeight = texture.height;
-        float newWR = width / oldWidth, newHR = height / oldHeight, times = newWR > newHR ? newWR : newHR;
-        times = (int)times + 1;
-        Debug.Log(times);
-
-        var newPixels = times == 1f ? texture.GetPixels32() : ResizeCanvas(texture.GetPixels32(), (int)oldWidth, (int)oldHeight, (int)(oldWidth * times), (int)(oldHeight * times), (int)times);
-
-        texture.Resize((int)(oldWidth * times), (int)(oldHeight * times));
-        texture.SetPixels32(newPixels);
-        texture.Apply();
-        return newPixels;
-    }
-
-    private static Color32[] ResizeCanvas(IList<Color32> pixels, int oldWidth, int oldHeight, int width, int height, int times)
-    {
-        var newPixels = new Color32[(width * height)];
-        Debug.Log(width * height);
-
-        for(int i = 0; i < oldHeight; ++i)
-        {
-            for(int j = 0; j < oldWidth; ++j)
-            {
-                int newIndex = i * width * times + j * times;
-                int oldIndex = i * oldWidth + j;
-
-                Color32 c = pixels[i * oldWidth + j];
-
-                newPixels[newIndex] = c;
-                newPixels[newIndex + 1] = c;
-                newPixels[newIndex + width] = c;
-                newPixels[newIndex + width + 1] = c;
+                tf.localPosition = (j - halfDisplayWidth) * Vector3.right * cellWidthInWC + (i - halfDisplayHeight) * Vector3.up * cellHeightInWC;
+                tf.localScale = Vector3.one;
+                tf.GetComponent<SpriteRenderer>().sprite = ChooseSprite(tf.position.x, tf.position.y);
             }
         }
 
+    }
 
-        /*
-        var wBorder = (width - oldWidth) / 2;
-        var hBorder = (height - oldHeight) / 2;
+    Color ChooseColor(int lt, float value)
+    {
+        int index = -1;
 
-        for (int r = 0; r < height; r++)
+        if (value < .2f)
+            index = 0;
+        else if (value < .35f)
+            index = 1;
+        else if (value < .5f)
+            index = 2;
+        else if (value < .65f)
+            index = 3;
+        else if (value < .8f)
+            index = 4;
+        else
+            index = 5;
+
+        return MapConstants.GrasslandColor[index];
+    }
+
+    Sprite ChooseSprite(float positionX, float positionY)
+    {
+        int pixelX = (int)(positionX * 100), pixelY = (int)(positionY * 100);
+        int widthCount = pixelX / CellWidth, heightCount = pixelY / CellHeight;
+        
+        int type = (int)worldData[heightCount][widthCount].MaterialTypes[0];
+        Vector3 position = worldData[heightCount][widthCount].Position;
+        
+        Texture2D t = new Texture2D(CellWidth, CellHeight);
+        
+        for (int k = 0; k < CellHeight; ++k)
         {
-            var oldR = r - hBorder;
-            if (oldR < 0) { continue; }
-            if (oldR >= oldHeight) { break; }
-
-            for (int c = 0; c < width; c++)
+            for (int l = 0; l < CellWidth; ++l)
             {
-                var oldC = c - wBorder;
-                if (oldC < 0) { continue; }
-                if (oldC >= oldWidth) { break; }
-
-                var oldI = oldR * oldWidth + oldC;
-                var i = r * width + c;
-                newPixels[i] = pixels[oldI];
+                t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
             }
         }
-        */
-
-        return newPixels;
+        t.Apply();
+        
+        return Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
     }
 
-    bool func()
+    Sprite ChooseSprite1(float positionX, float positionY)
     {
-        //td.MaterialTypes[0] = MapConstants.MaterialType.Desert;
-        Debug.Log("YO");
-        return false;
+        int pixelX = (int)(positionX * 100), pixelY = (int)(positionY * 100);
+        int widthCount = pixelX / CellWidth, heightCount = pixelY / CellHeight;
+
+        int type = (int)worldData[heightCount][widthCount].MaterialTypes[0];
+        Vector3 position = worldData[heightCount][widthCount].Position;
+
+        Texture2D t = new Texture2D(CellWidth, CellHeight);
+
+        for (int k = 0; k < CellHeight; ++k)
+        {
+            for (int l = 0; l < CellWidth; ++l)
+            {
+                t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
+            }
+        }
+        t.Apply();
+
+        return Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    float Interpolate(float x0, float x1, float alpha)
+    {
+        return x0 * (1 - alpha) + x1 * alpha;
+    }
+
+    Color Interpolate(Color c0, Color c1, float alpha)
+    {
+
+        if (alpha > .5f)
+            return c1;
+        else
+            return c0;
+    }
+
+    float[][] GenerateWhiteNoise(int width, int height)
+    {
+        float[][] noise = new float[width][];
+        for (int i = 0; i < width; ++i)
+        {
+            noise[i] = new float[height];
+            for (int j = 0; j < height; ++j)
+                noise[i][j] = UnityEngine.Random.Range(0f, 1f);
+        }
+
+        return noise;
+    }
+
+    float[][] GenerateSmoothNoise(float[][] baseNoise, int octave)
+    {
+        int width = baseNoise.Length, height = baseNoise[0].Length;
+
+        float[][] smoothNoise = new float[width][];
+
+        int samplePeriod = 1 << octave;
+        float sampleFrequency = 1f / samplePeriod;
+
+        for (int i = 0; i < width; ++i)
+        {
+            smoothNoise[i] = new float[height];
+
+            //to calculate the horizontal sampling indices
+            int sample_i0 = (i / samplePeriod) * samplePeriod;
+            int sample_i1 = (sample_i0 + samplePeriod) % width;
+            float horizontal_blend = (i - sample_i0) * sampleFrequency;
+
+            for (int j = 0; j < height; ++j)
+            {
+                //to calculate the vertical sampling indices
+                int sample_j0 = (j / samplePeriod) * samplePeriod;
+                int sample_j1 = (sample_j0 + samplePeriod) % height;
+                float vertical_blend = (j - sample_j0) * sampleFrequency;
+
+                //to blend the top of two corners
+                float top = Interpolate(baseNoise[sample_i0][sample_j0], baseNoise[sample_i1][sample_j0], horizontal_blend);
+                //to blend the bottom two corners
+                float bottom = Interpolate(baseNoise[sample_i0][sample_j1], baseNoise[sample_i1][sample_j1], horizontal_blend);
+
+                //final blend
+                smoothNoise[i][j] = Interpolate(top, bottom, vertical_blend);
+            }
+        }
+
+        return smoothNoise;
+    }
+
+    float[][] GeneratePerlinNoise(float[][] baseNoise, int octaveCount)
+    {
+        int width = baseNoise.Length, height = baseNoise[0].Length;
+
+        float[][][] smoothNoise = new float[octaveCount][][];
+        float persistance = .5f;
+
+        //to generate smooth noise
+        for (int i = 0; i < octaveCount; ++i)
+            smoothNoise[i] = GenerateSmoothNoise(baseNoise, i);
+
+        float[][] perlinNoise = new float[width][];
+        for (int i = 0; i < width; ++i)
+            perlinNoise[i] = new float[height];
+
+        float amplitude = 1f, totalAmplitude = 0f;
+
+        //to blend noise together
+        for (int octave = octaveCount - 1; octave >= 0; --octave)
+        {
+            amplitude *= persistance;
+            totalAmplitude += amplitude;
+
+            for (int i = 0; i < width; ++i)
+                for (int j = 0; j < height; ++j)
+                    perlinNoise[i][j] += smoothNoise[octave][i][j] * amplitude;
+        }
+
+        //normalization
+        for (int i = 0; i < width; ++i)
+        {
+            for (int j = 0; j < height; ++j)
+            {
+                perlinNoise[i][j] /= totalAmplitude;
+            }
+        }
+
+        return perlinNoise;
+    }
+
+    void Update ()
+    {
 	
 	}
 
-
-    public Texture2D Image;
-    public Sprite single;
-    public GameObject go;
+    public Transform Role, Role1, BigTile;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight;
+    public float DistanceThreshold;
+    
+    Transform[][] displayWorld;
+    TileData[][] worldData;
+    Texture2D t;
+    float[][] noise;
+    float[][] perlinNoise;
+    float[][] worldNoise;
+    float[][] worldPerlinNoise;
+    int landformTypeAmount = MapConstants.LandformTypeAmount;
 }
