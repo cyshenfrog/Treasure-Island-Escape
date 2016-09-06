@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
+using System.IO;
 
 public class Test : MonoBehaviour
 {
@@ -19,9 +19,12 @@ public class Test : MonoBehaviour
         //SpriteRenderer sr;
 
         //to calculate how many go do this world have to
-        float cellWidthInWC = CellWidth * .01f, cellHeightInWC = CellHeight * .01f, halfCellWidthInWC = cellWidthInWC * .5f, halfCellHeightInWC = cellHeightInWC * .5f;
-        int displayWidth = SightWidth / CellWidth + 2, displayHeight = SightHeight / CellHeight + 2;
-        float halfDisplayWidth = displayWidth / 2f, halfDisplayHeight = displayHeight / 2f;
+        cellWidthInWC = CellWidth * .01f;
+        cellHeightInWC = CellHeight * .01f;
+        displayWidth = SightWidth / CellWidth;
+        displayHeight = SightHeight / CellHeight;
+        halfDisplayWidth = displayWidth * .5f;
+        halfDisplayHeight = displayHeight * .5f;
 
         //to create the noise
         worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
@@ -31,19 +34,7 @@ public class Test : MonoBehaviour
         displayWorld = new Transform[displayWidth][];
         for (int i = 0; i < displayWidth; ++i)
             displayWorld[i] = new Transform[displayHeight];
-
-        t = new Texture2D(WorldWidth, WorldHeight);
-
-        for (int k = 0; k < WorldHeight; ++k)
-        {
-            for (int l = 0; l < WorldWidth; ++l)
-            {
-                t.SetPixel(l, k, ChooseColor(0, worldPerlinNoise[l][k]));
-            }
-        }
-        t.Apply();
-        BigTile.GetComponent<SpriteRenderer>().sprite = Sprite.Create(t, new Rect(0, 0, WorldWidth, WorldHeight), Vector2.zero);
-
+        
         //to decide the detail of new go
         for (int i = 0; i < displayHeight; ++i)
         {
@@ -51,26 +42,14 @@ public class Test : MonoBehaviour
             {
                 displayWorld[j][i] = tf = Instantiate(tf);
                 tf.parent = Role;
-
                 tf.localPosition = (j - halfDisplayWidth) * Vector3.right * cellWidthInWC  + (i - halfDisplayHeight) * Vector3.up * cellHeightInWC;
                 tf.localScale = Vector3.one;
-                tf.GetComponent<SpriteRenderer>().sprite = ChooseSprite1(tf.position.x, tf.position.y);
+
+                tf.GetComponent<SpriteRenderer>().sprite = MakeSprite(tf.position);
             }
         }
 
-        for (int i = 0; i < displayHeight; ++i)
-        {
-            for (int j = 0; j < displayWidth; ++j)
-            {
-                tf = Instantiate(tf);
-                tf.parent = Role1;
-
-                tf.localPosition = (j - halfDisplayWidth) * Vector3.right * cellWidthInWC + (i - halfDisplayHeight) * Vector3.up * cellHeightInWC;
-                tf.localScale = Vector3.one;
-                tf.GetComponent<SpriteRenderer>().sprite = ChooseSprite(tf.position.x, tf.position.y);
-            }
-        }
-
+        nowTileData = GetTileDataByWorldPosition(Role.position);
     }
 
     Color ChooseColor(int lt, float value)
@@ -93,48 +72,41 @@ public class Test : MonoBehaviour
         return MapConstants.GrasslandColor[index];
     }
 
-    Sprite ChooseSprite(float positionX, float positionY)
+    Sprite MakeSprite(Vector3 worldPosition)
     {
-        int pixelX = (int)(positionX * 100), pixelY = (int)(positionY * 100);
-        int widthCount = pixelX / CellWidth, heightCount = pixelY / CellHeight;
+        //to decide which TileData do we want
+        TileData td = GetTileDataByWorldPosition(worldPosition);
+        int type = (int)td.MaterialTypes[0];
+        Vector3 position = td.Position;
         
-        int type = (int)worldData[heightCount][widthCount].MaterialTypes[0];
-        Vector3 position = worldData[heightCount][widthCount].Position;
-        
-        Texture2D t = new Texture2D(CellWidth, CellHeight);
-        
-        for (int k = 0; k < CellHeight; ++k)
+        //important!! This should create more 2 width and height for SpriteCreate! Otherwise, the sprite will have some strange edges
+        Texture2D t1 = new Texture2D(CellWidth + 2, CellHeight + 2);
+
+        for (int k = 0; k < CellHeight + 2; ++k)
         {
-            for (int l = 0; l < CellWidth; ++l)
+            for (int l = 0; l < CellWidth + 2; ++l)
             {
-                t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
+                try
+                {
+                    t1.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l - 1][(int)position.y * CellHeight + k - 1]));
+                }
+                catch
+                {
+                    Debug.LogError("MakeSprite Error: OutOfRange");
+                }
             }
         }
-        t.Apply();
-        
-        return Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
+        t1.Apply();
+
+        return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
     }
 
-    Sprite ChooseSprite1(float positionX, float positionY)
+    TileData GetTileDataByWorldPosition(Vector3 worldPosition)
     {
-        int pixelX = (int)(positionX * 100), pixelY = (int)(positionY * 100);
-        int widthCount = pixelX / CellWidth, heightCount = pixelY / CellHeight;
+        //cast should be done last
+        float pixelX = worldPosition.y * 100, pixelY = worldPosition.x * 100;
 
-        int type = (int)worldData[heightCount][widthCount].MaterialTypes[0];
-        Vector3 position = worldData[heightCount][widthCount].Position;
-
-        Texture2D t = new Texture2D(CellWidth, CellHeight);
-
-        for (int k = 0; k < CellHeight; ++k)
-        {
-            for (int l = 0; l < CellWidth; ++l)
-            {
-                t.SetPixel(l, k, ChooseColor(type, worldPerlinNoise[(int)position.x * CellWidth + l][(int)position.y * CellHeight + k]));
-            }
-        }
-        t.Apply();
-
-        return Sprite.Create(t, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
+        return worldData[(int)(pixelX) / CellHeight][(int)(pixelY) / CellWidth];
     }
 
     float Interpolate(float x0, float x1, float alpha)
@@ -242,21 +214,183 @@ public class Test : MonoBehaviour
         return perlinNoise;
     }
 
+    void RefreshMap()
+    {
+        //to refresh the displayWorld
+        //walking speed cannot be too fast!?
+        TileData newTileData = GetTileDataByWorldPosition(Role.position);
+
+        if (nowTileData != newTileData)
+        {
+            //to decide the moving direction
+
+            Vector2 from = nowTileData.Position, to = newTileData.Position;
+            float distanceX = to.x - from.x, distanceY = to.y - from.y;
+            int tempX = displayWidth - 1, tempY = displayHeight - 1;
+
+            //one direction
+
+            if (distanceX > 0f)
+            {
+                //right direction
+
+                //transit
+                for (int i = 0; i < displayHeight; ++i)
+                    for (int j = 1; j < displayWidth; ++j)
+                        displayWorld[j - 1][i].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sight
+                for (int i = 0; i < displayHeight; ++i)
+                    displayWorld[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[tempX][i].position);
+            }
+            else if (distanceX < 0f)
+            {
+                //left direction
+
+                //transit
+                for (int i = 0; i < displayHeight; ++i)
+                    for (int j = displayWidth - 2; j >= 0; --j)
+                        displayWorld[j + 1][i].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sight
+                for (int i = 0; i < displayHeight; ++i)
+                    displayWorld[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[0][i].position);
+            }
+
+            if (distanceY > 0f)
+            {
+                //up direction
+
+                //transit
+                for (int i = 1; i < displayHeight; ++i)
+                    for (int j = 0; j < displayWidth; ++j)
+                        displayWorld[j][i - 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sight
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][tempY].position);
+            }
+            else if (distanceY < 0f)
+            {
+                //down direction
+
+                //transit
+                for (int i = displayHeight - 2; i >= 0; --i)
+                    for (int j = 0; j < displayWidth; ++j)
+                        displayWorld[j][i + 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sight
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][0].position);
+            }
+
+            nowTileData = newTileData;
+        }
+    }
+
     void Update ()
     {
-	
-	}
+        /*
+        if (distanceX != 0f && distanceY != 0f)
+        {
+            Debug.Log("Two directions");
+            //two directions need!?
+            if (distanceX > 0f && distanceY > 0f)
+            {
+                //right up direction
 
-    public Transform Role, Role1, BigTile;
+                //transit
+                for (int i = 1; i < displayHeight; ++i)
+                    for (int j = 1; j < displayWidth; ++j)
+                        displayWorld[j - 1][i - 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sightX
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][tempY].position);
+
+                //new sightY
+                for (int i = 0; i < tempY; ++i)
+                    displayWorld[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[tempX][i].position);
+
+
+            }
+            else if (distanceX > 0f && distanceY < 0f)
+            {
+                //right down direction
+
+                //transit
+                for (int i = displayHeight - 2; i >= 0; --i)
+                    for (int j = 1; j < displayWidth; ++j)
+                        displayWorld[j - 1][i + 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sightX
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][0].position);
+
+                //new sightY
+                for (int i = 0; i < tempY; ++i)
+                    displayWorld[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[tempX][i].position);
+            }
+            else if (distanceX < 0f && distanceY > 0f)
+            {
+                //left up direction
+
+                //transit
+                for (int i = 0; i < displayHeight; ++i)
+                    for (int j = displayWidth - 2; j >= 0; --j)
+                        displayWorld[j + 1][i - 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sightX
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][tempY].position);
+
+                //new sightY
+                for (int i = 0; i < tempY; ++i)
+                    displayWorld[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[0][i].position);
+            }
+            else if (distanceX < 0f && distanceY < 0f)
+            {
+                //left down direction
+
+                //transit
+                for (int i = displayHeight - 2; i >= 0; --i)
+                    for (int j = displayWidth - 2; j >= 0; --j)
+                        displayWorld[j + 1][i + 1].GetComponent<SpriteRenderer>().sprite = displayWorld[j][i].GetComponent<SpriteRenderer>().sprite;
+
+                //new sightX
+                for (int i = 0; i < displayWidth; ++i)
+                    displayWorld[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][0].position);
+
+                //new sightY
+                for (int i = 0; i < tempY; ++i)
+                    displayWorld[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[0][i].position);
+            }
+        }
+        */
+
+        /*
+        for (int i = 0; i < displayHeight; ++i)
+        {
+            for (int j = 0; j < displayWidth; ++j)
+            {
+                Debug.Log(j + " " + i + " " + displayWorld[j][i].localPosition.ToString());
+                displayWorld[j][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[j][i].position);
+            }
+        }
+        */
+
+    }
+
+    public Transform Role;
     public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight;
     public float DistanceThreshold;
     
     Transform[][] displayWorld;
     TileData[][] worldData;
     Texture2D t;
-    float[][] noise;
-    float[][] perlinNoise;
-    float[][] worldNoise;
-    float[][] worldPerlinNoise;
-    int landformTypeAmount = MapConstants.LandformTypeAmount;
+    TileData nowTileData;
+
+    float[][] worldNoise, worldPerlinNoise;
+    float cellWidthInWC, cellHeightInWC, halfDisplayWidth, halfDisplayHeight;
+    int displayWidth, displayHeight, landformTypeAmount = MapConstants.LandformTypeAmount;
 }
