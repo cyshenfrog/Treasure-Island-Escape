@@ -6,7 +6,6 @@ public class RoleController : MonoBehaviour {
     //basic data
     public float Speed;
 
-    private GameObject RoleCamera;       //main camera
     private Role data;                   //role data
 
     private Vector3 coordinateTarget = Vector3.zero;  //be used to moveToTarget, decide where role will move to 
@@ -15,11 +14,11 @@ public class RoleController : MonoBehaviour {
     public RoleState State { set; get; }
 
     void Awake() {
-        data = new Role();
+        data = new Chef();
         data.Attack = 100;
+
     }
 	void Start () {
-        RoleCamera = GameObject.Find("Main Camera");
         State = RoleState.IDLE;
     }
 
