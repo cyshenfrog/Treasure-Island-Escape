@@ -8,31 +8,14 @@ public class MController_1 : MonsterController {
     //be attack
     private Vector2 rolePosition;
     private bool cacheRolePosition = false;
-    private int beAttackedState = 0;
-    private const int STATE_STARTPLAYANIM = 0;
-    private const int STATE_ANIM = 1;
-    private const int STATE_RUNAWAY = 2;
+    
     private int roleDirectionX;
     private int roleDirectionY;
 
     public override void BeAttacked()
     {
-        switch (beAttackedState)
-        {
-            case STATE_STARTPLAYANIM:
-                //playanimation
-                beAttackedState = STATE_ANIM;
-                break;
-            case STATE_ANIM:
-                //callback 
-                beAttackedState = STATE_RUNAWAY;
-                break;
-            case STATE_RUNAWAY:
-                runAway();
-                break;
-            default:
-                break;
-        }
+        base.BeAttacked();
+        if(beAttackedState == STATE_FINISFANIM) runAway();
     }
 
     protected virtual void runAway() {

@@ -7,12 +7,21 @@ public class MonsterController : MonoBehaviour {
     public float Speed;
     public float Distance;
 
+    //basic
     protected GameObject role;
     protected Monster data;
     protected MonsterState State;
+
+    //idle and move parameters
     protected int lastTimes = 0;
     protected int randomDirection;
     protected int randomAction;
+
+    //be attacked parameters
+    protected int beAttackedState = 0;
+    protected const int STATE_STARTPLAYANIM = 0;
+    protected const int STATE_ANIM = 1;
+    protected const int STATE_FINISFANIM = 2;
 
     void Awake() {
         //data = Monster.Load(id);
@@ -125,7 +134,18 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void BeAttacked() {
-        Debug.Log("be attacked");
+        switch (beAttackedState) {
+            case STATE_STARTPLAYANIM:
+                //playanimation
+                beAttackedState = STATE_ANIM;
+                break;
+            case STATE_ANIM:
+                //callback 
+                beAttackedState = STATE_FINISFANIM;
+                break;
+            default:
+                break;
+        }
     }
     
 }
