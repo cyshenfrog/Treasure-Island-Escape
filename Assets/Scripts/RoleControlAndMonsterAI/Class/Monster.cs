@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 public class Monster {
     
-    //private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
+    private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
     private int id = 0;
 
     private string name;
