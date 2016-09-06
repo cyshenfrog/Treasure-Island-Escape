@@ -47,6 +47,9 @@ public class MonsterController : MonoBehaviour {
             case MonsterState.BEATTACK:
                 BeAttacked();
                 break;
+            case MonsterState.ATTACK:
+                Attack();
+                break;
             default:
                 break;
         }
@@ -118,15 +121,11 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-
+        Debug.Log("attack");
     }
 
     public virtual void BeAttacked() {
-
-    }
-
-    protected virtual void runAway() {
-
+        Debug.Log("be attacked");
     }
     
 }

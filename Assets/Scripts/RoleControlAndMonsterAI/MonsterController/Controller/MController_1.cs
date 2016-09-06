@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MController_1 : MonsterController {
 
+    //被打逃跑
+
     //be attack
     private Vector2 rolePosition;
     private bool cacheRolePosition = false;
@@ -33,7 +35,7 @@ public class MController_1 : MonsterController {
         }
     }
 
-    protected override void runAway() {
+    protected virtual void runAway() {
         //check if trigger run action
         if (!cacheRolePosition)
         {
