@@ -1,69 +1,70 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Role : Monolog {
+public class Role {
 
-    private static Carceer carceerName = Carceer.None;      //職業名稱
+    protected static string filePath = "none";
+    protected Carceer carceerName = Carceer.None;      //職業名稱
 
-    private static int hp;              //血量(顯示現在血量)
-    private static int maxHp;           //血量(顯示遊戲中血量上限)
-    private static int baseMaxHp;       //血量(基礎數值)
+    protected int hp;              //血量(顯示現在血量)
+    protected int maxHp;           //血量(顯示遊戲中血量上限)
+    protected int baseMaxHp;       //血量(基礎數值)
 
-    private static float attack;        //攻擊(遊戲中腳色攻擊力)
-    private static float baseAttack;    //攻擊(基礎數值)
+    protected float attack;        //攻擊(遊戲中腳色攻擊力)
+    protected float baseAttack;    //攻擊(基礎數值)
 
-    private static float defence;       //防禦(遊戲中)
-    private static float baseDefence;   //防禦(基礎數值)
+    protected float defence;       //防禦(遊戲中)
+    protected float baseDefence;   //防禦(基礎數值)
 
-    private static int load;            //負重(遊戲中)
-    private static int baseLoad;        //負重(基礎數值)
+    protected int loading;            //負重(遊戲中)
+    protected int baseLoading;        //負重(基礎數值)
 
-    private static float attackSpeed;      //攻擊速度(遊戲中)
-    private static float baseAttackSpeed;  //攻擊速度(基礎數值)
+    protected float attackSpeed;      //攻擊速度(遊戲中)
+    protected float baseAttackSpeed;  //攻擊速度(基礎數值)
 
-    private static float hungry;        //飢餓值(顯示現在飢餓值)
-    private static float tired;         //疲勞值(顯示現在疲勞值)
-    private static float spirit;        //精神值(顯示現在精神值)
+    protected float hungry;        //飢餓值(顯示現在飢餓值)
+    protected float tired;         //疲勞值(顯示現在疲勞值)
+    protected float spirit;        //精神值(顯示現在精神值)
 
-    private static float maxHungry;     //飢餓值(遊戲中飢餓值上限)
-    private static float maxTired;      //疲勞值(遊戲中疲勞值上限)
-    private static float maxSpirit;     //精神值(遊戲中精神值上限)
+    protected float maxHungry;     //飢餓值(遊戲中飢餓值上限)
+    protected float maxTired;      //疲勞值(遊戲中疲勞值上限)
+    protected float maxSpirit;     //精神值(遊戲中精神值上限)
 
-    private static float baseMaxHungry;    //飢餓值(基礎數值)
-    private static float baseMaxTired;     //疲勞值(基礎數值)
-    private static float baseMaxSpirit;    //精神值(基礎數值)
+    protected float baseMaxHungry;    //飢餓值(基礎數值)
+    protected float baseMaxTired;     //疲勞值(基礎數值)
+    protected float baseMaxSpirit;    //精神值(基礎數值)
 
-    private static float moveSpeed;        //移動速度(遊戲中)
-    private static float baseMoveSpeed;    //移動數值(基礎數值)
+    protected float moveSpeed;        //移動速度(遊戲中)
+    protected float baseMoveSpeed;    //移動數值(基礎數值)
 
-    private static float beHungry;         //飢餓值耗損速度(遊戲中)
-    private static float beTired;          //疲勞值耗損速度(遊戲中)
-    private static float beFear;           //精神值耗損速度(遊戲中)
+    protected float beHungry;         //飢餓值耗損速度(遊戲中)
+    protected float beTired;          //疲勞值耗損速度(遊戲中)
+    protected float beFear;           //精神值耗損速度(遊戲中)
 
-    private static float baseBeHungry;     //飢餓值耗損速度(基礎數值)
-    private static float baseBeTired;      //疲勞值耗損速度(基礎數值)
-    private float baseBeFear;       //精神值耗損速度(基礎數值)
+    protected float baseBeHungry;     //飢餓值耗損速度(基礎數值)
+    protected float baseBeTired;      //疲勞值耗損速度(基礎數值)
+    protected float baseBeFear;       //精神值耗損速度(基礎數值)
 
-    private static float beHungryAtNight;       //夜間飢餓值耗損速度(遊戲中)
-    private static float beTiredAtNight;        //夜間疲勞值耗損速度(遊戲中)
-    private static float beFearAtNight;         //夜間精神值耗損速度(遊戲中)
+    protected float beHungryAtNight;       //夜間飢餓值耗損速度(遊戲中)
+    protected float beTiredAtNight;        //夜間疲勞值耗損速度(遊戲中)
+    protected float beFearAtNight;         //夜間精神值耗損速度(遊戲中)
 
-    private static float baseBeHungryAtNight;   //夜間飢餓值耗損速度(基礎數據)
-    private static float baseBeTiredAtNight;    //夜間疲勞值耗損速度(基礎數據)
-    private static float baseBeFearAtNight;     //夜間精神值耗損速度(基礎數據)
+    protected float baseBeHungryAtNight;   //夜間飢餓值耗損速度(基礎數據)
+    protected float baseBeTiredAtNight;    //夜間疲勞值耗損速度(基礎數據)
+    protected float baseBeFearAtNight;     //夜間精神值耗損速度(基礎數據)
 
-    private static Monolog logSet;  //獨白字典
+    //protected Monolog logSet;  //獨白字典
 
-    public virtual Monolog LogSet {
+    /*public Monolog LogSet {
         set { logSet = value; }
         get { return logSet; }
-    }
+    }*/
 
-    public virtual Carceer CarceerName {
+    public Carceer CarceerName {
         set { carceerName = value; }
         get { return carceerName; }
     }
-    public virtual int Hp {
+    public int Hp {
         set {
             if (hp > maxHp)
                 hp = maxHp;
@@ -74,56 +75,56 @@ public class Role : Monolog {
         }
         get { return hp; }
     }
-    public virtual int MaxHp {
+    public int MaxHp {
         set { maxHp = value; }
         get { return maxHp; }
     }
-    public virtual int BaseMaxHp {
+    public int BaseMaxHp {
         set { baseMaxHp = value; }
         get { return baseMaxHp; }
     }
-    public virtual float Attack {
+    public float Attack {
         set { attack = value; }
         get { return attack; }
     }
-    public virtual float BaseAttack {
+    public float BaseAttack {
         set { baseAttack = value; }
         get { return baseAttack; }
     }
-    public virtual float Defence {
+    public float Defence {
         set { defence = value; }
         get { return defence; }
     }
-    public virtual float BaseDefence{
+    public float BaseDefence{
         set { baseDefence = value; }
         get { return baseDefence; }
     }
-    public virtual int Load {
-        set { load = value; }
-        get { return load; }
+    public int Loading {
+        set { loading = value; }
+        get { return loading; }
     }
-    public virtual int BaseLoad {
-        set { baseLoad = value; }
-        get { return baseLoad; }
+    public int BaseLoading {
+        set { baseLoading = value; }
+        get { return baseLoading; }
     }
-    public virtual float AttackSpeed {
+    public float AttackSpeed {
         set { attackSpeed = value; }
         get { return attackSpeed; }
     }
-    public virtual float BaseAttackSpeed {
+    public float BaseAttackSpeed {
         set { baseAttackSpeed = value; }
         get { return baseAttackSpeed; }
     }
-    public virtual float MoveSpeed {
+    public float MoveSpeed {
         set { moveSpeed = value; }
         get { return moveSpeed; }
     }
-    public virtual float BaseMoveSpeed
+    public float BaseMoveSpeed
     {
         set { baseMoveSpeed = value; }
         get { return baseMoveSpeed; }
     }
-    public virtual float Hungry {
+    public float Hungry {
         set {
             if (hungry > maxHungry)
                 hungry = maxHungry;
@@ -134,7 +135,7 @@ public class Role : Monolog {
         }
         get { return hungry; }
     }
-    public virtual float Tired {
+    public float Tired {
         set {
             if (tired > maxTired)
                 tired = maxTired;
@@ -145,7 +146,7 @@ public class Role : Monolog {
         }
         get { return tired; }
     }
-    public virtual float Spirit {
+    public float Spirit {
         set {
             if (spirit > maxSpirit)
                 spirit = maxSpirit;
@@ -156,79 +157,88 @@ public class Role : Monolog {
         }
         get { return spirit; }
     }
-    public virtual float MaxHungry {
+    public float MaxHungry {
         set { maxHungry = value; }
         get { return maxHungry; }
     }
-    public virtual float MaxTired {
+    public float MaxTired {
         set { maxTired = value; }
         get { return maxTired; }
     }
-    public virtual float MaxSpirit {
+    public float MaxSpirit {
         set { maxSpirit = value; }
         get { return maxSpirit; }
     }
-    public virtual float BaseMaxHungry {
+    public float BaseMaxHungry {
         set { baseMaxHungry = value; }
         get { return baseMaxHungry; }
     }
-    public virtual float BaseMaxTired {
+    public float BaseMaxTired {
         set { baseMaxTired = value; }
         get { return baseMaxTired; }
     }
-    public virtual float BaseMaxSpirit {
+    public float BaseMaxSpirit {
         set { baseMaxSpirit = value; }
         get { return baseMaxSpirit; }
     }
-    public virtual float BeHungry {
+    public float BeHungry {
         set { beHungry = value; }
         get { return beHungry; }
     }
-    public virtual float BeTired {
+    public float BeTired {
         set { beTired = value; }
         get { return beTired; }
     }
-    public virtual float BeFear {
+    public float BeFear {
         set { beFear = value; }
         get { return beFear; }
     }
-    public virtual float BaseBeHungry {
+    public float BaseBeHungry {
         set { baseBeHungry = value; }
         get { return baseBeHungry; }
     }
-    public virtual float BaseBeTired {
+    public float BaseBeTired {
         set { baseBeTired = value; }
         get { return baseBeTired; }
     }
-    public virtual float BaseBeFear {
+    public float BaseBeFear {
         set { baseBeFear = value; }
         get { return baseBeFear; }
     }
-    public virtual float BeHungryAtNight {
+    public float BeHungryAtNight {
         set { beHungryAtNight = value; }
         get { return beHungryAtNight; }
     }
-    public virtual float BeTiredAtNight {
+    public float BeTiredAtNight {
         set { beTiredAtNight = value; }
         get { return beTiredAtNight; }
     }
-    public virtual float BeFearAtNight {
+    public float BeFearAtNight {
         set { beFearAtNight = value; }
         get { return beFearAtNight; }
     }
-    public virtual float BaseBeHungryAtNight {
+    public float BaseBeHungryAtNight {
         set { baseBeHungryAtNight = value; }
         get { return baseBeHungryAtNight; }
     }
-    public virtual float BaseBeTiredAtNight {
+    public float BaseBeTiredAtNight {
         set { baseBeTiredAtNight = value; }
         get { return baseBeTiredAtNight; }
     }
-    public virtual float BaseBeFearAtNight {
+    public float BaseBeFearAtNight {
         set { baseBeFearAtNight = value; }
         get { return baseBeFearAtNight; }
     }
 
+    public virtual Role Load() {
+        Role r = new Role();
+        readFile(ref r);
+        return r;
+    }
+
+    protected void readFile(ref Role r) {
+        //read file
+    }
 
     public static Role GetRoleData(Carceer c) {
 
@@ -242,7 +252,7 @@ public class Role : Monolog {
             case Carceer.Warrior:
                 return new Warrior();
             default:
-                return new Role();
+                return new Engineer();
         }
     }
     

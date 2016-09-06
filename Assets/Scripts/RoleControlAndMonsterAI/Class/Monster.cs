@@ -4,9 +4,9 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-public class Monster : Monolog{
+public class Monster {
     
-    private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
+    //private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
     private int id = 0;
 
     private string name;
@@ -34,14 +34,14 @@ public class Monster : Monolog{
     private float beHungry;
     private float baseBeHungry;
 
-    private Dictionary<Log, string> logSet = new Dictionary<Log, string>();       //獨白
+    //private Dictionary<Log, string> logSet = new Dictionary<Log, string>();       //獨白
     private Dictionary<string, float> drop = new Dictionary<string, float>();     //掉落物
     private Dictionary<Status, int> status = new Dictionary<Status, int>();       //狀態
 
-    public Dictionary<Log, string> LogSet {
+    /*public Dictionary<Log, string> LogSet {
         set { logSet = value; }
         get { return logSet; }
-    }   
+    }*/
     public Dictionary<string, float> Drop {
         set { drop = value; }
         get { return drop; }
@@ -138,14 +138,14 @@ public class Monster : Monolog{
     }
 
     //查詢獨白字典
-    public string LogString(Log log)
+    /*public string LogString(Log log)
     {
         foreach (var item in logSet)
         {
             if (item.Key == log) return item.Value;
         }
         return null;
-    }
+    }*/
 
     public void Save() {
         XmlSerializer serializer = new XmlSerializer(typeof(Monster));

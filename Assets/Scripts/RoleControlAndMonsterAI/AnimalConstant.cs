@@ -1,4 +1,5 @@
 ﻿public static class AnimalConstant {
+    public const string RolePrefab = "Role";
 
     public const float RoleAttackRange = 5;
     public const float RolePickUpRange = 10;

@@ -4,28 +4,15 @@ using System.Collections;
 public class MonsterController : MonoBehaviour {
 
     public int id;
-    public string RolePrefabName;
     public float Speed;
     public float Distance;
 
-    private GameObject role;
-    private Monster data;
-
-    private MonsterState enemyState;
-
-    private int lastTimes = 0;
-    private int randomDirection;
-    private int randomAction;
-
-    //be attack
-    private Vector2 rolePosition;
-    private bool cacheRolePosition = false;
-    private int beAttackState = 0;
-    private const int STATE_STARTPLAYANIM = 0;
-    private const int STATE_ANIM = 1;
-    private const int STATE_RUNAWAY = 2;
-    private int roleDirectionX;
-    private int roleDirectionY;
+    protected GameObject role;
+    protected Monster data;
+    protected MonsterState State;
+    protected int lastTimes = 0;
+    protected int randomDirection;
+    protected int randomAction;
 
     void Awake() {
         //data = Monster.Load(id);
@@ -35,20 +22,20 @@ public class MonsterController : MonoBehaviour {
     }
 
 	void Start () {
-        role = GameObject.Find(RolePrefabName);
-        enemyState = MonsterState.IDlE;
+        role = GameObject.Find(AnimalConstant.RolePrefab);
+        State = MonsterState.IDlE;
 	}
 	
 	void Update () {
-        if (lastTimes == 0 && (enemyState == MonsterState.IDlE || enemyState == MonsterState.MOVE)) {
+        if (lastTimes == 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);
             lastTimes = Random.Range(10, 40);
 
-            enemyState = (MonsterState)randomAction;
+            State = (MonsterState)randomAction;
         }
 
-        switch (enemyState) {
+        switch (State) {
             case MonsterState.IDlE:
                 Idle();
                 break;
@@ -58,7 +45,7 @@ public class MonsterController : MonoBehaviour {
             case MonsterState.NIGHT:
                 break;
             case MonsterState.BEATTACK:
-                BeAttack();
+                BeAttacked();
                 break;
             default:
                 break;
@@ -134,84 +121,12 @@ public class MonsterController : MonoBehaviour {
 
     }
 
-    public virtual void BeAttack() {
-        
-        switch (beAttackState) {
-            case STATE_STARTPLAYANIM:
-                //playanimation
-                beAttackState = STATE_ANIM;
-                break;
-            case STATE_ANIM:
-                //callback 
-                beAttackState = STATE_RUNAWAY;
-                break;
-            case STATE_RUNAWAY:
-                runAway();
-                break;
-            default:
-                break;
-        }
+    public virtual void BeAttacked() {
 
     }
 
-    private void runAway() {
-        
-        //check if trigger run action
-        if (!cacheRolePosition) {
-            //if not , record role direction data
-            rolePosition = role.transform.localPosition;
-            cacheRolePosition = true;
-            float deltaX = rolePosition.x - transform.localPosition.x;
-            float deltaY = rolePosition.y - transform.localPosition.y;
-
-            roleDirectionX = deltaX == 0 ? AnimalConstant.Origin : deltaX > 0 ? AnimalConstant.Right : AnimalConstant.Left;
-            roleDirectionY = deltaY == 0 ? AnimalConstant.Origin : deltaY > 0 ? AnimalConstant.Up : AnimalConstant.Down;
-        }
-
-        float distance = Vector2.Distance(rolePosition, transform.localPosition);
-
-        if (distance < AnimalConstant.RunAwayDistance) {
-            
-            if (lastTimes == 0) {
-                lastTimes = Random.Range(10, 40);
-                
-                do
-                {
-                    //random run direction (excludes role direction)
-                    randomDirection = Random.Range(0, 4);
-                } while (randomDirection == roleDirectionX || randomDirection == roleDirectionY);
-            }
-            Run();
-        }
-        else {
-            //finish run state
-            cacheRolePosition = false;
-            enemyState = MonsterState.IDlE;
-            beAttackState = STATE_STARTPLAYANIM;
-        }
-
+    protected virtual void runAway() {
 
     }
-
-
-    void OnMouseDown() {
-        
-        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
-
-            enemyState = MonsterState.BEATTACK;
-
-            lastTimes = 0;
-            beAttackState = STATE_STARTPLAYANIM;
-            cacheRolePosition = false;
-
-            if (data.Hp == 0) {
-                //play animation
-                //remove data in monster collection
-                Debug.Log("monster die");
-                Destroy(gameObject);
-            }
-        }
-
-        
-    }
+    
 }
