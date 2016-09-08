@@ -9,8 +9,8 @@ public class Test : MonoBehaviour
         int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
 
         //to get random world
-        WorldRandomer wr = new WorldRandomer(widthCount, heightCount, DistanceThreshold);
-        worldData = wr.WorldData;
+        GroundRandomer wr = new GroundRandomer(widthCount, heightCount, DistanceThreshold);
+        worldData = wr.GroundData;
 
         //to display the random map
 
@@ -52,7 +52,7 @@ public class Test : MonoBehaviour
         nowTileData = GetTileDataByWorldPosition(Role.position);
     }
 
-    Color ChooseColor(int lt, float value)
+    Color ChooseColor(int type, float value)
     {
         int index = -1;
 
@@ -69,7 +69,7 @@ public class Test : MonoBehaviour
         else
             index = 5;
 
-        return MapConstants.GrasslandColor[index];
+        return MapConstants.LandformColor[type][index];
     }
 
     Sprite MakeSprite(Vector3 worldPosition)
