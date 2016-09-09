@@ -12,6 +12,21 @@ public class MController_1 : MonsterController {
     private int roleDirectionX;
     private int roleDirectionY;
 
+    void OnMouseDown() {
+        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
+
+            State = MonsterState.BEATTACK;
+
+            //refresh data of be attacked
+            lastTimes = 0;
+            beAttackedState = STATE_STARTPLAYANIM;
+            cacheRolePosition = false;
+
+            //monster die
+            if (data.Hp == 0) Die();
+        }
+    }
+
     public override void BeAttacked()
     {
         base.BeAttacked();
@@ -34,11 +49,9 @@ public class MController_1 : MonsterController {
 
         float distance = Vector2.Distance(rolePosition, transform.localPosition);
 
-        if (distance < AnimalConstant.RunAwayDistance)
-        {
+        if (distance < AnimalConstant.RunAwayDistance) {
 
-            if (lastTimes == 0)
-            {
+            if (lastTimes == 0) {
                 lastTimes = Random.Range(10, 40);
 
                 do
@@ -59,25 +72,5 @@ public class MController_1 : MonsterController {
 
     }
 
-    void OnMouseDown()
-    {
-        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
-
-            State = MonsterState.BEATTACK;
-
-            //refresh data of be attacked
-            lastTimes = 0;
-            beAttackedState = STATE_STARTPLAYANIM;
-            cacheRolePosition = false;
-
-            //monster die
-            if (data.Hp == 0)
-            {
-                //play animation
-                //remove data in monster collection
-                Debug.Log("monster die");
-                Destroy(gameObject);
-            }
-        }
-    }
+    
 }

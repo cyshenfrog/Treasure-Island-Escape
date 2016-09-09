@@ -17,6 +17,12 @@ public class Monster {
     private int maxHp;
     private int baseMaxHp;
 
+    private float attackRange;
+    private float baseAttackRange;
+
+    private float attackSpace;
+    private float baseAttackSpace;
+
     private float speed;
     private float baseSpeed;
 
@@ -82,6 +88,24 @@ public class Monster {
     {
         set { baseMaxHp = value; }
         get { return baseMaxHp; }
+    }
+
+    public float AttackRange {
+        set { attackRange = value; }
+        get { return attackRange; }
+    }
+    public float BaseAttackRange {
+        set { baseAttackRange = value;}
+        get { return baseAttackRange; }
+    }
+
+    public float AttackSpace {
+        set { attackSpace = value; }
+        get { return attackSpace; }
+    }
+    public float BaseAttackSpace {
+        set { baseAttackSpace = value; }
+        get { return baseAttackSpace; }
     }
 
     public float Speed {

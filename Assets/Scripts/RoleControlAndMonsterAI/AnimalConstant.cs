@@ -2,6 +2,9 @@
 
     public const string RolePrefab = "Role";
 
+    public const float RoleWinkColdDown = 5;
+    public const float RoleGripperColdDown = 9;
+
     public const float RoleAttackRange = 5;
     public const float RolePickUpRange = 10;
 

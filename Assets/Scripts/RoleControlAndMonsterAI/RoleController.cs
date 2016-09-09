@@ -5,11 +5,15 @@ public class RoleController : MonoBehaviour {
 
     //basic data
     public float Speed;
+    public Animator anim;
 
     private Role data;                   //role data
 
     private Vector3 coordinateTarget = Vector3.zero;  //be used to moveToTarget, decide where role will move to 
     private List<Vector2> objPosition = new List<Vector2>();
+
+    private float wink = AnimalConstant.RoleWinkColdDown;
+    private float gripper = AnimalConstant.RoleGripperColdDown;
 
     public RoleState State { set; get; }
 
@@ -80,6 +84,10 @@ public class RoleController : MonoBehaviour {
             State = RoleState.IDLE;
     }
 
+    private void idle() {
+
+    }
+
     //role move by keyboard
     private void move() {
 
@@ -96,37 +104,75 @@ public class RoleController : MonoBehaviour {
         //according string key decide role's movement
         switch (key) {
             case "1000":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkUp");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x, pos.y + Time.deltaTime * Speed, pos.z);
                 break;
             case "0100":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkLeft");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x - Time.deltaTime * Speed, pos.y, pos.z);
                 break;
-            //below deal with moving diagonally
             case "0010":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkDown");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x, pos.y - Time.deltaTime * Speed, pos.z);
                 break;
             case "0001":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkRight");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x + Time.deltaTime * Speed, pos.y, pos.z);
                 break;
+            //below deal with moving diagonally
             case "1100":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkLeft");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
                 break;
             case "0110":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkLeft");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
                 break;
             case "0011":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkRight");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
                 break;
             case "1001":
+                wink = AnimalConstant.RoleWinkColdDown;
+                gripper = AnimalConstant.RoleGripperColdDown;
+                anim.SetTrigger("walkRight");
                 pos = transform.position;
                 transform.position = new Vector3(pos.x + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
+                break;
+            default:
+                anim.SetTrigger("stand");
+                wink -= Time.deltaTime;
+                gripper -= Time.deltaTime;
+                if (gripper <= 0) {
+                    anim.SetTrigger("gripper");
+                    gripper = AnimalConstant.RoleGripperColdDown;
+                }
+                if (wink <= 0) {
+                    anim.SetTrigger("wink");
+                    wink = AnimalConstant.RoleWinkColdDown;
+                }
+
                 break;
         }
     }
@@ -249,5 +295,20 @@ public class RoleController : MonoBehaviour {
             //State = RoleState.ATTACK; ???
             return false;
         }
+    }
+
+    public void BeAttacked(int attack) {
+        data.Hp -= attack;
+        State = RoleState.BEATTACK;
+
+        //play anim
+
+        if (data.Hp == 0) {
+            Die();
+        }
+    }
+
+    public void Die() {
+
     }
 }

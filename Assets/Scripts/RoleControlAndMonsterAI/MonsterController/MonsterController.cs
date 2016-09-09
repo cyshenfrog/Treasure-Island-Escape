@@ -130,7 +130,11 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-        Debug.Log("attack");
+
+        if (Vector2.Distance(role.transform.localPosition, transform.localPosition) < data.AttackRange) {
+            //play anim
+            role.GetComponent<RoleController>().BeAttacked((int)data.Attack);
+        }
     }
 
     public virtual void BeAttacked() {
@@ -146,6 +150,13 @@ public class MonsterController : MonoBehaviour {
             default:
                 break;
         }
+    }
+
+    public virtual void Die() {
+        //play animation
+        //remove data in monster collection
+        Debug.Log("monster die");
+        Destroy(gameObject);
     }
     
 }
