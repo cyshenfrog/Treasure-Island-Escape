@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 
+//ex: TileData td = GroundController.GetTileDataByWorldPosition(position);
 public class GroundController : MonoBehaviour
 {
     void Awake ()
@@ -30,7 +31,16 @@ public class GroundController : MonoBehaviour
         worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
+        //Display(false);
         Display(true);
+        /*
+        foreach(Transform[] ta in displaySight)
+        {
+            foreach(Transform t in ta)
+            {
+                t.gameObject.SetActive(true);
+            }
+        }*/
         
         //to set the nowTileData below the Role
         nowTileData = GetTileDataByWorldPosition(Role.position);
@@ -165,6 +175,7 @@ public class GroundController : MonoBehaviour
                 tile.name = "Tile " + i.ToString() + ',' + j.ToString();
 
                 tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                //tile.gameObject.SetActive(false);
             }
         }
 
@@ -201,6 +212,8 @@ public class GroundController : MonoBehaviour
                 tile.name = "Tile " + i.ToString() + ',' + j.ToString();
 
                 tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+
+                tile.gameObject.SetActive(false);
             }
         }
     }
