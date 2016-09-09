@@ -6,57 +6,53 @@ public class GroundController : MonoBehaviour
 {
     void Awake ()
     {
-        int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
+        StaticCellWidth = CellWidth;
+        StaticCellHeight = CellHeight;
+        tile = Resources.Load<GameObject>(@"Map\Tile").transform;
+
+        worldWidthCount = WorldWidth / CellWidth;
+        worldHeightCount = WorldHeight / CellHeight;
 
         //to get random world
-        GroundRandomer gr = new GroundRandomer(widthCount, heightCount, DistanceThreshold);
-        groundData = gr.GroundData;
+        groundData = GroundRandomer.Create(worldWidthCount, worldHeightCount, DistanceThreshold).GroundData;
         
         //to display the random map
-
-        //new go
-        Transform tf = ((GameObject)Resources.Load(@"Map\Tile")).transform;
 
         //to calculate how many go do this world have to
 
         //1 pixel = 0.01 in world coordinates
         cellWidthInWC = CellWidth * .01f;
         cellHeightInWC = CellHeight * .01f;
-        displayWidth = SightWidth / CellWidth;
-        displayHeight = SightHeight / CellHeight;
-        halfDisplayWidth = displayWidth * .5f;
-        halfDisplayHeight = displayHeight * .5f;
+        sightWidthCount = SightWidth / CellWidth;
+        sightHeightCount = SightHeight / CellHeight;
 
         //to create the noise
         worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
-        //to display
-        displayWorld = new Transform[displayWidth][];
-
+        Display(true);
         
-        //to decide the detail of new go
-        for (int i = 0; i < displayWidth; ++i)
-        {
-            displayWorld[i] = new Transform[displayHeight];
-
-            for (int j = 0; j < displayHeight; ++j)
-            {
-                //to initialize
-                displayWorld[i][j] = tf = Instantiate(tf);
-                tf.parent = Role;
-                tf.localPosition = (i - halfDisplayWidth) * Vector3.right * cellWidthInWC + (j - halfDisplayHeight) * Vector3.up * cellHeightInWC;
-                tf.localScale = Vector3.one;
-                tf.name = "Tile " + i.ToString() + ',' + j.ToString();
-
-                tf.GetComponent<SpriteRenderer>().sprite = MakeSprite(tf.position);
-            }
-        }
-
         //to set the nowTileData below the Role
         nowTileData = GetTileDataByWorldPosition(Role.position);
     }
-    
+
+    public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
+    {
+        //cast should be done last
+        //"+1" is to ensure the correctness of getting GroundData
+        float pixelX = worldPosition.x * 100 + 1, pixelY = worldPosition.y * 100 + 1;
+
+        try
+        {
+            return GroundRandomer.Self.GroundData[(int)(pixelX) / StaticCellWidth][(int)(pixelY) / StaticCellHeight];
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("GetTileDataByWorldPosition Error: " + e);
+            return null;
+        }
+    }
+
     Color ChooseColor(int type, float value)
     {
         int index = -1;
@@ -75,14 +71,6 @@ public class GroundController : MonoBehaviour
             index = 5;
         
         return MapConstants.LandformColor[type][index];
-    }
-
-    TileData GetTileDataByWorldPosition(Vector3 worldPosition)
-    {
-        //cast should be done last
-        float pixelX = worldPosition.x * 100, pixelY = worldPosition.y * 100;
-
-        return groundData[(int)(pixelX) / CellWidth][(int)(pixelY) / CellHeight];
     }
 
     Sprite MakeSprite(Vector3 worldPosition)
@@ -106,9 +94,9 @@ public class GroundController : MonoBehaviour
                     {
                         t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
                     }
-                    catch(Exception e)
+                    catch(IndexOutOfRangeException e)
                     {
-                        Debug.LogError("MakeSprite Error: OutOfRange " + e);
+                        t1.SetPixel(k, l, Color.white);
                     }
                 }
             }
@@ -129,9 +117,9 @@ public class GroundController : MonoBehaviour
                     {
                         t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
                     }
-                    catch(Exception e)
+                    catch(IndexOutOfRangeException e)
                     {
-                        Debug.LogError("MakeSprite Error: OutOfRange " + e);
+                        t1.SetPixel(k, l, Color.white);
                     }
                 }
             }
@@ -153,6 +141,70 @@ public class GroundController : MonoBehaviour
         return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
     }
 
+    void Display(bool isSight)
+    {
+        Transform parent = isSight ? Role : transform;
+        int widthCount = isSight ? sightWidthCount : worldWidthCount, heightCount = isSight ? sightHeightCount : worldHeightCount;
+        float halfWidthCount = isSight ? sightWidthCount * .5f : 0f, halfHeightCount = isSight ? sightHeightCount * .5f : 0f;
+        
+        //to display
+        Transform[][] display = new Transform[widthCount][];
+
+        //to decide the detail of new go
+        for (int i = 0; i < widthCount; ++i)
+        {
+            display[i] = new Transform[heightCount];
+
+            for (int j = 0; j < heightCount; ++j)
+            {
+                //to initialize
+                display[i][j] = tile = Instantiate(tile);
+                tile.parent = parent;
+                tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
+                tile.localScale = Vector3.one;
+                tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+
+                tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+            }
+        }
+
+        if (isSight)
+            displaySight = display;
+        else
+            displayWorld = display;
+    }
+
+    void DisplaySight()
+    {
+
+    }
+
+    void DisplayAllWorld()
+    {
+        float halfWorldWidth = worldWidthCount * .5f, halfWorldHeight = worldHeightCount * .5f;
+
+        //to display
+        displayWorld = new Transform[worldWidthCount][];
+
+        //to decide the detail of new go
+        for (int i = 0; i < worldWidthCount; ++i)
+        {
+            displayWorld[i] = new Transform[worldHeightCount];
+
+            for (int j = 0; j < worldHeightCount; ++j)
+            {
+                //to initialize
+                displayWorld[i][j] = tile = Instantiate(tile);
+                tile.parent = transform;
+                tile.localPosition = (i - halfWorldWidth) * Vector3.right * cellWidthInWC + (j - halfWorldHeight) * Vector3.up * cellHeightInWC;
+                tile.localScale = Vector3.one;
+                tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+
+                tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+            }
+        }
+    }
+
     void RefreshMap()
     {
         //to refresh the displayWorld
@@ -165,7 +217,7 @@ public class GroundController : MonoBehaviour
 
             Vector2 from = nowTileData.Position, to = newTileData.Position;
             float distanceX = to.x - from.x, distanceY = to.y - from.y;
-            int tempX = displayWidth - 1, tempY = displayHeight - 1;
+            int tempX = sightWidthCount - 1, tempY = sightHeightCount - 1;
 
             //one direction
             //two directions redundancy?
@@ -175,26 +227,26 @@ public class GroundController : MonoBehaviour
                 //right direction
 
                 //transit
-                for (int i = 1; i < displayWidth; ++i)
-                    for (int j = 0; j < displayHeight; ++j)
-                        displayWorld[i - 1][j].GetComponent<SpriteRenderer>().sprite = displayWorld[i][j].GetComponent<SpriteRenderer>().sprite;
+                for (int i = 1; i < sightWidthCount; ++i)
+                    for (int j = 0; j < sightHeightCount; ++j)
+                        displaySight[i - 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                 //new sight
-                for (int i = 0; i < displayHeight; ++i)
-                    displayWorld[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[tempX][i].position);
+                for (int i = 0; i < sightHeightCount; ++i)
+                    displaySight[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[tempX][i].position);
             }
             else if (distanceX < 0f)
             {
                 //left direction
 
                 //transit
-                for (int i = displayWidth - 2; i >= 0; --i)
-                    for (int j = 0; j < displayHeight; ++j)
-                        displayWorld[i + 1][j].GetComponent<SpriteRenderer>().sprite = displayWorld[i][j].GetComponent<SpriteRenderer>().sprite;
+                for (int i = sightWidthCount - 2; i >= 0; --i)
+                    for (int j = 0; j < sightHeightCount; ++j)
+                        displaySight[i + 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                 //new sight
-                for (int i = 0; i < displayHeight; ++i)
-                    displayWorld[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[0][i].position);
+                for (int i = 0; i < sightHeightCount; ++i)
+                    displaySight[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[0][i].position);
             }
 
             if (distanceY > 0f)
@@ -202,26 +254,26 @@ public class GroundController : MonoBehaviour
                 //up direction
 
                 //transit
-                for (int i = 0; i < displayWidth; ++i)
-                    for (int j = 1; j < displayHeight; ++j)
-                        displayWorld[i][j - 1].GetComponent<SpriteRenderer>().sprite = displayWorld[i][j].GetComponent<SpriteRenderer>().sprite;
+                for (int i = 0; i < sightWidthCount; ++i)
+                    for (int j = 1; j < sightHeightCount; ++j)
+                        displaySight[i][j - 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                 //new sight
-                for (int i = 0; i < displayWidth; ++i)
-                    displayWorld[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][tempY].position);
+                for (int i = 0; i < sightWidthCount; ++i)
+                    displaySight[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][tempY].position);
             }
             else if (distanceY < 0f)
             {
                 //down direction
 
                 //transit
-                for (int i = 0; i < displayWidth; ++i)
-                    for (int j = displayHeight - 2; j >= 0; --j)
-                        displayWorld[i][j + 1].GetComponent<SpriteRenderer>().sprite = displayWorld[i][j].GetComponent<SpriteRenderer>().sprite;
+                for (int i = 0; i < sightWidthCount; ++i)
+                    for (int j = sightHeightCount - 2; j >= 0; --j)
+                        displaySight[i][j + 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                 //new sight
-                for (int i = 0; i < displayWidth; ++i)
-                    displayWorld[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displayWorld[i][0].position);
+                for (int i = 0; i < sightWidthCount; ++i)
+                    displaySight[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][0].position);
             }
 
             nowTileData = newTileData;
@@ -340,15 +392,18 @@ public class GroundController : MonoBehaviour
         RefreshMap();
     }
 
+    public static int StaticCellWidth, StaticCellHeight;
+
     public Transform Role;
     public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight;
     public float DistanceThreshold;
-    
-    Transform[][] displayWorld;
+
+    Transform[][] displaySight, displayWorld;
     TileData[][] groundData;
     TileData nowTileData;
+    Transform tile;
 
     float[][] worldNoise, worldPerlinNoise;
-    float cellWidthInWC, cellHeightInWC, halfDisplayWidth, halfDisplayHeight;
-    int displayWidth, displayHeight, landformTypeAmount = MapConstants.LandformTypeAmount;
+    float cellWidthInWC, cellHeightInWC;
+    int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, landformTypeAmount = MapConstants.LandformTypeAmount;
 }

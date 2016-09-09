@@ -9,7 +9,7 @@ public class Test : MonoBehaviour
         int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
 
         //to get random world
-        GroundRandomer wr = new GroundRandomer(widthCount, heightCount, DistanceThreshold);
+        GroundRandomer wr = GroundRandomer.Create(widthCount, heightCount, DistanceThreshold);
         worldData = wr.GroundData;
 
         //to display the random map

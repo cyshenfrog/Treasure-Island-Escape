@@ -3,20 +3,80 @@ using System.Collections.Generic;
 
 public class GroundRandomer
 {
-    public GroundRandomer(int width, int height, float distanceThreshold)
+    private GroundRandomer(int w, int h, float d)
     {
-        this.width = width;
-        this.height = height;
-        this.distanceThreshold = distanceThreshold;
+        width = w;
+        height = h;
+        distanceThreshold = d;
 
         //islandForm = new Ellipse(new Vector2(width / 2, height / 2), width / 2 - 50, height / 2 - 55);
 
         islandForm = FormManager.Factory((MapConstants.FormType)Random.Range(0, (int)MapConstants.FormType.None), width, height);
-        
+
         GenerateGround();
     }
 
-    void GenerateGround()
+    public static GroundRandomer Create(int width, int height, float distanceThreshold)
+    {
+        if (self == null)
+            self = new GroundRandomer(width, height, distanceThreshold);
+        else
+            Debug.Log("GroundRandomer Create Error: Attempt to create more than two Groundrandomer");
+
+        return self;
+    }
+
+    static bool UnReasonableDistance(Vector2[] positions)
+    {
+        for (int i = 0; i < landformTypeAmount; ++i)
+            for (int j = i + 1; j < landformTypeAmount; ++j)
+                if (Vector2.Distance(positions[i], positions[j]) < distanceThreshold)
+                    return true;
+
+        return false;
+    }
+    
+    static void Swap<T>(T[] positions, int i, int j)
+    {
+        T temp = positions[i];
+        positions[i] = positions[j];
+        positions[j] = temp;
+    }
+
+    static Vector2[] RandomSites()
+    {
+        Vector2[] positions = new Vector2[landformTypeAmount];
+        bool conti = true;
+
+        while (conti)
+        {
+            Debug.Log("random...");
+
+            //to create positions randomly
+            for (int i = 0; i < landformTypeAmount; ++i)
+                positions[i] = new Vector2(Random.Range(1, width), Random.Range(1, height));
+
+            //to check if these sites is too close
+            conti = UnReasonableDistance(positions);
+        }
+
+        //to ensure that position[5] has max y value and position[6] has min y value
+        if (positions[5].y < positions[6].y)
+            Swap(positions, 5, 6);
+
+        int temp = landformTypeAmount - 2;
+        for (int i = 0; i < temp; ++i)
+        {
+            if (positions[i].y > positions[5].y)
+                Swap(positions, i, 5);
+            else if (positions[i].y < positions[6].y)
+                Swap(positions, i, 6);
+        }
+
+        return positions;
+    }
+
+    static void GenerateGround()
     {
         Vector2[] positions = RandomSites();
         List<TileData> DFSList = new List<TileData>(), volcanoBFSList = new List<TileData>(), snowfieldBFSList = new List<TileData>();
@@ -30,9 +90,8 @@ public class GroundRandomer
         for (int i = 0; i < landformTypeAmount; ++i)
         {
             //to create the TileData in the position of groundData
-            groundData[(int)positions[i].x][(int)positions[i].y] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]);
             landformList[i] = new List<TileData>();
-            landformList[i].Add(groundData[(int)positions[i].x][(int)positions[i].y]);
+            landformList[i].Add(groundData[(int)positions[i].x][(int)positions[i].y] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]));
         }
 
         //DFS and BFS generator
@@ -72,54 +131,9 @@ public class GroundRandomer
         }
     }
 
-    bool UnReasonableDistance(Vector2[] positions)
+    public static GroundRandomer Self
     {
-        for (int i = 0; i < landformTypeAmount; ++i)
-            for (int j = i + 1; j < landformTypeAmount; ++j)
-                if (Vector2.Distance(positions[i], positions[j]) < distanceThreshold)
-                    return true;
-
-        return false;
-    }
-    
-    void Swap<T>(T[] positions, int i, int j)
-    {
-        T temp = positions[i];
-        positions[i] = positions[j];
-        positions[j] = temp;
-    }
-
-    Vector2[] RandomSites()
-    {
-        Vector2[] positions = new Vector2[landformTypeAmount];
-        bool conti = true;
-
-        while(conti)
-        {
-            Debug.Log("random...");
-
-            //to create positions randomly
-            for (int i = 0; i < landformTypeAmount; ++i)
-                positions[i] = new Vector2(Random.Range(1, width), Random.Range(1, height));
-            
-            //to check if these sites is too close
-            conti = UnReasonableDistance(positions);
-        }
-        
-        //to ensure that position[5] has max y value and position[6] has min y value
-        if(positions[5].y < positions[6].y)
-            Swap(positions, 5, 6);
-
-        int temp = landformTypeAmount - 2;
-        for(int i = 0; i < temp; ++i)
-        {
-            if (positions[i].y > positions[5].y)
-                Swap(positions, i, 5);
-            else if (positions[i].y < positions[6].y)
-                Swap(positions, i, 6);
-        }
-
-        return positions;
+        get { return self; }
     }
 
     public TileData[][] GroundData
@@ -130,12 +144,12 @@ public class GroundRandomer
     public List<TileData>[] LandformList
     {
         get { return landformList; }
-        set { landformList = value; }
     }
-    
-    TileData[][] groundData;
-    List<TileData>[] landformList = new List<TileData>[MapConstants.LandformTypeAmount];
-    Form islandForm;
-    int landformTypeAmount = MapConstants.LandformTypeAmount, width, height;
-    float distanceThreshold;
+
+    static GroundRandomer self = null;
+    static TileData[][] groundData;
+    static List<TileData>[] landformList = new List<TileData>[MapConstants.LandformTypeAmount];
+    static Form islandForm;
+    static float distanceThreshold;
+    static int landformTypeAmount = MapConstants.LandformTypeAmount, width, height;
 }
