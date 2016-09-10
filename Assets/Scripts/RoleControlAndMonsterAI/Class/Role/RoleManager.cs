@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class RoleData {
+public static class RoleManager {
 
     private static Chef chef = new Chef();
     private static Engineer engineer = new Engineer();

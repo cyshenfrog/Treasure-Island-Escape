@@ -19,7 +19,7 @@ public class RoleController : MonoBehaviour {
 
     void Awake() {
         data = new Chef();
-        data.Attack = 100;
+        data.Attack = 10;
         data.MaxHp = 1000;
         data.Hp = 1000;
     }

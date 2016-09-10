@@ -20,8 +20,6 @@ public class MController_2 : MonsterController {
         }
     }
 
-
-
     protected void chase() {
         Vector2 target = role.transform.position - transform.position;
         float degree = Mathf.Atan2(target.y, target.x) * Mathf.Rad2Deg;

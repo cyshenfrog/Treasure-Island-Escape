@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Monster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Id>0</Id>
+  <Name>棉花象</Name>
+  <Hp>100</Hp>
+  <MaxHp>100</MaxHp>
+  <BaseMaxHp>100</BaseMaxHp>
+  <AttackRange>0</AttackRange>
+  <BaseAttackRange>0</BaseAttackRange>
+  <AttackSpace>0</AttackSpace>
+  <BaseAttackSpace>0</BaseAttackSpace>
+  <Speed>1</Speed>
+  <BaseSpeed>1</BaseSpeed>
+  <Attack>0</Attack>
+  <BaseAttack>0</BaseAttack>
+  <Defence>0</Defence>
+  <BaseDefence>0</BaseDefence>
+  <Hungry>0</Hungry>
+  <MaxHungry>0</MaxHungry>
+  <BaseMaxHungry>0</BaseMaxHungry>
+  <BeHungry>0</BeHungry>
+  <BaseBeHungry>0</BaseBeHungry>
+</Monster>

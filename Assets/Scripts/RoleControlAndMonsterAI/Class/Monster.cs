@@ -12,7 +12,6 @@ public class Monster {
     private string name;
 
     private int hp;
-    private int baseHp;
 
     private int maxHp;
     private int baseMaxHp;
@@ -41,26 +40,28 @@ public class Monster {
     private float baseBeHungry;
 
     //private Dictionary<Log, string> logSet = new Dictionary<Log, string>();       //獨白
-    private Dictionary<string, float> drop = new Dictionary<string, float>();     //掉落物
-    private Dictionary<Status, int> status = new Dictionary<Status, int>();       //狀態
+    //private Dictionary<string, float> drop = new Dictionary<string, float>();     //掉落物
+    //private Dictionary<Status, int> status = new Dictionary<Status, int>();       //狀態
 
     /*public Dictionary<Log, string> LogSet {
         set { logSet = value; }
         get { return logSet; }
     }*/
-    public Dictionary<string, float> Drop {
+    /*public Dictionary<string, float> Drop {
         set { drop = value; }
         get { return drop; }
     }  
     public Dictionary<Status, int> Status {
         set { status = value; }
         get{ return status; }
-    } 
+    } */
 
     public int Id {
+        set { id = value; }
         get { return id; }
     }
     public string Name {
+        set { name = value; }
         get { return name; }
     }
     public int Hp {
@@ -74,10 +75,6 @@ public class Monster {
         }
         get { return hp; }
     }
-    public int BaseHp {
-        set { baseHp = value; }
-        get { return baseHp; }
-    }
 
     public int MaxHp
     {
@@ -86,7 +83,11 @@ public class Monster {
     }
     public int BaseMaxHp
     {
-        set { baseMaxHp = value; }
+        set {
+            baseMaxHp = value;
+            MaxHp = value;
+            hp = value;
+        }
         get { return baseMaxHp; }
     }
 
@@ -95,7 +96,10 @@ public class Monster {
         get { return attackRange; }
     }
     public float BaseAttackRange {
-        set { baseAttackRange = value;}
+        set {
+            baseAttackRange = value;
+            attackRange = value;
+        }
         get { return baseAttackRange; }
     }
 
@@ -104,7 +108,10 @@ public class Monster {
         get { return attackSpace; }
     }
     public float BaseAttackSpace {
-        set { baseAttackSpace = value; }
+        set {
+            baseAttackSpace = value;
+            attackSpace = value;
+        }
         get { return baseAttackSpace; }
     }
 
@@ -113,7 +120,10 @@ public class Monster {
         get { return speed; }
     }
     public float BaseSpeed {
-        set { baseSpeed = value; }
+        set {
+            baseSpeed = value;
+            speed = value;
+        }
         get { return baseSpeed; }
     }
 
@@ -122,7 +132,10 @@ public class Monster {
         get { return attack; }
     }
     public float BaseAttack {
-        set { baseAttack = value; }
+        set {
+            baseAttack = value;
+            attack = value;
+        }
         get { return baseAttack; }
     }
     public float Defence
@@ -132,7 +145,10 @@ public class Monster {
     }
     public float BaseDefence
     {
-        set { baseDefence = value; }
+        set {
+            baseDefence = value;
+            defence = value;
+        }
         get { return baseDefence; }
     }
     public float Hungry
@@ -147,7 +163,11 @@ public class Monster {
     }
     public float BaseMaxHungry
     {
-        set { baseMaxHungry = value; }
+        set {
+            baseMaxHungry = value;
+            hungry = value;
+            maxHungry = value;
+        }
         get { return baseMaxHungry; }
     }
     public float BeHungry
@@ -157,7 +177,10 @@ public class Monster {
     }
     public float BaseBeHungry
     {
-        set { baseBeHungry = value; }
+        set {
+            baseBeHungry = value;
+            beHungry = value;
+        }
         get { return baseBeHungry; }
     }
 

@@ -12,6 +12,11 @@ public class MController_1 : MonsterController {
     private int roleDirectionX;
     private int roleDirectionY;
 
+    protected override void Awake() {
+        base.Awake();
+        data = MonsterManager.Create(id);
+    }
+
     void OnMouseDown() {
         if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
 

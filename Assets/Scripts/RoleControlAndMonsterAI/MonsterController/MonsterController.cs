@@ -23,7 +23,7 @@ public class MonsterController : MonoBehaviour {
     protected const int STATE_ANIM = 1;
     protected const int STATE_FINISFANIM = 2;
 
-    void Awake() {
+    protected virtual void Awake() {
         //data = Monster.Load(id);
         data = new Monster();
         data.MaxHp = 1000;
@@ -48,6 +48,10 @@ public class MonsterController : MonoBehaviour {
             State = (MonsterState)randomAction;
         }
 
+        stateMachine();
+    }
+
+    private void stateMachine() {
         switch (State) {
             case MonsterState.IDlE:
                 Idle();
@@ -66,8 +70,6 @@ public class MonsterController : MonoBehaviour {
             default:
                 break;
         }
-
-
     }
 
     public virtual void Move() {
