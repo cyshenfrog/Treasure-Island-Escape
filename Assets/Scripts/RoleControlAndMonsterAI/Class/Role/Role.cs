@@ -66,12 +66,9 @@ public class Role {
     }
     public int Hp {
         set {
-            if (hp > maxHp)
-                hp = maxHp;
-            else if (hp < 0)
-                hp = 0;
-            else
-                hp = value;
+            if (hp > maxHp) hp = maxHp;
+            else if (hp < 0) hp = 0;
+            else hp = value;
         }
         get { return hp; }
     }

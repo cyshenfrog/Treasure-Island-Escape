@@ -28,15 +28,19 @@ public class MonsterController : MonoBehaviour {
         data = new Monster();
         data.MaxHp = 1000;
         data.Hp = 1000;
+        data.AttackSpace = 1;
+        data.AttackRange = 5;
+        data.Attack = 100;
+
+        role = GameObject.Find(AnimalConstant.RolePrefab);
     }
 
-	void Start () {
-        role = GameObject.Find(AnimalConstant.RolePrefab);
+	void Start () {       
         State = MonsterState.IDlE;
 	}
 	
 	void Update () {
-        if (lastTimes == 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
+        if (lastTimes <= 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);
             lastTimes = Random.Range(10, 40);
@@ -130,10 +134,10 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-
         if (Vector2.Distance(role.transform.localPosition, transform.localPosition) < data.AttackRange) {
             //play anim
-            role.GetComponent<RoleController>().BeAttacked((int)data.Attack);
+            role.GetComponent<RoleController>().BeAttacked((int)data.Attack, transform.position);
+
         }
     }
 

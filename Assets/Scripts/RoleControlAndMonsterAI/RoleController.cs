@@ -20,29 +20,27 @@ public class RoleController : MonoBehaviour {
     void Awake() {
         data = new Chef();
         data.Attack = 100;
-
+        data.MaxHp = 1000;
+        data.Hp = 1000;
     }
 	void Start () {
         State = RoleState.IDLE;
     }
 
-    /*void FixedUpdate() {
-        //let camera follow role  
-        RoleCamera.transform.position = transform.localPosition + new Vector3(0, 0, -10);
-    }*/
-
 	void Update () {
         //Speed = Role.GetRoleData(Carceer.None).MoveSpeed;
-
         switch (State) {
             case RoleState.IDLE:
-                move();
+                idle();
                 break;
             case RoleState.MOUSEHOLD:
                 mouseHold();
                 break;
             case RoleState.PICKUP:
                 moveToTarget();
+                break;
+            case RoleState.BEATTACK:
+                beAttacked();
                 break;
             default:
                 break;
@@ -52,8 +50,7 @@ public class RoleController : MonoBehaviour {
     }
 
     private void mouseHold() {
-        if (Input.GetMouseButton(0))
-        {
+        if (Input.GetMouseButton(0)) {
 
             Vector3 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             worldPoint.z = transform.position.z;
@@ -63,35 +60,30 @@ public class RoleController : MonoBehaviour {
             float atan = Mathf.Atan2(degree.y, degree.x) * Mathf.Rad2Deg;
 
             if (atan > -22.5f && atan <= 22.5f)         //right
-                move("0001");
+                keyAction("0001");
             else if (atan > 22.5f && atan <= 67.5f)     //right-top
-                move("1001");
+                keyAction("1001");
             else if (atan > 67.5f && atan <= 112.5f)    //top
-                move("1000");
+                keyAction("1000");
             else if (atan > 112.5 && atan <= 157.5f)    //left-top
-                move("1100");
+                keyAction("1100");
             else if (atan > 157.5f || atan <= -157.5f)  //left
-                move("0100");
+                keyAction("0100");
             else if (atan <= -22.5f && atan > -67.5f)   //right-bottom
-                move("0011");
+                keyAction("0011");
             else if (atan <= -67.5 && atan > -112.5f)   //bottom
-                move("0010");
+                keyAction("0010");
             else if (atan <= -112.5f && atan > -157.5f) //left-bottom
-                move("0110");
+                keyAction("0110");
 
         }
-        else
-            State = RoleState.IDLE;
-    }
-
-    private void idle() {
-
+        else State = RoleState.IDLE;
     }
 
     //role move by keyboard
-    private void move() {
+    private void idle() {
 
-        Vector3 pos;                             //record the position of role
+        //Vector3 pos;                             //record the position of role
         bool w = Input.GetKey("w");        
         bool a = Input.GetKey("a");
         bool s = Input.GetKey("s");
@@ -101,8 +93,18 @@ public class RoleController : MonoBehaviour {
             + s.GetHashCode().ToString() 
             + d.GetHashCode().ToString();
 
+        keyAction(key);
+
+        
+    }
+
+    private void keyAction(string key) {
+
+        Vector3 pos;   //record the position of role
+
         //according string key decide role's movement
-        switch (key) {
+        switch (key)
+        {
             case "1000":
                 wink = AnimalConstant.RoleWinkColdDown;
                 gripper = AnimalConstant.RoleGripperColdDown;
@@ -164,11 +166,13 @@ public class RoleController : MonoBehaviour {
                 anim.SetTrigger("stand");
                 wink -= Time.deltaTime;
                 gripper -= Time.deltaTime;
-                if (gripper <= 0) {
+                if (gripper <= 0)
+                {
                     anim.SetTrigger("gripper");
                     gripper = AnimalConstant.RoleGripperColdDown;
                 }
-                if (wink <= 0) {
+                if (wink <= 0)
+                {
                     anim.SetTrigger("wink");
                     wink = AnimalConstant.RoleWinkColdDown;
                 }
@@ -177,60 +181,21 @@ public class RoleController : MonoBehaviour {
         }
     }
 
-    private void move(string key)
-    {
-
-        Vector3 pos;   //record the position of role
-
-        //according string key decide role's movement
-        switch (key) {
-            case "1000":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x, pos.y + Time.deltaTime * Speed, pos.z);
-                break;
-            case "0100":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x - Time.deltaTime * Speed, pos.y, pos.z);
-                break;
-            /// # below deal with moving diagonally
-            case "0010":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x, pos.y - Time.deltaTime * Speed, pos.z);
-                break;
-            case "0001":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x + Time.deltaTime * Speed, pos.y, pos.z);
-                break;
-            case "1100":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
-                break;
-            case "0110":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
-                break;
-            case "0011":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y - Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
-                break;
-            case "1001":
-                pos = transform.position;
-                transform.position = new Vector3(pos.x + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.y + Time.deltaTime * Speed * (Mathf.Sqrt(2) / 2), pos.z);
-                break;
-        }
-    }
-
-
     //let role move to target
     private void moveToTarget() {
         if (transform.position == coordinateTarget || Input.GetKey("w") || Input.GetKey("a") || Input.GetKey("s") || Input.GetKey("d"))
             State = RoleState.IDLE; //triggerToMove = false;
         else
         {
-            if (coordinateTarget.x == transform.position.x || coordinateTarget.y == transform.position.y)
+            if (coordinateTarget.x == transform.position.x || coordinateTarget.y == transform.position.y) {
+
+                if (coordinateTarget.x > transform.position.x) anim.SetTrigger("walkRight");
+                else if (coordinateTarget.x < transform.position.x) anim.SetTrigger("walkLeft");
+                else if (coordinateTarget.y > transform.position.y) anim.SetTrigger("walkUp");
+                else if (coordinateTarget.y < transform.position.y) anim.SetTrigger("walkDown");
                 transform.position = Vector3.MoveTowards(transform.position, coordinateTarget, Time.deltaTime * Speed);
-            else
-            {
+            }
+            else {
                 float x = coordinateTarget.x - transform.position.x;
                 float y = coordinateTarget.y - transform.position.y;
                 float deltaX = Mathf.Abs(x);
@@ -240,8 +205,10 @@ public class RoleController : MonoBehaviour {
                     x > 0 ? new Vector3(transform.position.x + deltaY, coordinateTarget.y, 0) : new Vector3(transform.position.x - deltaY, coordinateTarget.y, 0) :
                     y > 0 ? new Vector3(coordinateTarget.x, transform.position.y + deltaX, 0) : new Vector3(coordinateTarget.x, transform.position.y - deltaX, 0);
 
-                transform.position = Vector3.MoveTowards(transform.position, relayStation, Time.deltaTime * Speed);
+                if (coordinateTarget.x > transform.position.x) anim.SetTrigger("walkRight");
+                else anim.SetTrigger("walkLeft");
 
+                transform.position = Vector3.MoveTowards(transform.position, relayStation, Time.deltaTime * Speed);
 
             }
         }
@@ -297,15 +264,29 @@ public class RoleController : MonoBehaviour {
         }
     }
 
-    public void BeAttacked(int attack) {
+    private void beAttacked() {
+
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_right")
+            || anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_left")) {
+            State = RoleState.IDLE;
+        }
+        
+    }
+
+    public void BeAttacked(int attack, Vector2 pos) {
+
         data.Hp -= attack;
+
         State = RoleState.BEATTACK;
-
-        //play anim
-
         if (data.Hp == 0) {
             Die();
         }
+        else {
+            
+            if (pos.x > transform.position.x) anim.SetTrigger("beattacked_right");
+            else anim.SetTrigger("beattacked_left");
+        }
+        
     }
 
     public void Die() {

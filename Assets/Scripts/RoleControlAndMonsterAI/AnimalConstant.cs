@@ -15,5 +15,5 @@
     public const int Right  = 3;
 
     public const float RunMagnification = 2f;  //maybe remove
-    public const float RunAwayDistance = 10;
+    public const float RunAwayDistance = 10; //逃跑距離
 }
