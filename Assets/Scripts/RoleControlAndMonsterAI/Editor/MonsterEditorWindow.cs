@@ -84,7 +84,7 @@ public class MonsterEditorWindow : EditorWindow {
                 m.Save();
 
                 if (!isOld) {
-                    using (var stream = new StreamWriter(filePath + "id.txt", false, Encoding.UTF8)) {
+                    using (var stream = new StreamWriter(filePath + "/id.txt", false, Encoding.UTF8)) {
                         stream.WriteLine((id + 1).ToString());
                     }
                 }
