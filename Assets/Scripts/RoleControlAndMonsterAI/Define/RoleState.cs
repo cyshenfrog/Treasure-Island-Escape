@@ -4,4 +4,5 @@
     IDLE,
     MOUSEHOLD,
     PICKUP,
+    TYRANTS,
 }

@@ -20,8 +20,8 @@ public class MonsterEditorWindow : EditorWindow {
     GUIStyle style = new GUIStyle();
     static int id;
     bool isOld = false;
-    string[] fieldName = {"名稱", "血量","攻擊範圍","攻擊速度","移動速度","攻擊","防禦","飢餓值","飢餓消耗"};
-    string[] field = { "", "", "", "", "", "", "", "", "" };
+    string[] fieldName = {"名稱", "血量","攻擊範圍","攻擊速度","移動速度","攻擊"};
+    string[] field = { "", "", "", "", "", ""};
 
     void OnGUI() {
         
@@ -43,9 +43,6 @@ public class MonsterEditorWindow : EditorWindow {
                 field[3] = m.BaseAttackSpace.ToString();
                 field[4] = m.BaseSpeed.ToString();
                 field[5] = m.BaseAttack.ToString();
-                field[6] = m.BaseDefence.ToString();
-                field[7] = m.BaseMaxHungry.ToString();
-                field[8] = m.BaseBeHungry.ToString();
                 id = m.Id;
             }
         }
@@ -77,9 +74,6 @@ public class MonsterEditorWindow : EditorWindow {
                 m.BaseAttackSpace = Int32.Parse(field[3]);
                 m.BaseSpeed = Int32.Parse(field[4]);
                 m.BaseAttack = Int32.Parse(field[5]);
-                m.BaseDefence = Int32.Parse(field[6]);
-                m.BaseMaxHungry = Int32.Parse(field[7]);
-                m.BaseBeHungry = Int32.Parse(field[8]);
 
                 m.Save();
 

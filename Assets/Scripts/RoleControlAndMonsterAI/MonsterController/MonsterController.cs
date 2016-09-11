@@ -5,7 +5,6 @@ public class MonsterController : MonoBehaviour {
 
     public int id;
     public float Speed;
-    public float Distance;
 
     //basic
     protected GameObject role;
@@ -23,6 +22,7 @@ public class MonsterController : MonoBehaviour {
     protected const int STATE_ANIM = 1;
     protected const int STATE_FINISFANIM = 2;
 
+
     protected virtual void Awake() {
         //data = Monster.Load(id);
         data = new Monster();
@@ -35,11 +35,11 @@ public class MonsterController : MonoBehaviour {
         role = GameObject.Find(AnimalConstant.RolePrefab);
     }
 
-	void Start () {       
+	protected virtual void Start () {       
         State = MonsterState.IDlE;
 	}
 	
-	void Update () {
+	protected virtual void Update () {
         if (lastTimes <= 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);

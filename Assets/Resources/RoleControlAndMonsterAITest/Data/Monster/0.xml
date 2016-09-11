@@ -13,11 +13,4 @@
   <BaseSpeed>1</BaseSpeed>
   <Attack>0</Attack>
   <BaseAttack>0</BaseAttack>
-  <Defence>0</Defence>
-  <BaseDefence>0</BaseDefence>
-  <Hungry>0</Hungry>
-  <MaxHungry>0</MaxHungry>
-  <BaseMaxHungry>0</BaseMaxHungry>
-  <BeHungry>0</BeHungry>
-  <BaseBeHungry>0</BaseBeHungry>
 </Monster>

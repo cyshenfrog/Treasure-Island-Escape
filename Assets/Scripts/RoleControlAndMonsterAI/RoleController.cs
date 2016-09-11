@@ -14,6 +14,7 @@ public class RoleController : MonoBehaviour {
 
     private float wink = AnimalConstant.RoleWinkColdDown;
     private float gripper = AnimalConstant.RoleGripperColdDown;
+    private float tyrants = AnimalConstant.RoleTyrants;
 
     public RoleState State { set; get; }
 
@@ -31,6 +32,7 @@ public class RoleController : MonoBehaviour {
         //Speed = Role.GetRoleData(Carceer.None).MoveSpeed;
         switch (State) {
             case RoleState.IDLE:
+            case RoleState.TYRANTS:
                 idle();
                 break;
             case RoleState.MOUSEHOLD:
@@ -82,6 +84,15 @@ public class RoleController : MonoBehaviour {
 
     //role move by keyboard
     private void idle() {
+
+        if (State == RoleState.TYRANTS) {
+
+            tyrants -= Time.deltaTime;
+            if (tyrants <= 0) {
+                State = RoleState.IDLE;
+                tyrants = AnimalConstant.RoleTyrants;
+            }
+        }
 
         //Vector3 pos;                             //record the position of role
         bool w = Input.GetKey("w");        
@@ -251,7 +262,7 @@ public class RoleController : MonoBehaviour {
 
         if (Vector2.Distance(transform.localPosition, target) <= AnimalConstant.RoleAttackRange) {
             m.Hp -= (int)data.Attack;
-            Debug.Log(m.Hp + "/" + m.MaxHp);
+            Debug.Log("Monster Hp : " + m.Hp + "/" + m.MaxHp);
 
             //play animation
             //animation callback to unlock state;
@@ -268,25 +279,27 @@ public class RoleController : MonoBehaviour {
 
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_right")
             || anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_left")) {
-            State = RoleState.IDLE;
+            State = RoleState.TYRANTS;
         }
         
     }
 
     public void BeAttacked(int attack, Vector2 pos) {
 
-        data.Hp -= attack;
+        if (State != RoleState.TYRANTS) {
+            data.Hp -= attack;
+            Debug.Log("Role Hp : " + data.Hp + "/" + data.MaxHp);
+            State = RoleState.BEATTACK;
+            if (data.Hp == 0) {
+                Die();
+            }
+            else {
 
-        State = RoleState.BEATTACK;
-        if (data.Hp == 0) {
-            Die();
+                if (pos.x > transform.position.x) anim.SetTrigger("beattacked_right");
+                else anim.SetTrigger("beattacked_left");
+            }
+
         }
-        else {
-            
-            if (pos.x > transform.position.x) anim.SetTrigger("beattacked_right");
-            else anim.SetTrigger("beattacked_left");
-        }
-        
     }
 
     public void Die() {

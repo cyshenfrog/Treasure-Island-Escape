@@ -27,7 +27,7 @@ public class Monster {
 
     private float attack;
     private float baseAttack;
-
+    /*
     private float defence;       
     private float baseDefence;
 
@@ -38,7 +38,7 @@ public class Monster {
 
     private float beHungry;
     private float baseBeHungry;
-
+    */
     //private Dictionary<Log, string> logSet = new Dictionary<Log, string>();       //獨白
     //private Dictionary<string, float> drop = new Dictionary<string, float>();     //掉落物
     //private Dictionary<Status, int> status = new Dictionary<Status, int>();       //狀態
@@ -138,6 +138,7 @@ public class Monster {
         }
         get { return baseAttack; }
     }
+    /*
     public float Defence
     {
         set { defence = value; }
@@ -183,7 +184,7 @@ public class Monster {
         }
         get { return baseBeHungry; }
     }
-
+    */
     //查詢獨白字典
     /*public string LogString(Log log)
     {
