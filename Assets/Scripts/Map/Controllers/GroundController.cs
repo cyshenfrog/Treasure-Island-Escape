@@ -5,6 +5,8 @@ using System;
 //ex: TileData td = GroundController.GetTileDataByWorldPosition(position);
 public class GroundController : MonoBehaviour
 {
+    //Its parent must be world;
+
     void Awake ()
     {
         StaticCellWidth = CellWidth;
@@ -27,6 +29,11 @@ public class GroundController : MonoBehaviour
         sightWidthCount = SightWidth / CellWidth;
         sightHeightCount = SightHeight / CellHeight;
 
+        minSightWidthBoundary = SightWidth * .01f;
+        maxSightWidthBoundary = (WorldWidth - SightWidth) * .01f;
+        minSightHeightBoundary = SightHeight * .01f;
+        maxSightHeightBoundary = (WorldHeight - SightHeight) * .01f;
+
         //to create the noise
         worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
@@ -44,6 +51,8 @@ public class GroundController : MonoBehaviour
         
         //to set the nowTileData below the Role
         nowTileData = GetTileDataByWorldPosition(Role.position);
+
+        Debug.Log("groundcontroller is " + transform.parent);
     }
 
     public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
@@ -161,21 +170,45 @@ public class GroundController : MonoBehaviour
         Transform[][] display = new Transform[widthCount][];
 
         //to decide the detail of new go
-        for (int i = 0; i < widthCount; ++i)
+
+        isNotRoleNearBoundary = Role.position.x > minSightWidthBoundary && Role.position.x < maxSightWidthBoundary && Role.position.y > minSightHeightBoundary && Role.position.y < maxSightHeightBoundary;
+
+        if (IsNotRoleNearBoundary)
         {
-            display[i] = new Transform[heightCount];
-
-            for (int j = 0; j < heightCount; ++j)
+            for (int i = 0; i < widthCount; ++i)
             {
-                //to initialize
-                display[i][j] = tile = Instantiate(tile);
-                tile.parent = parent;
-                tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
-                tile.localScale = Vector3.one;
-                tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+                display[i] = new Transform[heightCount];
 
-                tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
-                //tile.gameObject.SetActive(false);
+                for (int j = 0; j < heightCount; ++j)
+                {
+                    //to initialize
+                    display[i][j] = tile = Instantiate(tile);
+                    tile.parent = parent;
+                    tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
+                    tile.localScale = Vector3.one;
+                    tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+
+                    tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < widthCount; ++i)
+            {
+                display[i] = new Transform[heightCount];
+
+                for (int j = 0; j < heightCount; ++j)
+                {
+                    //to initialize
+                    display[i][j] = tile = Instantiate(tile);
+                    tile.parent = parent;
+                    tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
+                    tile.localScale = Vector3.one;
+                    tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+
+                    tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                }
             }
         }
 
@@ -221,75 +254,79 @@ public class GroundController : MonoBehaviour
     void RefreshMap()
     {
         //to refresh the displayWorld
-        //walking speed cannot be too fast!?
-        TileData newTileData = GetTileDataByWorldPosition(Role.position);
 
-        if (nowTileData != newTileData)
+        if(IsNotRoleNearBoundary = Role.position.x > minSightWidthBoundary && Role.position.x < maxSightWidthBoundary && Role.position.y > minSightHeightBoundary && Role.position.y < maxSightHeightBoundary)
         {
-            //to decide the moving direction
+            //walking speed cannot be too fast!?
+            TileData newTileData = GetTileDataByWorldPosition(Role.position);
 
-            Vector2 from = nowTileData.Position, to = newTileData.Position;
-            float distanceX = to.x - from.x, distanceY = to.y - from.y;
-            int tempX = sightWidthCount - 1, tempY = sightHeightCount - 1;
-
-            //one direction
-            //two directions redundancy?
-
-            if (distanceX > 0f)
+            if (nowTileData != newTileData)
             {
-                //right direction
+                //to decide the moving direction
 
-                //transit
-                for (int i = 1; i < sightWidthCount; ++i)
-                    for (int j = 0; j < sightHeightCount; ++j)
-                        displaySight[i - 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+                Vector2 from = nowTileData.Position, to = newTileData.Position;
+                float distanceX = to.x - from.x, distanceY = to.y - from.y;
+                int tempX = sightWidthCount - 1, tempY = sightHeightCount - 1;
 
-                //new sight
-                for (int i = 0; i < sightHeightCount; ++i)
-                    displaySight[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[tempX][i].position);
+                //one direction
+                //two directions redundancy?
+
+                if (distanceX > 0f)
+                {
+                    //right direction
+
+                    //transit
+                    for (int i = 1; i < sightWidthCount; ++i)
+                        for (int j = 0; j < sightHeightCount; ++j)
+                            displaySight[i - 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+
+                    //new sight
+                    for (int i = 0; i < sightHeightCount; ++i)
+                        displaySight[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[tempX][i].position);
+                }
+                else if (distanceX < 0f)
+                {
+                    //left direction
+
+                    //transit
+                    for (int i = sightWidthCount - 2; i >= 0; --i)
+                        for (int j = 0; j < sightHeightCount; ++j)
+                            displaySight[i + 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+
+                    //new sight
+                    for (int i = 0; i < sightHeightCount; ++i)
+                        displaySight[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[0][i].position);
+                }
+
+                if (distanceY > 0f)
+                {
+                    //up direction
+
+                    //transit
+                    for (int i = 0; i < sightWidthCount; ++i)
+                        for (int j = 1; j < sightHeightCount; ++j)
+                            displaySight[i][j - 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+
+                    //new sight
+                    for (int i = 0; i < sightWidthCount; ++i)
+                        displaySight[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][tempY].position);
+                }
+                else if (distanceY < 0f)
+                {
+                    //down direction
+
+                    //transit
+                    for (int i = 0; i < sightWidthCount; ++i)
+                        for (int j = sightHeightCount - 2; j >= 0; --j)
+                            displaySight[i][j + 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+
+                    //new sight
+                    for (int i = 0; i < sightWidthCount; ++i)
+                        displaySight[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][0].position);
+                }
+
+                nowTileData = newTileData;
             }
-            else if (distanceX < 0f)
-            {
-                //left direction
-
-                //transit
-                for (int i = sightWidthCount - 2; i >= 0; --i)
-                    for (int j = 0; j < sightHeightCount; ++j)
-                        displaySight[i + 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
-
-                //new sight
-                for (int i = 0; i < sightHeightCount; ++i)
-                    displaySight[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[0][i].position);
-            }
-
-            if (distanceY > 0f)
-            {
-                //up direction
-
-                //transit
-                for (int i = 0; i < sightWidthCount; ++i)
-                    for (int j = 1; j < sightHeightCount; ++j)
-                        displaySight[i][j - 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
-
-                //new sight
-                for (int i = 0; i < sightWidthCount; ++i)
-                    displaySight[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][tempY].position);
-            }
-            else if (distanceY < 0f)
-            {
-                //down direction
-
-                //transit
-                for (int i = 0; i < sightWidthCount; ++i)
-                    for (int j = sightHeightCount - 2; j >= 0; --j)
-                        displaySight[i][j + 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
-
-                //new sight
-                for (int i = 0; i < sightWidthCount; ++i)
-                    displaySight[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][0].position);
-            }
-
-            nowTileData = newTileData;
         }
     }
 
@@ -416,7 +453,37 @@ public class GroundController : MonoBehaviour
     TileData nowTileData;
     Transform tile;
 
+    bool IsNotRoleNearBoundary
+    {
+        get { return isNotRoleNearBoundary; }
+
+        set
+        {
+            if(isNotRoleNearBoundary != value)
+            {
+                //bug: cannot init at small/large posiiton 
+
+                Transform tf, parent = value ? Role : transform.parent;
+
+                for (int i = 0; i < sightWidthCount; ++i)
+                    for (int j = 0; j < sightHeightCount; ++j)
+                    {
+                        tf = displaySight[i][j];
+                        
+                        tf.parent = parent;
+                        tf.localScale = Vector3.one;
+                    }
+
+                Debug.Log(value ? "displaySight is moving" : "displaySight is stand still");
+                isNotRoleNearBoundary = value;
+            }
+        }
+    }
+
     float[][] worldNoise, worldPerlinNoise;
     float cellWidthInWC, cellHeightInWC;
+    //InWC
+    float minSightWidthBoundary, maxSightWidthBoundary, minSightHeightBoundary, maxSightHeightBoundary;
     int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, landformTypeAmount = MapConstants.LandformTypeAmount;
+    bool isNotRoleNearBoundary;
 }
