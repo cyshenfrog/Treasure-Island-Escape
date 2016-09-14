@@ -16,7 +16,7 @@ public class MController_2 : MonsterController {
         }
     }
 
-    protected void chase() {
+    protected virtual void chase() {
         Vector2 target = role.transform.position - transform.position;
         float degree = Mathf.Atan2(target.y, target.x) * Mathf.Rad2Deg;
         if (degree < 45 && degree >= -45) randomDirection = AnimalConstant.Right;
@@ -30,6 +30,7 @@ public class MController_2 : MonsterController {
         base.BeAttacked();
         if (beAttackedState == STATE_FINISFANIM) {
             State = MonsterState.ATTACK;
+            beAttackedState = STATE_STARTPLAYANIM;
         }      
     }
 

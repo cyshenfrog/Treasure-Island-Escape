@@ -23,8 +23,8 @@ public static class RoleManager {
         else return new Role();
     }
 
-    public static void Write() {
-
+    public static void Write(Role r) {
+        
     }
 	
 }
