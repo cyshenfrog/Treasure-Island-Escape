@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
+using System.Collections;
 using System;
 
 //ex: TileData td = GroundController.GetTileDataByWorldPosition(position);
@@ -9,37 +9,50 @@ public class GroundController : MonoBehaviour
 
     void Awake ()
     {
+        //to initialize some value
         StaticCellWidth = CellWidth;
         StaticCellHeight = CellHeight;
-        tile = Resources.Load<GameObject>(@"Map\Tile").transform;
+        StaticSightWidth = SightWidth;
+        StaticSightHeight = SightHeight;
 
+        preSightRange = PreSight + 2;
+
+        //to calculate how many tileData do this world have to
         worldWidthCount = WorldWidth / CellWidth;
         worldHeightCount = WorldHeight / CellHeight;
 
-        //to get random world
-        groundData = GroundRandomer.Create(worldWidthCount, worldHeightCount, DistanceThreshold).GroundData;
-        
-        //to display the random map
-
-        //to calculate how many go do this world have to
+        //to calculate how many go do sightWorld have to
+        sightWidthCount = SightWidth / CellWidth;
+        sightHeightCount = SightHeight / CellHeight;
+        halfSightWidthCount = (int)(sightWidthCount * .5f);
+        halfSightHeightCount = (int)(sightHeightCount * .5f);
 
         //1 pixel = 0.01 in world coordinates
         cellWidthInWC = CellWidth * .01f;
         cellHeightInWC = CellHeight * .01f;
-        sightWidthCount = SightWidth / CellWidth;
-        sightHeightCount = SightHeight / CellHeight;
+        
+        tile = Resources.Load<GameObject>(@"Map\Tile").transform;
+        tile.GetComponent<BoxCollider>().size = cellWidthInWC * Vector3.right + cellHeightInWC * Vector3.up;
+        tile.GetComponent<BoxCollider>().center = cellWidthInWC * .5f * Vector3.right + cellHeightInWC * .5f * Vector3.up;
 
+        //boundary
         minSightWidthBoundary = SightWidth * .01f;
         maxSightWidthBoundary = (WorldWidth - SightWidth) * .01f;
         minSightHeightBoundary = SightHeight * .01f;
         maxSightHeightBoundary = (WorldHeight - SightHeight) * .01f;
+        
+        //to get random world
+        groundData = GroundRandomer.Create(worldWidthCount, worldHeightCount, DistanceThreshold).GroundData;
+
+        //to display the random map
 
         //to create the noise
         worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
         //Display(false);
-        Display(true);
+        Display();
+
         /*
         foreach(Transform[] ta in displaySight)
         {
@@ -50,23 +63,30 @@ public class GroundController : MonoBehaviour
         }*/
         
         //to set the nowTileData below the Role
-        nowTileData = GetTileDataByWorldPosition(Role.position);
+        //nowTileData = GetTileDataByWorldPosition(Role.position);
+        
+        //the max tile
+        mapPool[worldWidthCount - 1, worldHeightCount - 1] = tile = Instantiate(tile);
+        tile.parent = SightList;
+        tile.position = (worldWidthCount - 1) * Vector3.right * cellWidthInWC + (worldHeightCount - 1) * Vector3.up * cellHeightInWC;
+        tile.localScale = Vector3.one;
+        tile.name = "Tile " + (worldWidthCount - 1).ToString() + ',' + (worldHeightCount - 1).ToString();
 
-        Debug.Log("groundcontroller is " + transform.parent);
+        InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
     }
 
     public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
     {
         //cast should be done last
-        //"+1" is to ensure the correctness of getting GroundData
-        float pixelX = worldPosition.x * 100 + 1, pixelY = worldPosition.y * 100 + 1;
 
         try
         {
-            return GroundRandomer.Self.GroundData[(int)(pixelX) / StaticCellWidth][(int)(pixelY) / StaticCellHeight];
+            //"+1" is to ensure the correctness of getting GroundData
+            return GroundRandomer.Self.GroundData[(int)(worldPosition.x * 100 + 1) / StaticCellWidth][(int)(worldPosition.y * 100 + 1) / StaticCellHeight];
         }
         catch(Exception e)
         {
+            Debug.Log(worldPosition);
             Debug.LogError("GetTileDataByWorldPosition Error: " + e);
             return null;
         }
@@ -160,67 +180,65 @@ public class GroundController : MonoBehaviour
         return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
     }
 
-    void Display(bool isSight)
+    void Display()
     {
-        Transform parent = isSight ? Role : transform;
-        int widthCount = isSight ? sightWidthCount : worldWidthCount, heightCount = isSight ? sightHeightCount : worldHeightCount;
-        float halfWidthCount = isSight ? sightWidthCount * .5f : 0f, halfHeightCount = isSight ? sightHeightCount * .5f : 0f;
-        
-        //to display
-        Transform[][] display = new Transform[widthCount][];
+        //to create the mapPool
+        mapPool = new Transform[worldWidthCount, worldHeightCount];
+        sightBottomLeft = new Vector3[preSightRange * preSightRange];
 
         //to decide the detail of new go
 
-        isNotRoleNearBoundary = Role.position.x > minSightWidthBoundary && Role.position.x < maxSightWidthBoundary && Role.position.y > minSightHeightBoundary && Role.position.y < maxSightHeightBoundary;
+        bool isNotLeft = Role.position.x > minSightWidthBoundary, isNotRight = Role.position.x < maxSightWidthBoundary, isNotDown = Role.position.y > minSightHeightBoundary, isNotUp = Role.position.y < maxSightHeightBoundary;
 
-        if (IsNotRoleNearBoundary)
+        //overhead??
+        //                                                                                 normal situation special situation: role is near boundary
+        //SightList.parent = (isNotRoleNearBoundary = isNotLeft && isNotRight && isNotDown && isNotUp) ? Role : transform;
+        //isNotRoleNearBoundary = isNotLeft && isNotRight && isNotDown && isNotUp;
+        //int x = IsNotRoleNearBoundary ? -halfSightWidthCount : isNotLeft ? isNotRight ? (int)(Role.position.x) : worldWidthCount - sightWidthCount : 0;
+        //int y = IsNotRoleNearBoundary ? -halfSightHeightCount : isNotDown ? isNotUp ? (int)(Role.position.y) : worldHeightCount - sightHeightCount : 0;
+        int x = -halfSightWidthCount;
+        int y = -halfSightHeightCount;
+        //int nowXCount = (int)(Role.position.x * 100 + 1) / CellWidth, nowYCount = (int)(Role.position.y * 100 + 1) / CellHeight;
+        //to plus x and y to ensure that Role will be surrounded by these tiles
+        int startX = (int)(Role.position.x * 100 + 1) / CellWidth + x - PreSight * sightWidthCount, startY = (int)(Role.position.y * 100 + 1) / CellHeight + y - PreSight * sightHeightCount, tileX, tileY;
+        int sightX, sightY;
+
+        //to display the 9 sights
+        
+        for(int i = 0; i < preSightRange; ++i)
         {
-            for (int i = 0; i < widthCount; ++i)
+            for(int j = 0; j < preSightRange; ++j)
             {
-                display[i] = new Transform[heightCount];
+                sightX = startX + i * sightWidthCount;
+                sightY = startY + j * sightHeightCount;
 
-                for (int j = 0; j < heightCount; ++j)
+                for (int k = 0; k < sightWidthCount; ++k)
                 {
-                    //to initialize
-                    display[i][j] = tile = Instantiate(tile);
-                    tile.parent = parent;
-                    tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
-                    tile.localScale = Vector3.one;
-                    tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+                    for (int l = 0; l < sightHeightCount; ++l)
+                    {
+                        tileX = sightX + k;
+                        tileY = sightY + l;
 
-                    tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                        if (tileX >= 0 && tileX < worldWidthCount && tileY >= 0 && tileY < worldHeightCount)
+                        {
+                            //to initialize
+                            tile = Instantiate(tile);
+                            tile.parent = SightList;
+                            tile.position = tileX * cellWidthInWC * Vector3.right + tileY * cellHeightInWC * Vector3.up;
+                            tile.localScale = Vector3.one;
+                            tile.name = "Tile " + tileX.ToString() + ',' + tileY.ToString();
+
+                            tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+
+                            //to put tile into mapPool
+                            mapPool[tileX, tileY] = tile;
+                        }
+                    }
                 }
+
+                sightBottomLeft[i + j * preSightRange] = sightX * cellWidthInWC * Vector3.right + sightY * cellHeightInWC * Vector3.up;
             }
         }
-        else
-        {
-            for (int i = 0; i < widthCount; ++i)
-            {
-                display[i] = new Transform[heightCount];
-
-                for (int j = 0; j < heightCount; ++j)
-                {
-                    //to initialize
-                    display[i][j] = tile = Instantiate(tile);
-                    tile.parent = parent;
-                    tile.localPosition = (i - halfWidthCount) * Vector3.right * cellWidthInWC + (j - halfHeightCount) * Vector3.up * cellHeightInWC;
-                    tile.localScale = Vector3.one;
-                    tile.name = "Tile " + i.ToString() + ',' + j.ToString();
-
-                    tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
-                }
-            }
-        }
-
-        if (isSight)
-            displaySight = display;
-        else
-            displayWorld = display;
-    }
-
-    void DisplaySight()
-    {
-
     }
 
     void DisplayAllWorld()
@@ -228,17 +246,17 @@ public class GroundController : MonoBehaviour
         float halfWorldWidth = worldWidthCount * .5f, halfWorldHeight = worldHeightCount * .5f;
 
         //to display
-        displayWorld = new Transform[worldWidthCount][];
+        map = new Transform[worldWidthCount][];
 
         //to decide the detail of new go
         for (int i = 0; i < worldWidthCount; ++i)
         {
-            displayWorld[i] = new Transform[worldHeightCount];
+            map[i] = new Transform[worldHeightCount];
 
             for (int j = 0; j < worldHeightCount; ++j)
             {
                 //to initialize
-                displayWorld[i][j] = tile = Instantiate(tile);
+                map[i][j] = tile = Instantiate(tile);
                 tile.parent = transform;
                 tile.localPosition = (i - halfWorldWidth) * Vector3.right * cellWidthInWC + (j - halfWorldHeight) * Vector3.up * cellHeightInWC;
                 tile.localScale = Vector3.one;
@@ -253,8 +271,208 @@ public class GroundController : MonoBehaviour
 
     void RefreshMap()
     {
-        //to refresh the displayWorld
+        //to decide the moving direction
+        Vector3 from = sightBottomLeft[(int)sightDirection.Center], to = Role.position;
+        Debug.Log(from + " " + to);
+        float distanceX = to.x - from.x, distanceY = to.y - from.y;
+        bool right = distanceX > sightWidthCount * cellWidthInWC, left = distanceX < 0, up = distanceY > sightHeightCount * cellHeightInWC, down = distanceY < 0; 
 
+        //TileData newTileData = GetTileDataByWorldPosition(Role.position);
+        //if (nowTileData != newTileData)
+        if (true)
+        {
+            //bool isNotLeft = Role.position.x > minSightWidthBoundary, isNotRight = Role.position.x < maxSightWidthBoundary, isNotDown = Role.position.y > minSightHeightBoundary, isNotUp = Role.position.y < maxSightHeightBoundary;
+
+            //to refresh the displayWorld
+            //if (IsNotRoleNearBoundary = isNotLeft && isNotRight && isNotDown && isNotUp)
+            if(right || left || up || down)
+            {
+                Debug.Log("in");
+                //normal situation
+
+                //to decide the moving direction
+                //Vector2 from = nowTileData.Position, to = newTileData.Position;
+                //float distanceX = to.x - from.x, distanceY = to.y - from.y;
+
+                //int nowXCount = (int)(Role.position.x * 100 + 1) / CellWidth, nowYCount = (int)(Role.position.y * 100 + 1) / CellHeight;
+
+                int nowXCount = (int)(from.x * 100 + 1) / CellWidth, nowYCount = (int)(from.y * 100 + 1) / CellHeight;
+                int newXCount = right ? nowXCount + (PreSight + 1) * sightWidthCount : left ? nowXCount - (PreSight + 1) * sightWidthCount : nowXCount - sightWidthCount;
+                int oldXCount = right ? nowXCount - PreSight * sightWidthCount : left ? nowXCount + PreSight * sightWidthCount : 0;
+                int newYCount = up ? nowYCount + (PreSight + 1) * sightHeightCount : down ? nowYCount - (PreSight + 1) * sightHeightCount : nowYCount - sightHeightCount;
+                int oldYCount = up ? nowYCount - PreSight * sightHeightCount : down ? nowYCount + PreSight * sightHeightCount : 0;
+
+                //two dimensions
+                if ((right || left) && (up || down))
+                    Debug.Log("twe dimensions");
+
+                int indexX, indexY, sumX, sumY, cancelX, cancelY;
+
+                //moving in x direction
+                if (right || left)
+                {
+                    Vector3 newXVector = newXCount * cellWidthInWC * Vector3.right;
+                    Vector3 newYUpVector = (newYCount + 2 * sightHeightCount) * cellHeightInWC * Vector3.up;
+                    Vector3 newYMiddleVector = (newYCount + sightHeightCount) * cellHeightInWC * Vector3.up;
+                    Vector3 newYDownVector = newYCount * cellHeightInWC * Vector3.up;
+
+                    if (right)
+                    {
+                        sightBottomLeft[6] = sightBottomLeft[7]; sightBottomLeft[7] = sightBottomLeft[8]; sightBottomLeft[8] = newXVector + newYUpVector;
+                        sightBottomLeft[3] = sightBottomLeft[4]; sightBottomLeft[4] = sightBottomLeft[5]; sightBottomLeft[5] = newXVector + newYMiddleVector;
+                        sightBottomLeft[0] = sightBottomLeft[1]; sightBottomLeft[1] = sightBottomLeft[2]; sightBottomLeft[2] = newXVector + newYDownVector;
+                    }
+                    else
+                    {
+                        //left
+                        sightBottomLeft[8] = sightBottomLeft[7]; sightBottomLeft[7] = sightBottomLeft[6]; sightBottomLeft[6] = newXVector + newYUpVector;
+                        sightBottomLeft[5] = sightBottomLeft[4]; sightBottomLeft[4] = sightBottomLeft[3]; sightBottomLeft[3] = newXVector + newYMiddleVector;
+                        sightBottomLeft[2] = sightBottomLeft[1]; sightBottomLeft[1] = sightBottomLeft[0]; sightBottomLeft[0] = newXVector + newYDownVector;
+                    }
+
+                    Debug.Log(newXCount + " " + newYCount + " " + oldXCount);
+
+                    indexY = newYCount;
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        for (int j = 0; j < sightWidthCount; ++j)
+                        {
+                            sumX = newXCount + j;
+                            cancelX = oldXCount + j;
+
+                            for (int k = 0; k < sightHeightCount; ++k)
+                            {
+                                sumY = indexY + k;
+
+                                try
+                                {
+                                    //to display
+                                    if (mapPool[sumX, sumY] != null)
+                                    {
+                                        mapPool[sumX, sumY].gameObject.SetActive(true);
+                                    }
+                                    else
+                                    {
+                                        //to create new tile into mapPool
+                                        mapPool[sumX, sumY] = tile = Instantiate(tile);
+                                        tile.parent = SightList;
+                                        tile.position = sumX * cellWidthInWC * Vector3.right + sumY * cellHeightInWC * Vector3.up;
+                                        tile.localScale = Vector3.one;
+                                        tile.name = "Tile " + sumX.ToString() + ',' + sumY.ToString();
+
+                                        tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                                    }
+                                }
+                                catch(IndexOutOfRangeException e)
+                                {
+                                    Debug.Log("RefreshMap: Display OutOfRange\n" + e);
+                                }
+
+                                try
+                                {
+                                    //to cancel
+                                    mapPool[cancelX, sumY].gameObject.SetActive(false);
+                                }
+                                catch(IndexOutOfRangeException e)
+                                {
+                                    Debug.Log("RefreshMap: Cancel OutOfRange\n" + e);
+                                }
+                            }
+                        }
+                        indexY += sightHeightCount;
+                    }
+                }
+
+                
+                //moving in y direction
+                if (up || down)
+                {
+                    Vector3 newYVector = newYCount * cellHeightInWC * Vector3.up;
+                    Vector3 newXRightVector = (newXCount + 2 * sightWidthCount) * cellWidthInWC * Vector3.right;
+                    Vector3 newXMiddleVector = (newXCount + sightWidthCount) * cellWidthInWC * Vector3.right;
+                    Vector3 newXLeftVector = newXCount * cellWidthInWC * Vector3.right;
+
+                    if (up)
+                    {
+                        sightBottomLeft[0] = sightBottomLeft[3]; sightBottomLeft[1] = sightBottomLeft[4]; sightBottomLeft[2] = sightBottomLeft[5];
+                        sightBottomLeft[3] = sightBottomLeft[6]; sightBottomLeft[4] = sightBottomLeft[7]; sightBottomLeft[5] = sightBottomLeft[8];
+                        sightBottomLeft[6] = newXLeftVector + newYVector; sightBottomLeft[7] = newXMiddleVector + newYVector; sightBottomLeft[8] = newXRightVector + newYVector;
+                    }
+                    else
+                    {
+                        //down
+                        sightBottomLeft[6] = sightBottomLeft[3]; sightBottomLeft[7] = sightBottomLeft[4]; sightBottomLeft[8] = sightBottomLeft[5];
+                        sightBottomLeft[3] = sightBottomLeft[0]; sightBottomLeft[4] = sightBottomLeft[1]; sightBottomLeft[5] = sightBottomLeft[2];
+                        sightBottomLeft[0] = newXLeftVector + newYVector; sightBottomLeft[1] = newXMiddleVector + newYVector; sightBottomLeft[2] = newXRightVector + newYVector;
+                    }
+
+                    Debug.Log(newXCount + " " + newYCount + " " + oldYCount);
+
+                    indexX = newXCount;
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        for (int j = 0; j < sightWidthCount; ++j)
+                        {
+                            sumX = indexX + j;
+
+                            for (int k = 0; k < sightHeightCount; ++k)
+                            {
+                                sumY = newYCount + k;
+                                cancelY = oldYCount + k;
+
+                                try
+                                {
+                                    //to display
+                                    if (mapPool[sumX, sumY] != null)
+                                    {
+                                        mapPool[sumX, sumY].gameObject.SetActive(true);
+                                    }
+                                    else
+                                    {
+                                        //to create new tile into mapPool
+                                        mapPool[sumX, sumY] = tile = Instantiate(tile);
+                                        tile.parent = SightList;
+                                        tile.position = sumX * cellWidthInWC * Vector3.right + sumY * cellHeightInWC * Vector3.up;
+                                        tile.localScale = Vector3.one;
+                                        tile.name = "Tile " + sumX.ToString() + ',' + sumY.ToString();
+
+                                        tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                                    }
+                                }
+                                catch (IndexOutOfRangeException e)
+                                {
+                                    Debug.Log("RefreshMap: Display OutOfRange\n" + e);
+                                }
+
+                                try
+                                {
+                                    //to cancel
+                                    mapPool[sumX, cancelY].gameObject.SetActive(false);
+                                }
+                                catch (IndexOutOfRangeException e)
+                                {
+                                    Debug.Log(sumX + " " + cancelY + " " + sumY);
+                                    Debug.Log("RefreshMap: Cancel OutOfRange\n" + e);
+                                }
+                                catch (NullReferenceException ne)
+                                {
+                                    Debug.Log(sumX + " " + cancelY + " " + sumY);
+                                    Debug.Log("RefreshMap: Cancel Null\n" + ne);
+                                }
+                            }
+                        }
+
+                        indexX += sightWidthCount;
+                    }
+                }
+            }
+
+            //nowTileData = newTileData;
+        }
+
+        /*
+        //to refresh the displayWorld
+        
         if(IsNotRoleNearBoundary = Role.position.x > minSightWidthBoundary && Role.position.x < maxSightWidthBoundary && Role.position.y > minSightHeightBoundary && Role.position.y < maxSightHeightBoundary)
         {
             //walking speed cannot be too fast!?
@@ -278,11 +496,11 @@ public class GroundController : MonoBehaviour
                     //transit
                     for (int i = 1; i < sightWidthCount; ++i)
                         for (int j = 0; j < sightHeightCount; ++j)
-                            displaySight[i - 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+                            sight[i - 1][j].GetComponent<SpriteRenderer>().sprite = sight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                     //new sight
                     for (int i = 0; i < sightHeightCount; ++i)
-                        displaySight[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[tempX][i].position);
+                        sight[tempX][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(sight[tempX][i].position);
                 }
                 else if (distanceX < 0f)
                 {
@@ -291,11 +509,11 @@ public class GroundController : MonoBehaviour
                     //transit
                     for (int i = sightWidthCount - 2; i >= 0; --i)
                         for (int j = 0; j < sightHeightCount; ++j)
-                            displaySight[i + 1][j].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+                            sight[i + 1][j].GetComponent<SpriteRenderer>().sprite = sight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                     //new sight
                     for (int i = 0; i < sightHeightCount; ++i)
-                        displaySight[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[0][i].position);
+                        sight[0][i].GetComponent<SpriteRenderer>().sprite = MakeSprite(sight[0][i].position);
                 }
 
                 if (distanceY > 0f)
@@ -305,11 +523,11 @@ public class GroundController : MonoBehaviour
                     //transit
                     for (int i = 0; i < sightWidthCount; ++i)
                         for (int j = 1; j < sightHeightCount; ++j)
-                            displaySight[i][j - 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+                            sight[i][j - 1].GetComponent<SpriteRenderer>().sprite = sight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                     //new sight
                     for (int i = 0; i < sightWidthCount; ++i)
-                        displaySight[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][tempY].position);
+                        sight[i][tempY].GetComponent<SpriteRenderer>().sprite = MakeSprite(sight[i][tempY].position);
                 }
                 else if (distanceY < 0f)
                 {
@@ -318,16 +536,17 @@ public class GroundController : MonoBehaviour
                     //transit
                     for (int i = 0; i < sightWidthCount; ++i)
                         for (int j = sightHeightCount - 2; j >= 0; --j)
-                            displaySight[i][j + 1].GetComponent<SpriteRenderer>().sprite = displaySight[i][j].GetComponent<SpriteRenderer>().sprite;
+                            sight[i][j + 1].GetComponent<SpriteRenderer>().sprite = sight[i][j].GetComponent<SpriteRenderer>().sprite;
 
                     //new sight
                     for (int i = 0; i < sightWidthCount; ++i)
-                        displaySight[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(displaySight[i][0].position);
+                        sight[i][0].GetComponent<SpriteRenderer>().sprite = MakeSprite(sight[i][0].position);
                 }
 
                 nowTileData = newTileData;
             }
         }
+        */
     }
 
     float Interpolate(float x0, float x1, float alpha)
@@ -439,18 +658,20 @@ public class GroundController : MonoBehaviour
     
     void Update()
     {
-        RefreshMap();
+        //RefreshMap();
     }
 
-    public static int StaticCellWidth, StaticCellHeight;
+    public static int StaticCellWidth, StaticCellHeight, StaticSightWidth, StaticSightHeight;
 
-    public Transform Role;
-    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight;
-    public float DistanceThreshold;
+    //SightList localPosition must be 0, 0, 0
+    public Transform Role, SightList;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight;
+    public float DistanceThreshold, MapRefreshTime;
 
-    Transform[][] displaySight, displayWorld;
+    Transform[,] mapPool;
+    Transform[][] sight, map;
     TileData[][] groundData;
-    TileData nowTileData;
+    //TileData nowTileData;
     Transform tile;
 
     bool IsNotRoleNearBoundary
@@ -459,31 +680,48 @@ public class GroundController : MonoBehaviour
 
         set
         {
+            /*
             if(isNotRoleNearBoundary != value)
             {
-                //bug: cannot init at small/large posiiton 
+                SightList.parent = value ? Role : transform;
 
-                Transform tf, parent = value ? Role : transform.parent;
-
+                
                 for (int i = 0; i < sightWidthCount; ++i)
                     for (int j = 0; j < sightHeightCount; ++j)
                     {
-                        tf = displaySight[i][j];
+                        tf = sight[i][j];
                         
                         tf.parent = parent;
                         tf.localScale = Vector3.one;
                     }
+                
 
                 Debug.Log(value ? "displaySight is moving" : "displaySight is stand still");
                 isNotRoleNearBoundary = value;
             }
+            */
+            isNotRoleNearBoundary = value;
         }
     }
 
+    enum sightDirection
+    {
+        BottomLeft,
+        Bottom,
+        BottomRight,
+        Left,
+        Center,
+        Right,
+        TopLeft,
+        Top,
+        TopRight
+    }
+
+    Vector3[] sightBottomLeft;
     float[][] worldNoise, worldPerlinNoise;
     float cellWidthInWC, cellHeightInWC;
     //InWC
     float minSightWidthBoundary, maxSightWidthBoundary, minSightHeightBoundary, maxSightHeightBoundary;
-    int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, landformTypeAmount = MapConstants.LandformTypeAmount;
+    int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, halfSightWidthCount, halfSightHeightCount, preSightRange, landformTypeAmount = MapConstants.LandformTypeAmount;
     bool isNotRoleNearBoundary;
 }
