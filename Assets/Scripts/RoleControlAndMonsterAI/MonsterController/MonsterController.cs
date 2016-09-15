@@ -24,7 +24,6 @@ public class MonsterController : MonoBehaviour {
     protected const int STATE_ANIM = 1;
     protected const int STATE_FINISFANIM = 2;
 
-
     protected virtual void Awake() {
         //data = Monster.Load(id);
         data = new Monster();
@@ -53,7 +52,7 @@ public class MonsterController : MonoBehaviour {
         stateMachine();
     }
 
-    private void stateMachine() {
+    protected void stateMachine() {
         switch (State) {
             case MonsterState.IDlE:
                 Idle();
