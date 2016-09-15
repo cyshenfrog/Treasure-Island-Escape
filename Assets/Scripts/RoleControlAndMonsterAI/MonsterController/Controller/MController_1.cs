@@ -32,7 +32,7 @@ public class MController_1 : MonsterController {
         }
     }
 
-    public override void BeAttacked()
+    public override void BeAttacked() 
     {
         base.BeAttacked();
         if(beAttackedState == STATE_FINISFANIM) runAway();

@@ -226,6 +226,15 @@ public class RoleController : MonoBehaviour {
         
     }
 
+    private void beAttacked()  {
+
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_right")
+            || anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_left")) {
+            State = RoleState.TYRANTS;
+        }
+
+    }
+
     /// <summary>
     /// let role move to target
     /// </summary>
@@ -275,15 +284,6 @@ public class RoleController : MonoBehaviour {
         }
     }
 
-    private void beAttacked() {
-
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_right")
-            || anim.GetCurrentAnimatorStateInfo(0).IsName("idle_stand_left")) {
-            State = RoleState.TYRANTS;
-        }
-        
-    }
-
     public void BeAttacked(int attack, Vector2 pos) {
 
         if (State != RoleState.TYRANTS) {
@@ -300,6 +300,14 @@ public class RoleController : MonoBehaviour {
             }
 
         }
+    }
+
+    public bool Collect(Vector2 pos) {
+        if (Vector2.Distance(transform.position, pos) < AnimalConstant.RoleCollectRange) {
+            Debug.Log("collect...");
+            return true;
+        }
+        return false;
     }
 
     public void Die() {

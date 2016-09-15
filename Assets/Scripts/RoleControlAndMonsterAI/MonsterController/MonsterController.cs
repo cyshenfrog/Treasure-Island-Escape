@@ -16,12 +16,13 @@ public class MonsterController : MonoBehaviour {
     protected int randomDirection;
     protected int randomAction;
 
+    protected int facing = -1;
+
     //be attacked parameters
     protected int beAttackedState = 0;
     protected const int STATE_STARTPLAYANIM = 0;
     protected const int STATE_ANIM = 1;
     protected const int STATE_FINISFANIM = 2;
-
 
     protected virtual void Awake() {
         //data = Monster.Load(id);
@@ -35,11 +36,11 @@ public class MonsterController : MonoBehaviour {
         role = GameObject.Find(AnimalConstant.RolePrefab);
     }
 
-	protected virtual void Start () {       
+    protected virtual void Start() {
         State = MonsterState.IDlE;
-	}
-	
-	protected virtual void Update () {
+    }
+
+    protected virtual void Update() {
         if (lastTimes <= 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
             randomAction = Random.Range(0, 2);
             randomDirection = Random.Range(0, 4);
@@ -51,7 +52,7 @@ public class MonsterController : MonoBehaviour {
         stateMachine();
     }
 
-    private void stateMachine() {
+    protected void stateMachine() {
         switch (State) {
             case MonsterState.IDlE:
                 Idle();
@@ -60,6 +61,7 @@ public class MonsterController : MonoBehaviour {
                 Move();
                 break;
             case MonsterState.NIGHT:
+                Night();
                 break;
             case MonsterState.BEATTACK:
                 BeAttacked();
@@ -73,7 +75,7 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Move() {
-        
+
         switch (randomDirection)
         {
             case AnimalConstant.Left:
@@ -158,11 +160,14 @@ public class MonsterController : MonoBehaviour {
         }
     }
 
+    public virtual void Night() { }
+
     public virtual void Die() {
         //play animation
         //remove data in monster collection
         Debug.Log("monster die");
         Destroy(gameObject);
     }
+
     
 }
