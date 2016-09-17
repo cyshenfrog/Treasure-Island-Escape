@@ -79,7 +79,9 @@ public class GroundRandomer
     static void GenerateGround()
     {
         Vector2[] positions = RandomSites();
-        List<TileData> DFSList = new List<TileData>(), volcanoBFSList = new List<TileData>(), snowfieldBFSList = new List<TileData>();
+        //List<TileData> DFSList = new List<TileData>(), volcanoBFSList = new List<TileData>(), snowfieldBFSList = new List<TileData>();
+        Queue<TileData>[] qs = new Queue<TileData>[landformTypeAmount];
+
 
         //ground initialization
         groundData = new TileData[width][];
@@ -92,12 +94,15 @@ public class GroundRandomer
             //to create the TileData in the position of groundData
             landformList[i] = new List<TileData>();
             landformList[i].Add(groundData[(int)positions[i].x][(int)positions[i].y] = TileDataManager.Factory((MapConstants.LandformType)i, positions[i]));
+            qs[i] = new Queue<TileData>();
+            qs[i].Enqueue(groundData[(int)positions[i].x][(int)positions[i].y]);
         }
 
         //DFS and BFS generator
 
         //to initialize DFSList and two BFSLists
 
+        /*
         //temp is the count of landformType except for snowfield and volcano
         int temp = landformTypeAmount - 2;
         for (int i = 0; i < temp; ++i)
@@ -105,7 +110,8 @@ public class GroundRandomer
 
         snowfieldBFSList.Add(groundData[(int)positions[5].x][(int)positions[5].y]);
         volcanoBFSList.Add(groundData[(int)positions[6].x][(int)positions[6].y]);
-
+        
+        
         //to generate map
         int index = 0;
         bool isDFSContinued = true, isVolcanoBFSContinued = true, isSnowfieldContinued = true;
@@ -129,6 +135,9 @@ public class GroundRandomer
                     landformList[6].Add(snowfieldBFSList[snowfieldBFSList.Count - 1]);
             }
         }
+        */
+
+        TileDataManager.BFSearchs(qs, landformList, groundData, islandForm);
     }
 
     public static GroundRandomer Self

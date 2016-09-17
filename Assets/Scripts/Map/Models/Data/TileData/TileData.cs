@@ -42,7 +42,15 @@ public abstract class TileData
         set { materialDirections = value; }
     }
 
+    /*
     public List<Vector2> Directions
+    {
+        get { return directions; }
+        set { directions = value; }
+    }
+    */
+
+    public Vector2[] Directions
     {
         get { return directions; }
         set { directions = value; }
@@ -101,7 +109,8 @@ public abstract class TileData
     }
     
     //DFS directions
-    protected List<Vector2> directions = new List<Vector2>() { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+    //protected List<Vector2> directions = new List<Vector2>() { Vector2.left + Vector2.up, Vector2.up, Vector2.right + Vector2.up, Vector2.left, Vector2.right, Vector2.left + Vector2.down, Vector2.down, Vector2.right + Vector2.down };
+    protected Vector2[] directions = new Vector2[] { Vector2.left + Vector2.up, Vector2.up, Vector2.right + Vector2.up, Vector2.left, Vector2.right, Vector2.left + Vector2.down, Vector2.down, Vector2.right + Vector2.down };
     //used for blending images
     protected Vector2[] materialDirections = new Vector2[4];
     protected MapConstants.LandformType[] materialTypes = new MapConstants.LandformType[] { MapConstants.LandformType.None, MapConstants.LandformType.None, MapConstants.LandformType.None, MapConstants.LandformType.None };

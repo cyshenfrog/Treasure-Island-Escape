@@ -26,6 +26,18 @@ public static class MapConstants
     {
         Vestige
     }
+
+    public enum Directions
+    {
+        TopLeft,
+        Top,
+        TopRight,
+        Left,
+        Right,
+        BottomLeft,
+        Bottom,
+        BottomRight
+    }
     
     public static Vector2[] SearchDirections = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
 
@@ -39,6 +51,8 @@ public static class MapConstants
     public static Color[][] LandformColor = new Color[][] { SeaColor, GrasslandColor, ForestColor, DesertColor, MarshColor, SnowfieldColor, VolcanoColor };
     //new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,)
 
-    public static int LandformTypeAmount = (int)LandformType.None;
+    //public static 
+
     public static string LandformPath = @"Map\Grassland";
+    public static int LandformTypeAmount = (int)LandformType.None, MaxStack = 30;
 }

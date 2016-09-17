@@ -32,8 +32,8 @@ public class GroundController : MonoBehaviour
         cellHeightInWC = CellHeight * .01f;
         
         tile = Resources.Load<GameObject>(@"Map\Tile").transform;
-        tile.GetComponent<BoxCollider>().size = cellWidthInWC * Vector3.right + cellHeightInWC * Vector3.up;
-        tile.GetComponent<BoxCollider>().center = cellWidthInWC * .5f * Vector3.right + cellHeightInWC * .5f * Vector3.up;
+        //tile.GetComponent<BoxCollider>().size = cellWidthInWC * Vector3.right + cellHeightInWC * Vector3.up;
+        //tile.GetComponent<BoxCollider>().center = cellWidthInWC * .5f * Vector3.right + cellHeightInWC * .5f * Vector3.up;
 
         //boundary
         minSightWidthBoundary = SightWidth * .01f;
@@ -51,7 +51,11 @@ public class GroundController : MonoBehaviour
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
         //Display(false);
-        Display();
+        //Display();
+        DisplayWorld();
+
+        for (int i = 0; i < landformTypeAmount; ++i)
+            Debug.Log((MapConstants.LandformType)i + ": " + GroundRandomer.Self.LandformList[i].Count);
 
         /*
         foreach(Transform[] ta in displaySight)
@@ -61,18 +65,20 @@ public class GroundController : MonoBehaviour
                 t.gameObject.SetActive(true);
             }
         }*/
-        
-        //to set the nowTileData below the Role
-        //nowTileData = GetTileDataByWorldPosition(Role.position);
-        
-        //the max tile
-        mapPool[worldWidthCount - 1, worldHeightCount - 1] = tile = Instantiate(tile);
-        tile.parent = SightList;
-        tile.position = (worldWidthCount - 1) * Vector3.right * cellWidthInWC + (worldHeightCount - 1) * Vector3.up * cellHeightInWC;
-        tile.localScale = Vector3.one;
-        tile.name = "Tile " + (worldWidthCount - 1).ToString() + ',' + (worldHeightCount - 1).ToString();
 
-        InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
+            //to set the nowTileData below the Role
+            //nowTileData = GetTileDataByWorldPosition(Role.position);
+
+            /*
+            //the max tile
+            mapPool[worldWidthCount - 1, worldHeightCount - 1] = tile = Instantiate(tile);
+            tile.parent = SightList;
+            tile.position = (worldWidthCount - 1) * Vector3.right * cellWidthInWC + (worldHeightCount - 1) * Vector3.up * cellHeightInWC;
+            tile.localScale = Vector3.one;
+            tile.name = "Tile " + (worldWidthCount - 1).ToString() + ',' + (worldHeightCount - 1).ToString();
+            */
+
+            //InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
     }
 
     public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
@@ -241,30 +247,35 @@ public class GroundController : MonoBehaviour
         }
     }
 
-    void DisplayAllWorld()
-    {
-        float halfWorldWidth = worldWidthCount * .5f, halfWorldHeight = worldHeightCount * .5f;
-
-        //to display
-        map = new Transform[worldWidthCount][];
-
-        //to decide the detail of new go
+    void DisplayWorld()
+    {        
+        //to create the mapPool
+        mapPool = new Transform[worldWidthCount, worldHeightCount];
+        
+        //to display world
         for (int i = 0; i < worldWidthCount; ++i)
         {
-            map[i] = new Transform[worldHeightCount];
-
             for (int j = 0; j < worldHeightCount; ++j)
             {
-                //to initialize
-                map[i][j] = tile = Instantiate(tile);
-                tile.parent = transform;
-                tile.localPosition = (i - halfWorldWidth) * Vector3.right * cellWidthInWC + (j - halfWorldHeight) * Vector3.up * cellHeightInWC;
-                tile.localScale = Vector3.one;
-                tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+                {
+                    if(groundData[i][j] != null)
+                    {
+                        //to initialize
+                        tile = Instantiate(tile);
+                        tile.parent = SightList;
+                        tile.position = i * cellWidthInWC * Vector3.right + j * cellHeightInWC * Vector3.up;
+                        tile.localScale = Vector3.one;
+                        tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+                        tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
 
-                tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
-
-                tile.gameObject.SetActive(false);
+                        //to put tile into mapPool
+                        mapPool[i, j] = tile;
+                    }
+                    else
+                    {
+                        Debug.Log("tiledata null");
+                    }
+                }
             }
         }
     }

@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
-public class TileDataManager
+public static class TileDataManager
 {
+    /*
     public static bool DFS(List<TileData> DFSList, ref int index, TileData[][] groundData, Form islandForm)
     {
         TileData td = DFSList[index];
 
         while (td.Directions.Count != 0)
         {
-            int random = Random.Range(0, td.Directions.Count);
+            int random = UnityEngine.Random.Range(0, td.Directions.Count);
             Vector2 direction = td.Directions[random], nextPosition = td.Position + direction;
 
             //to remove the direction in td
@@ -34,7 +36,7 @@ public class TileDataManager
                 }
             }
 
-            /*
+            /////
             //to get nexttd
             if(islandForm.Inside(nextPosition))
             {
@@ -81,7 +83,7 @@ public class TileDataManager
                         CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                     }
                 }
-            }*/
+            }////
         }
 
         //all directions in td have been found
@@ -107,8 +109,281 @@ public class TileDataManager
                 return false;
         }
     }
+    */
 
-    public static bool BFS(List<TileData> BFSList, TileData[][] groundData, Form islandForm)
+    public static bool BFS(Queue<TileData> q, List<TileData> landformList, TileData[][] groundData, Form islandForm, ref int stack)
+    {
+        int count = q.Count;
+        List<TileData> success = new List<TileData>();
+
+        while(count-- > 0)
+        {
+            TileData td = q.Dequeue();
+            
+            for(int i = 0; i < 8; ++i)
+            {
+                //Debug.Log(i);
+                //Debug.Log(td);
+                //Debug.Log(td.Directions[i]);
+                Vector2 direction = td.Directions[i], nextPosition = td.Position + direction;
+
+                //if (islandForm.Inside(nextPosition) || (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+                //if (nextPosition.x < groundData.Length && nextPosition.x >= 0 && nextPosition.y < groundData[0].Length && nextPosition.y >= 0)
+                try
+                {
+                    if (groundData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                    {
+                        //first found
+                        TileData next = CreateNext(nextPosition, direction, td, groundData, false);
+
+                        landformList.Add(next);
+
+                        //mode 0: normal
+                        //q.Enqueue(next);
+
+                        success.Add(next);
+                    }
+                    else
+                    {
+                        //it has been found before
+                        CreateEdge(direction, td, groundData[(int)nextPosition.x][(int)nextPosition.y]);
+                    }
+                }
+                catch(IndexOutOfRangeException e)
+                {
+                    Debug.Log("BFS Error: " + e);
+                }
+            }
+        }
+
+
+        
+        //mode 1: random pick one point
+        //if(success.Count != 0)
+            //q.Enqueue(success[UnityEngine.Random.Range(0, success.Count)]);
+
+        //mode 2: random pick many point
+        if (success.Count >= 2)
+        {
+            int random = UnityEngine.Random.Range(0, success.Count);
+            q.Enqueue(success[random]);
+            success.RemoveAt(random);
+            random = UnityEngine.Random.Range(0, success.Count);
+            q.Enqueue(success[random]);
+            success.RemoveAt(random);
+        }
+
+        //mode 3: 
+
+        return !(++stack >= MapConstants.MaxStack || q.Count == 0);
+    }
+
+    public static int Choice(int direction)
+    {
+        int p0 = direction, p1, p2, p3, p4;
+
+        switch(direction)
+        {
+            case (int)MapConstants.Directions.TopLeft:
+                p1 = (int)MapConstants.Directions.Top;
+                p2 = (int)MapConstants.Directions.Left;
+                p3 = (int)MapConstants.Directions.TopRight;
+                p4 = (int)MapConstants.Directions.BottomLeft;
+                break;
+
+            case (int)MapConstants.Directions.Top:
+                p1 = (int)MapConstants.Directions.TopLeft;
+                p2 = (int)MapConstants.Directions.TopRight;
+                p3 = p0;
+                p4 = p0;
+                break;
+
+            case (int)MapConstants.Directions.TopRight:
+                p1 = (int)MapConstants.Directions.Top;
+                p2 = (int)MapConstants.Directions.Right;
+                p3 = (int)MapConstants.Directions.TopLeft;
+                p4 = (int)MapConstants.Directions.BottomRight;
+                break;
+
+            case (int)MapConstants.Directions.Left:
+                p1 = (int)MapConstants.Directions.TopLeft;
+                p2 = (int)MapConstants.Directions.BottomLeft;
+                p3 = p0;
+                p4 = p0;
+                break;
+
+            case (int)MapConstants.Directions.Right:
+                p1 = (int)MapConstants.Directions.TopRight;
+                p2 = (int)MapConstants.Directions.BottomRight;
+                p3 = p0;
+                p4 = p0;
+                break;
+
+            case (int)MapConstants.Directions.BottomLeft:
+                p1 = (int)MapConstants.Directions.Bottom;
+                p2 = (int)MapConstants.Directions.Left;
+                p3 = (int)MapConstants.Directions.TopLeft;
+                p4 = (int)MapConstants.Directions.BottomRight;
+                break;
+
+            case (int)MapConstants.Directions.Bottom:
+                p1 = (int)MapConstants.Directions.BottomLeft;
+                p2 = (int)MapConstants.Directions.BottomRight;
+                p3 = p0;
+                p4 = p0;
+                break;
+
+            case (int)MapConstants.Directions.BottomRight:
+                p1 = (int)MapConstants.Directions.Bottom;
+                p2 = (int)MapConstants.Directions.Right;
+                p3 = (int)MapConstants.Directions.TopRight;
+                p4 = (int)MapConstants.Directions.BottomLeft;
+                break;
+
+            default:
+                p1 = p0;
+                p2 = p0;
+                p3 = p0;
+                p4 = p0;
+                break;
+        }
+
+        int random = UnityEngine.Random.Range(0, 9);
+
+        switch(random)
+        {
+            case 0:
+            case 5:
+            case 8:
+                return p0;
+
+            case 1:
+            case 6:
+                return p1;
+
+            case 2:
+            case 7:
+                return p2;
+
+            case 3:
+                return p3;
+
+            case 4:
+                return p4;
+
+            default:
+                return p0;
+        }
+    }
+
+    public static bool BFS(Queue<TileData> q, List<TileData> landformList, TileData[][] groundData, Form islandForm, ref int stack, int last)
+    {
+        int count = q.Count;
+        List<TileData> success = new List<TileData>();
+
+        while (count-- > 0)
+        {
+            TileData td = q.Dequeue();
+
+            for (int i = 0; i < 8; ++i)
+            {
+                Vector2 direction = td.Directions[i], nextPosition = td.Position + direction;
+
+                //if (islandForm.Inside(nextPosition) || (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
+                //if (nextPosition.x < groundData.Length && nextPosition.x >= 0 && nextPosition.y < groundData[0].Length && nextPosition.y >= 0)
+                try
+                {
+                    if (groundData[(int)nextPosition.x][(int)nextPosition.y] == null)
+                    {
+                        //first found
+                        TileData next = CreateNext(nextPosition, direction, td, groundData, false);
+
+                        landformList.Add(next);
+                        success.Add(next);
+                    }
+                    else
+                    {
+                        //it has been found before
+                        CreateEdge(direction, td, groundData[(int)nextPosition.x][(int)nextPosition.y]);
+                    }
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    Debug.Log("BFS Error: " + e);
+                }
+            }
+        }
+
+        /*
+        //mode 2: random pick many point
+        int random;
+        int c = success.Count >= 3 ? 3 : success.Count;
+
+        for (int i = c; i >= 0; --i)
+        {
+            random = UnityEngine.Random.Range(0, i);
+            q.Enqueue(success[random]);
+            success.RemoveAt(random);
+        }
+        */
+
+        //mode 3: 
+        int random;
+        int c = success.Count >= 3 ? 3 : success.Count;
+
+        for (int i = c; i >= 0; --i)
+        {
+            random = UnityEngine.Random.Range(0, i);
+            q.Enqueue(success[random]);
+            success.RemoveAt(random);
+        }
+
+        return !(++stack >= MapConstants.MaxStack || q.Count == 0);
+    }
+
+    public static void BFSearchs(Queue<TileData>[] qs, List<TileData>[] landformsList, TileData[][] groundData, Form islandForm)
+    {
+        int landformTypeAmount = MapConstants.LandformTypeAmount;
+        int[] stacks = new int[landformTypeAmount];
+        bool[] flags = new bool[landformTypeAmount];
+        int flagsCount = 0;
+
+        for (int i = 0; i < landformTypeAmount; ++i)
+        {
+            stacks[i] = 1;
+            flags[i] = false;
+        }
+
+
+        int index = 0;
+        while (true)
+        {
+            //to do bfs
+            if (!BFS(qs[index], landformsList[index], groundData, islandForm, ref stacks[index]))
+            {
+                flags[index] = true;
+                if(++flagsCount <= landformTypeAmount)
+                {
+                    //finished
+                    return;
+                }
+            }
+
+            //Debug.Log(flags[0]);
+
+            //next turn
+            while (true)
+            {
+                index = (++index) % landformTypeAmount;
+                //Debug.Log(index);
+                if (!flags[index])
+                    break;
+            }
+        }
+    }
+
+    /*
+    public static bool BFSs(List<TileData> BFSList, TileData[][] groundData, Form islandForm)
     {
         //int times = selected.Count > maxBFSTimes ? maxBFSTimes : selected.Count;
 
@@ -126,7 +401,7 @@ public class TileDataManager
 
             //inside or randomly outside
             //if (islandForm.Inside(nextPosition) || (UnityEngine.Random.Range(0, 9) < 5 && nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0))
-            if ((nextPosition.x < groundData.Length && nextPosition.x >= 0 && nextPosition.y < groundData[0].Length && nextPosition.y >= 0))
+            if (nextPosition.x < groundData.Length && nextPosition.x >= 0 && nextPosition.y < groundData[0].Length && nextPosition.y >= 0)
             {
                 //to check if the nexttd has benn found
                 if (groundData[(int)nextPosition.x][(int)nextPosition.y] == null)
@@ -142,7 +417,7 @@ public class TileDataManager
                 }
             }
 
-            /*
+            /////
             //to get nexttd
             if (nextPosition.x < worldData.Length && nextPosition.x >= 0 && nextPosition.y < worldData[0].Length && nextPosition.y >= 0)
             {
@@ -165,17 +440,21 @@ public class TileDataManager
                     CreateEdge(direction, td, worldData[(int)nextPosition.x][(int)nextPosition.y]);
                 }
             }
-            */
+            /////
         }
 
         BFSList.RemoveAt(0);
 
+        return false;
+        ///
         if (BFSList.Count != 0)
             return BFS(BFSList, groundData, islandForm);
         else
             return false;
+            ////
         //}
     }
+    */
 
     public static TileData Factory(MapConstants.LandformType mt, Vector2 position, TileData fromTile = null)
     {
@@ -209,7 +488,7 @@ public class TileDataManager
                 {
                     next.MaterialTypes[i] = td.MaterialTypes[0];
                     next.MaterialDirections[i] = direction;
-                    next.Directions.Remove(-direction);
+                    //next.Directions.Remove(-direction);
                     return;
                 }
     }
@@ -218,7 +497,7 @@ public class TileDataManager
     {
         TileData next = groundData[(int)nextPosition.x][(int)nextPosition.y] = Factory(td.MaterialTypes[0], nextPosition, DFS ? td : null);
         next.MaterialDirections[0] = direction;
-        next.Directions.Remove(-direction);
+        //next.Directions.Remove(-direction);
         return next;
     }
 }
