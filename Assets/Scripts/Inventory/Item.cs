@@ -45,7 +45,7 @@ public class Item : MonoBehaviour {
             abilityDescription += "\n stamine " + stamine.ToString();
         }
         
-        return string.Format("<color=" + color +"><size=16>{0}</size></color><size=14><i><color=lime>\n{1}</color></i>{2}</size>", itemName, description, abilityDescription);
+        return string.Format("<color=" + color +"><size=50>{0}</size></color><size=48><i><color=lime>\n{1}</color></i>{2}</size>", itemName, description, abilityDescription);
     }
     public void setStatus(Item item)
     {

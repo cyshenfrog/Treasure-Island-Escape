@@ -66,47 +66,20 @@ public class Player : MonoBehaviour {
         {
             if (inventory1.placeEmpty(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for(int i = 0; i < 5; ++i)
-                    {
-                        if(!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
             else if (inventory2.placeEmpty(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
             else if (inventory3.placeEmpty(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
         }
@@ -114,50 +87,55 @@ public class Player : MonoBehaviour {
         {
             if (inventory1.addItem(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
             else if (inventory2.addItem(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
             else if (inventory3.addItem(item))
             {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
+                updateCraftInventory(item);
+                updateCookingInventory(item);
                 return true;
             }
         }
         return false;
+    }
+    void updateCraftInventory(Item item)
+    {
+        GameObject temp = GameObject.Find("MakingWindow");
+        if (temp)
+        {
+            CraftSystem craftSystem = temp.GetComponent<CraftSystem>();
+            for (int i = 0; i < 5; ++i)
+            {
+                if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.itemName == item.itemName)
+                {
+                    craftSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
+    }
+    void updateCookingInventory(Item item)
+    {
+        GameObject temp = GameObject.Find("CookingWindow");
+        if (temp)
+        {
+            CookingSystem cookingSystem = temp.GetComponent<CookingSystem>();
+            for (int i = 0; i < 2; ++i)
+            {
+                if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.itemName == item.itemName)
+                {
+                    cookingSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
     }
 }

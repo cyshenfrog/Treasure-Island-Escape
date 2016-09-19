@@ -25,7 +25,7 @@ public class InventoryManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-        hoverPrefab = Resources.Load("Inventory/HoverIcon", typeof(GameObject)) as GameObject;
+        hoverPrefab = Resources.Load("Inventory/UIs/HoverIcon", typeof(GameObject)) as GameObject;
         if (selectStackSize == null)
         {
             selectStackSize = GameObject.Find("MoveItemStackSize");
@@ -36,8 +36,7 @@ public class InventoryManager : MonoBehaviour {
         player = GameObject.Find("Player");
         playerScript = player.GetComponent<Player>();
     }
-
-    // Update is called once per frame
+    
     public static void setStackInfo(int maxStackCount)
     {
         selectStackSize.SetActive(true);
@@ -220,18 +219,18 @@ public class InventoryManager : MonoBehaviour {
     {
         hoverObj = Instantiate(hoverPrefab);
         
-        hoverObj.GetComponent<Image>().sprite = click.GetComponent<Image>().sprite;
+        hoverObj.GetComponent<Image>().sprite = click.transform.Find("ItemImage").GetComponent<Image>().sprite;
 
         RectTransform hoverRect = hoverObj.GetComponent<RectTransform>();
 
-        hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
-        hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
+        //hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
+        //hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
 
         hoverRect.SetParent(canvas.transform, false);
         hoverText = hoverObj.transform.GetChild(0).GetComponent<Text>();
-        RectTransform hoverTextTransform = hoverText.GetComponent<RectTransform>();
-        hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
-        hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
+        //RectTransform hoverTextTransform = hoverText.GetComponent<RectTransform>();
+        //hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
+        //hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
     }
 
     public void changeText(int i)

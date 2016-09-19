@@ -43,7 +43,7 @@ public class Inventory : InventoryManager {
                 
                 if (dropItem != null)
                 {
-                    float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
+                    float angle = Random.Range(0.0f, Mathf.PI * 2);
                     Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
                     foreach (Item item in from.Items)
                     {
@@ -83,7 +83,8 @@ public class Inventory : InventoryManager {
     private void CreateInventoryLayout()
     {
         allSlots = new List<GameObject>();
-        foreach (Transform child in transform)
+        Transform slotLayout = transform.Find("SlotLayout");
+        foreach (Transform child in slotLayout)
         {
             Slot slot = child.GetComponent<Slot>();
             if (slot != null)
@@ -93,17 +94,16 @@ public class Inventory : InventoryManager {
                 GameObject temp = child.gameObject;
                 btn.onClick.AddListener(delegate { moveItem(temp); });
             }
-            else if (child.name == "arrowUp")
-            {
-                btn = child.GetComponent<Button>();
-                btn.onClick.AddListener(() => gameObject.transform.SetAsFirstSibling());
-            }
         }
+        Button arrowUp = transform.Find("arrowUp").GetComponent<Button>();
+        arrowUp.onClick.AddListener(() => gameObject.transform.SetAsFirstSibling());
+        Button arrowDown = transform.Find("arrowDown").GetComponent<Button>();
+        arrowDown.onClick.AddListener(() => gameObject.transform.parent.GetChild(0).transform.SetAsLastSibling());
     }
     
     public bool addItem(Item item)
     {
-        if(item.maxStackSize == 1)
+        if (item.maxStackSize == 1)
         {
             return placeEmpty(item);
         }

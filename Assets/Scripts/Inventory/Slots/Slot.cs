@@ -13,18 +13,20 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         set { items = value; }
     }
 
+    private Image itemImage;
     private Text stackText;
     public Sprite slotEmpty;
     // Use this for initialization
     //private Canvas canvas;
 
-    private static GameObject toolTip;
-    private static Text sizeText;
-    private static Text visualText;
+    public static GameObject toolTip;
+    public static Text sizeText;
+    public static Text visualText;
 
 	void Start () {
         stackText = gameObject.GetComponentInChildren<Text>();
-        
+        itemImage = transform.Find("ItemImage").GetComponent<Image>();
+
         items = new Stack<Item>();
         RectTransform slotRect = GetComponent<RectTransform>();
         RectTransform textRect = stackText.GetComponent<RectTransform>();
@@ -45,10 +47,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         }
     }
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
     public void showToolTip()
     {
         if(!isEmpty && GameObject.Find("HoverIcon(Clone)") == null)
@@ -89,7 +87,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
     private void changeSprite(Sprite icon)
     {
-        GetComponent<Image>().sprite = icon;
+        itemImage.sprite = icon;
     }
 
     private void useItem()

@@ -3,19 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-public class CraftFormulaList : MonoBehaviour
-{
+public class CookingFormulaList : MonoBehaviour {
+
     public static Dictionary<string, string> formula = new Dictionary<string, string>();
 
     [SerializeField]
     private GameObject[] targetButton;
-    
+
     private TargetBar targetBar;
-    private CraftSystem makingWindow;
+    private CookingSystem CookingWindow;
     void Start()
     {
         targetBar = GetComponent<TargetBar>();
-        makingWindow = GameObject.Find("MakingWindow").GetComponent<CraftSystem>();
+        CookingWindow = GameObject.Find("CookingWindow").GetComponent<CookingSystem>();
         createAllFormula();
     }
     void createAllFormula()
@@ -36,7 +36,7 @@ public class CraftFormulaList : MonoBehaviour
     void createFormula(string name, string fml, Transform button)
     {
         //load item to get tool tip
-        Item item = (Resources.Load("Inventory/Items/"+name, typeof(GameObject)) as GameObject).GetComponent<Item>();
+        Item item = (Resources.Load("Inventory/Items/" + name, typeof(GameObject)) as GameObject).GetComponent<Item>();
 
         //initialize slot and push item into slot
         TargetBarSlot slot = button.GetComponent<TargetBarSlot>();
@@ -44,7 +44,7 @@ public class CraftFormulaList : MonoBehaviour
         slot.addItem(item);
 
         //set button callback
-        button.GetComponent<Button>().onClick.AddListener(delegate { makingWindow.ShowCraftFormula(name, item.toolTipContent()); });
+        button.GetComponent<Button>().onClick.AddListener(delegate { CookingWindow.ShowCookingFormula(name, item.toolTipContent()); });
 
         //create craft formula
         formula.Add(name, fml);
