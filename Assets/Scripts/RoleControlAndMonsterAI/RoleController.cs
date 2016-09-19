@@ -249,8 +249,8 @@ public class RoleController : MonoBehaviour {
         float minDistance = 1000000;
         int index = -1;
         for (int i = 0;i < objPosition.Count;i++) {
-            if (Vector2.Distance(objPosition[i], transform.localPosition) < minDistance && Vector2.Distance(objPosition[i], transform.localPosition) <= AnimalConstant.RolePickUpRange) {
-                minDistance = Vector2.Distance(objPosition[i], transform.localPosition);
+            if (Vector2.Distance(objPosition[i], transform.position) < minDistance && Vector2.Distance(objPosition[i], transform.position) <= AnimalConstant.RolePickUpRange) {
+                minDistance = Vector2.Distance(objPosition[i], transform.position);
                 index = i;
             }
         }
@@ -269,7 +269,7 @@ public class RoleController : MonoBehaviour {
 
         //State = RoleState.ATTACK;
 
-        if (Vector2.Distance(transform.localPosition, target) <= AnimalConstant.RoleAttackRange) {
+        if (Vector2.Distance(transform.position, target) <= AnimalConstant.RoleAttackRange) {
             m.Hp -= (int)data.Attack;
             Debug.Log("Monster Hp : " + m.Hp + "/" + m.MaxHp);
 

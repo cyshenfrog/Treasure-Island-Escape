@@ -4,10 +4,10 @@ using System.Collections;
 public class MController_6 : MController_2 {
 
     //茶鵝
-
     private int collectTimes = 0;
     
     protected override void Update() {
+        //BroadcastMessage("stateMachine", SendMessageOptions.DontRequireReceiver);
         stateMachine();
     }
 
@@ -18,6 +18,7 @@ public class MController_6 : MController_2 {
             if (collectTimes >= 2) {
                 State = MonsterState.ATTACK;
                 collectTimes = 0;
+                
             }
         }
     }

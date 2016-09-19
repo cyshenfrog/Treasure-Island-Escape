@@ -9,7 +9,7 @@ public class MonsterManager : MonoBehaviour {
     //id by count
 
     public static void Initial() {
-
+        
     }
 
 

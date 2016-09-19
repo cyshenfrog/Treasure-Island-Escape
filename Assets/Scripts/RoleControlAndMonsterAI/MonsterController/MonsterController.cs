@@ -79,16 +79,17 @@ public class MonsterController : MonoBehaviour {
         switch (randomDirection)
         {
             case AnimalConstant.Left:
-                transform.localPosition = new Vector3(transform.localPosition.x - Speed * Time.deltaTime, transform.localPosition.y, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x - Speed * Time.deltaTime, transform.position.y, transform.position.z);
+                //transform.Translate(Vector2.left * Speed * Time.deltaTime);
                 break;
             case AnimalConstant.Right:
-                transform.localPosition = new Vector3(transform.localPosition.x + Speed * Time.deltaTime, transform.localPosition.y, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x + Speed * Time.deltaTime, transform.position.y, transform.position.z);
                 break;
             case AnimalConstant.Down:
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - Speed * Time.deltaTime, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x, transform.position.y - Speed * Time.deltaTime, transform.position.z);
                 break;
             case AnimalConstant.Up:
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + Speed * Time.deltaTime, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x, transform.position.y + Speed * Time.deltaTime, transform.position.z);
                 break;
             default:
                 break;
@@ -102,16 +103,16 @@ public class MonsterController : MonoBehaviour {
         switch (randomDirection)
         {
             case AnimalConstant.Left:
-                transform.localPosition = new Vector3(transform.localPosition.x - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.localPosition.y, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.y, transform.position.z);
                 break;
             case AnimalConstant.Right:
-                transform.localPosition = new Vector3(transform.localPosition.x + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.localPosition.y, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.y, transform.position.z);
                 break;
             case AnimalConstant.Down:
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x, transform.position.y - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.z);
                 break;
             case AnimalConstant.Up:
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.localPosition.z);
+                transform.position = new Vector3(transform.position.x, transform.position.y + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.z);
                 break;
             default:
                 break;
@@ -138,7 +139,8 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-        if (Vector2.Distance(role.transform.localPosition, transform.localPosition) < data.AttackRange) {
+
+        if (Vector2.Distance(role.transform.position, transform.position) < data.AttackRange) {
             //play anim
             role.GetComponent<RoleController>().BeAttacked((int)data.Attack, transform.position);
 
