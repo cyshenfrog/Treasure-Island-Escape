@@ -15,8 +15,7 @@ public class MController_6 : MController_2 {
         if (State == MonsterState.IDlE && role.GetComponent<RoleController>().Collect(transform.position)) {
             collectTimes++;
             Debug.Log("collect times: " + collectTimes);
-            if (collectTimes >= 2)
-            {
+            if (collectTimes >= 2) {
                 State = MonsterState.ATTACK;
                 collectTimes = 0;
 
