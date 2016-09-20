@@ -11,7 +11,7 @@ public class InventoryManager : MonoBehaviour {
     public static GameObject hoverObj;
     public static Text hoverText;
     public static GameObject player;
-    public static Player playerScript;
+    public static Bag playerBackpack;
 
     public static GameObject selectStackSize;
     public static GameObject SelectStackSize {
@@ -33,8 +33,8 @@ public class InventoryManager : MonoBehaviour {
             movingSlot = GameObject.Find("MovingSlot").GetComponent<Slot>();
             selectStackSize.SetActive(false);
         }
-        player = GameObject.Find("Player");
-        playerScript = player.GetComponent<Player>();
+        player = GameObject.Find("Role");
+        playerBackpack = player.GetComponent<Bag>();
     }
     
     public static void setStackInfo(int maxStackCount)
@@ -149,7 +149,7 @@ public class InventoryManager : MonoBehaviour {
                         Stack<Item> tempTo = new Stack<Item>(from.Items);
                         while (tempTo.Count > 0)
                         {
-                            playerScript.pickUpItem(tempTo.Pop());
+                            playerBackpack.pickUpItem(tempTo.Pop());
                         }
                         from = null;
                         to = null;
@@ -161,7 +161,7 @@ public class InventoryManager : MonoBehaviour {
                         to.addItems(from.Items);
                         while (tempTo.Count > 0)
                         {
-                            playerScript.pickUpItem(tempTo.Pop());
+                            playerBackpack.pickUpItem(tempTo.Pop());
                         }
                         Destroy(hoverObj);
                         from = null;
