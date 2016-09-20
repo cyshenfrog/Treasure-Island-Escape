@@ -17,7 +17,7 @@ public class MController_1 : MonsterController {
         data = MonsterManager.Create(id);
     }
 
-    void OnMouseDown() {
+    protected override void OnMouseDown() {
         if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
 
             State = MonsterState.BEATTACK;

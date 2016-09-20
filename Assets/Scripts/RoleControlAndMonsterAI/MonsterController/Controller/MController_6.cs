@@ -11,15 +11,18 @@ public class MController_6 : MController_2 {
         stateMachine();
     }
 
-    void OnMouseDown() {
+    protected override void OnMouseDown() {
         if (State == MonsterState.IDlE && role.GetComponent<RoleController>().Collect(transform.position)) {
             collectTimes++;
             Debug.Log("collect times: " + collectTimes);
-            if (collectTimes >= 2) {
+            if (collectTimes >= 2)
+            {
                 State = MonsterState.ATTACK;
                 collectTimes = 0;
-                
+
             }
         }
+        else if(State != MonsterState.IDlE) base.OnMouseDown();
+        
     }
 }
