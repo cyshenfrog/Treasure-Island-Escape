@@ -12,7 +12,7 @@ public class Bank : MonoBehaviour {
     }
 	// Use this for initialization
 	void Start () {
-        inventoryPrefab = Resources.Load("Inventory/BankInventory", typeof(GameObject)) as GameObject;
+        inventoryPrefab = Resources.Load("Inventory/UIs/BankInventory", typeof(GameObject)) as GameObject;
         canvas = GameObject.Find("Canvas");
         createBankInventory();
 	}

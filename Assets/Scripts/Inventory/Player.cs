@@ -4,7 +4,6 @@ using System.Collections;
 public class Player : MonoBehaviour {
     public float speed = 10.0f;
     
-    public Inventory inventory1,inventory2, inventory3;
 	// Use this for initialization
 	void Start () {
     
@@ -29,17 +28,7 @@ public class Player : MonoBehaviour {
             transform.position += speed * Vector3.right * Time.deltaTime;
         }
     }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == "Item")
-        {
-            if (pickUpItem(other.GetComponent<Item>()))
-            {
-                Destroy(other.gameObject);
-            }
-        }
-    }
+    
     void OnTriggerStay(Collider other)
     {
         if (other.tag == "Bank" && Input.GetKeyDown(KeyCode.B))
@@ -59,105 +48,5 @@ public class Player : MonoBehaviour {
             if (!bank.IsClose)
                 bank.close();
         }
-    }
-    public bool pickUpItem(Item item)
-    {
-        if (item.maxStackSize == 1)
-        {
-            if (inventory1.placeEmpty(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for(int i = 0; i < 5; ++i)
-                    {
-                        if(!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-            else if (inventory2.placeEmpty(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-            else if (inventory3.placeEmpty(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        else
-        {
-            if (inventory1.addItem(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-            else if (inventory2.addItem(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-            else if (inventory3.addItem(item))
-            {
-                CraftInventory temp = GameObject.Find("CraftInventory").GetComponent<CraftInventory>();
-                if (temp)
-                {
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        if (!temp.AllSlots[i].isEmpty && temp.AllSlots[i].currentItem.itemName == item.itemName)
-                        {
-                            temp.searchItemsInBag();
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 }

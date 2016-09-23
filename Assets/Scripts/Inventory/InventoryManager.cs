@@ -11,7 +11,7 @@ public class InventoryManager : MonoBehaviour {
     public static GameObject hoverObj;
     public static Text hoverText;
     public static GameObject player;
-    public static Player playerScript;
+    public static Bag playerBackpack;
 
     public static GameObject selectStackSize;
     public static GameObject SelectStackSize {
@@ -25,7 +25,7 @@ public class InventoryManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-        hoverPrefab = Resources.Load("Inventory/HoverIcon", typeof(GameObject)) as GameObject;
+        hoverPrefab = Resources.Load("Inventory/UIs/HoverIcon", typeof(GameObject)) as GameObject;
         if (selectStackSize == null)
         {
             selectStackSize = GameObject.Find("MoveItemStackSize");
@@ -33,11 +33,10 @@ public class InventoryManager : MonoBehaviour {
             movingSlot = GameObject.Find("MovingSlot").GetComponent<Slot>();
             selectStackSize.SetActive(false);
         }
-        player = GameObject.Find("Player");
-        playerScript = player.GetComponent<Player>();
+        player = GameObject.Find("Role");
+        playerBackpack = player.GetComponent<Bag>();
     }
-
-    // Update is called once per frame
+    
     public static void setStackInfo(int maxStackCount)
     {
         selectStackSize.SetActive(true);
@@ -150,7 +149,7 @@ public class InventoryManager : MonoBehaviour {
                         Stack<Item> tempTo = new Stack<Item>(from.Items);
                         while (tempTo.Count > 0)
                         {
-                            playerScript.pickUpItem(tempTo.Pop());
+                            playerBackpack.pickUpItem(tempTo.Pop());
                         }
                         from = null;
                         to = null;
@@ -162,7 +161,7 @@ public class InventoryManager : MonoBehaviour {
                         to.addItems(from.Items);
                         while (tempTo.Count > 0)
                         {
-                            playerScript.pickUpItem(tempTo.Pop());
+                            playerBackpack.pickUpItem(tempTo.Pop());
                         }
                         Destroy(hoverObj);
                         from = null;
@@ -220,18 +219,18 @@ public class InventoryManager : MonoBehaviour {
     {
         hoverObj = Instantiate(hoverPrefab);
         
-        hoverObj.GetComponent<Image>().sprite = click.GetComponent<Image>().sprite;
+        hoverObj.GetComponent<Image>().sprite = click.transform.Find("ItemImage").GetComponent<Image>().sprite;
 
         RectTransform hoverRect = hoverObj.GetComponent<RectTransform>();
 
-        hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
-        hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
+        //hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
+        //hoverRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
 
         hoverRect.SetParent(canvas.transform, false);
         hoverText = hoverObj.transform.GetChild(0).GetComponent<Text>();
-        RectTransform hoverTextTransform = hoverText.GetComponent<RectTransform>();
-        hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
-        hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
+        //RectTransform hoverTextTransform = hoverText.GetComponent<RectTransform>();
+        //hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 25);
+        //hoverTextTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 25);
     }
 
     public void changeText(int i)

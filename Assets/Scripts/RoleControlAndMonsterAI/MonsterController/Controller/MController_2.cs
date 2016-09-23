@@ -7,10 +7,10 @@ public class MController_2 : MonsterController {
 
     private float attackSpace = 0;
 
-    void OnMouseDown() {
+    protected override void OnMouseDown() {
         if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
             State = MonsterState.BEATTACK;
-            Debug.Log("??");
+            //Debug.Log("??");
             //monster die
             if (data.Hp == 0) Die();
         }

@@ -38,6 +38,7 @@ public class MonsterController : MonoBehaviour {
 
     protected virtual void Start() {
         State = MonsterState.IDlE;
+        //GroundController.StaticCellWidth;
     }
 
     protected virtual void Update() {
@@ -50,6 +51,9 @@ public class MonsterController : MonoBehaviour {
         }
 
         stateMachine();
+    }
+
+    protected virtual void OnMouseDown() {
     }
 
     protected void stateMachine() {
@@ -139,12 +143,7 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-
-        if (Vector2.Distance(role.transform.position, transform.position) < data.AttackRange) {
-            //play anim
-            role.GetComponent<RoleController>().BeAttacked((int)data.Attack, transform.position);
-
-        }
+        role.GetComponent<RoleController>().BeAttacked((int)data.Attack, transform.position);
     }
 
     public virtual void BeAttacked() {
