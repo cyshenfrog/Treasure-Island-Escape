@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Forest : TileData
 {
-    public Forest(Vector2 position, TileData fromTile = null)
+    public Forest(Vector2 position, TileData fromTile = null) : base(MapConstants.LandformType.Sea, position, fromTile)
     {
         this.position = position;
         this.fromTile = fromTile != null ? fromTile : this;

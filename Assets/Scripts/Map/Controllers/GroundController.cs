@@ -14,6 +14,10 @@ public class GroundController : MonoBehaviour
         StaticCellHeight = CellHeight;
         StaticSightWidth = SightWidth;
         StaticSightHeight = SightHeight;
+        StaticWorldWidth = WorldWidth;
+        StaticWorldHeight = WorldHeight;
+        StaticWorldWidthInWC = WorldWidth * .01f;
+        StaticWorldHeightInWC = WorldHeight * .01f;
 
         preSightRange = PreSight + 2;
 
@@ -51,9 +55,10 @@ public class GroundController : MonoBehaviour
         worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
 
         //Display(false);
-        //Display();
-        DisplayWorld();
+        Display();
+        //DisplayWorld();
 
+        
         for (int i = 0; i < landformTypeAmount; ++i)
             Debug.Log((MapConstants.LandformType)i + ": " + GroundRandomer.Self.LandformList[i].Count);
 
@@ -78,7 +83,7 @@ public class GroundController : MonoBehaviour
             tile.name = "Tile " + (worldWidthCount - 1).ToString() + ',' + (worldHeightCount - 1).ToString();
             */
 
-            //InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
+            InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
     }
 
     public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
@@ -265,16 +270,16 @@ public class GroundController : MonoBehaviour
                         tile.parent = SightList;
                         tile.position = i * cellWidthInWC * Vector3.right + j * cellHeightInWC * Vector3.up;
                         tile.localScale = Vector3.one;
-                        tile.name = "Tile " + i.ToString() + ',' + j.ToString();
+                        tile.name = "Tile " + i.ToString() + ',' + j.ToString() + ' ' + GetTileDataByWorldPosition(tile.position).MaterialTypes[0];
                         tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
 
                         //to put tile into mapPool
                         mapPool[i, j] = tile;
                     }
-                    else
-                    {
-                        Debug.Log("tiledata null");
-                    }
+                    //else
+                    //{
+                        //Debug.Log("tiledata null");
+                    //}
                 }
             }
         }
@@ -284,7 +289,7 @@ public class GroundController : MonoBehaviour
     {
         //to decide the moving direction
         Vector3 from = sightBottomLeft[(int)sightDirection.Center], to = Role.position;
-        Debug.Log(from + " " + to);
+        //Debug.Log(from + " " + to);
         float distanceX = to.x - from.x, distanceY = to.y - from.y;
         bool right = distanceX > sightWidthCount * cellWidthInWC, left = distanceX < 0, up = distanceY > sightHeightCount * cellHeightInWC, down = distanceY < 0; 
 
@@ -298,7 +303,7 @@ public class GroundController : MonoBehaviour
             //if (IsNotRoleNearBoundary = isNotLeft && isNotRight && isNotDown && isNotUp)
             if(right || left || up || down)
             {
-                Debug.Log("in");
+                //Debug.Log("in");
                 //normal situation
 
                 //to decide the moving direction
@@ -341,7 +346,7 @@ public class GroundController : MonoBehaviour
                         sightBottomLeft[2] = sightBottomLeft[1]; sightBottomLeft[1] = sightBottomLeft[0]; sightBottomLeft[0] = newXVector + newYDownVector;
                     }
 
-                    Debug.Log(newXCount + " " + newYCount + " " + oldXCount);
+                    //Debug.Log(newXCount + " " + newYCount + " " + oldXCount);
 
                     indexY = newYCount;
                     for (int i = 0; i < 3; ++i)
@@ -417,7 +422,7 @@ public class GroundController : MonoBehaviour
                         sightBottomLeft[0] = newXLeftVector + newYVector; sightBottomLeft[1] = newXMiddleVector + newYVector; sightBottomLeft[2] = newXRightVector + newYVector;
                     }
 
-                    Debug.Log(newXCount + " " + newYCount + " " + oldYCount);
+                    //Debug.Log(newXCount + " " + newYCount + " " + oldYCount);
 
                     indexX = newXCount;
                     for (int i = 0; i < 3; ++i)
@@ -672,7 +677,8 @@ public class GroundController : MonoBehaviour
         //RefreshMap();
     }
 
-    public static int StaticCellWidth, StaticCellHeight, StaticSightWidth, StaticSightHeight;
+    public static float StaticWorldWidthInWC, StaticWorldHeightInWC;
+    public static int StaticCellWidth, StaticCellHeight, StaticSightWidth, StaticSightHeight, StaticWorldWidth, StaticWorldHeight;
 
     //SightList localPosition must be 0, 0, 0
     public Transform Role, SightList;

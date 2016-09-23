@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using System;
 
-public abstract class TileData
+public class TileData
 {
     //public components
     //public int SearchID = 0;
+
+    public TileData(MapConstants.LandformType lm, Vector2 position, TileData fromTile = null)
+    {
+        this.position = position;
+        this.fromTile = fromTile != null ? fromTile : this;
+        center = this;
+        materialTypes[0] = lm;
+    }
 
     public MapConstants.LandformType[] MaterialTypes
     {
@@ -83,19 +91,38 @@ public abstract class TileData
 
     public bool IsRunable
     {
-        get { return isRunable; }
+        get
+        {
+            switch (materialTypes[0])
+            {
+                case MapConstants.LandformType.Sea:
+                    return false;
+                default:
+                    return true;
+            }
+        }
     }
 
     public bool IsConstructable
     {
-        get { return isConstructable; }
-        set { isConstructable = value; }
+        get
+        {
+            switch (materialTypes[0])
+            {
+                case MapConstants.LandformType.Sea:
+                    return false;
+                default:
+                    return true;
+            }
+        }
     }
 
     public bool IsConstructed
     {
-        get { return isConstructed; }
-        set { isConstructed = value; }
+        get
+        {
+            return false;
+        }
     }
 
     public void AddMtChanged(Action<TileData> a)
@@ -107,7 +134,7 @@ public abstract class TileData
     {
         mtChanged -= a;
     }
-    
+
     //DFS directions
     //protected List<Vector2> directions = new List<Vector2>() { Vector2.left + Vector2.up, Vector2.up, Vector2.right + Vector2.up, Vector2.left, Vector2.right, Vector2.left + Vector2.down, Vector2.down, Vector2.right + Vector2.down };
     protected Vector2[] directions = new Vector2[] { Vector2.left + Vector2.up, Vector2.up, Vector2.right + Vector2.up, Vector2.left, Vector2.right, Vector2.left + Vector2.down, Vector2.down, Vector2.right + Vector2.down };
@@ -119,7 +146,8 @@ public abstract class TileData
     protected TileData center, fromTile, buildingCenter;
     protected Vector2 position, buildingPosition;
     protected Action<TileData> mtChanged;
-    protected bool isRunable, isConstructable, isConstructed = false;
+    protected bool isRunable, isConstructable, isConstructed;
+
 
     //constructedObj
     //looseObj

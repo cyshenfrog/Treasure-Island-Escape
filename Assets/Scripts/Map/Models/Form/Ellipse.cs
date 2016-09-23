@@ -17,7 +17,8 @@ public class Ellipse : Form
 
     public override bool Inside(Vector2 position)
     {
-        return b2 * position.x * position.x + a2 * position.y * position.y - a2 * b2 < 0f;
+        float x = position.x - center.x, y = position.y - center.y;
+        return b2 * x * x + a2 * y * y - a2 * b2 < 0f;
     }
     
     float a, b, a2, b2;

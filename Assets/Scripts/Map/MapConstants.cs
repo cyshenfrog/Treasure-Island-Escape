@@ -6,13 +6,13 @@ public static class MapConstants
     //sea = 0, which is represented to index in landformList
     public enum LandformType
     {
-        Sea,
         Grassland,
         Forest,
         Desert,
         Marsh,
         Snowfield,
         Volcano,
+        Sea,
         None
     }
 
@@ -48,11 +48,11 @@ public static class MapConstants
     public static Color[] MarshColor = new Color[] { Color.cyan, Color.yellow, Color.cyan, Color.yellow, Color.cyan, Color.yellow };
     public static Color[] SnowfieldColor = new Color[] { new Color(.96f, .97f, .98f), new Color(.91f, .92f, .97f), new Color(.898f, .91f, .93f), new Color(.87f, .91f, .88f), new Color(.9f, .93f, .91f), Color.white };
     public static Color[] VolcanoColor = new Color[] { Color.gray, Color.red, Color.gray, Color.red, Color.gray, Color.red };
-    public static Color[][] LandformColor = new Color[][] { SeaColor, GrasslandColor, ForestColor, DesertColor, MarshColor, SnowfieldColor, VolcanoColor };
+    public static Color[][] LandformColor = new Color[][] { GrasslandColor, ForestColor, DesertColor, MarshColor, SnowfieldColor, VolcanoColor, SeaColor };
     //new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,)
 
     //public static 
 
     public static string LandformPath = @"Map\Grassland";
-    public static int LandformTypeAmount = (int)LandformType.None, MaxStack = 30;
+    public static int LandformTypeAmount = (int)LandformType.None, MaxStack = 100;
 }
