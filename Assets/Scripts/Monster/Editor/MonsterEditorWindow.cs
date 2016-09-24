@@ -6,7 +6,8 @@ using System.Text;
 
 public class MonsterEditorWindow : EditorWindow {
 
-    string filePath = Application.dataPath + "/Resources/RoleControlAndMonsterAITest/Data/Monster";
+    string filePath = Monster.filePath;
+    static string idFilePath = "Monster/Data/id";
 
     [MenuItem("Editor/Monster")]
     static void AddWindow() {
@@ -22,10 +23,21 @@ public class MonsterEditorWindow : EditorWindow {
     bool isOld = false;
     string[] fieldName = {"名稱", "血量","攻擊範圍","攻擊速度","移動速度","攻擊"};
     string[] field = { "", "", "", "", "", ""};
+    int livingArea = 0;
+    string[] tileType = {
+        "Grassland",
+        "Forest",
+        "Desert",
+        "Marsh",
+        "Snowfield",
+        "Volcano",
+        "Sea",
+        "None" };
 
     void OnGUI() {
         
-        style.fontSize = 12;
+        
+        style.fontSize = 12; 
 
         GUILayout.BeginVertical();
 
@@ -34,9 +46,10 @@ public class MonsterEditorWindow : EditorWindow {
             file = EditorUtility.OpenFilePanel("選擇檔案", filePath, "xml");
             if (file != "") {
                 isOld = true;
-                file = file.Replace(filePath + "/", "");
-                file = file.Replace(".xml", "");
+                
+                file = file.Replace(filePath, "").Replace(".xml", "");
                 Monster m = Monster.Load(Int32.Parse(file));
+                livingArea = (int)m.LivingArea;
                 field[0] = m.Name;
                 field[1] = m.BaseMaxHp.ToString();
                 field[2] = m.BaseAttackRange.ToString();
@@ -46,6 +59,8 @@ public class MonsterEditorWindow : EditorWindow {
                 id = m.Id;
             }
         }
+
+        livingArea = EditorGUILayout.Popup(livingArea, tileType);
 
         for (int i = 0; i < fieldName.Length; i++) {
             GUILayout.BeginHorizontal();
@@ -67,6 +82,7 @@ public class MonsterEditorWindow : EditorWindow {
 
             if (check) {
                 Monster m = new Monster();
+                m.LivingArea = (MapConstants.LandformType)livingArea;
                 m.Id = id;
                 m.Name = field[0];
                 m.BaseMaxHp = Int32.Parse(field[1]);
@@ -97,7 +113,7 @@ public class MonsterEditorWindow : EditorWindow {
     }
 
     static void readId() {
-        string str = Resources.Load<TextAsset>("RoleControlAndMonsterAITest/Data/Monster/id").ToString();
+        string str = Resources.Load<TextAsset>(idFilePath).ToString();
         id = Int32.Parse(str);
     }
 }

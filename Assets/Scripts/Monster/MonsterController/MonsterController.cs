@@ -7,8 +7,8 @@ public class MonsterController : MonoBehaviour {
     public float Speed;
 
     //basic
-    protected GameObject role;
-    protected Monster data;
+    public Monster data { set; get; }
+    protected GameObject role; 
     protected MonsterState State;
 
     //idle and move parameters
