@@ -22,7 +22,7 @@ public class ResourceData : ObjData
         set { items = value; }
     }
     */
-    public List<int> Items
+    public List<string> Items
     {
         get { return items; }
         set { items = value; }
@@ -96,7 +96,7 @@ public class ResourceData : ObjData
 
     Action pickAction = null, onPickFinishedAction = null;
     //List<Item> items = new List<Item>();
-    List<int> items = new List<int>();
+    List<string> items = new List<string>();
     List<float> dropRate = new List<float>();
 
     MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
