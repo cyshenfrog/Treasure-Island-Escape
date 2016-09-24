@@ -7,7 +7,7 @@ public class Test3 : MonoBehaviour
     void Start()
     {
         t.Func();
-        Destroy(this);
+        Destroy(gameObject);
     }
 
     public Test2 t;

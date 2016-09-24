@@ -51,7 +51,7 @@ public static class MapConstants
     public static Color[][] LandformColor = new Color[][] { GrasslandColor, ForestColor, DesertColor, MarshColor, SnowfieldColor, VolcanoColor, SeaColor };
     //new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,), new Color(,,)
 
-    //public static 
+    public static string[] LandformName = new string[] { "Grassland", "Forest", "Desert", "Marsh", "Snowfield", "Volcano", "Sea" }; 
 
     public static string LandformPath = @"Map\Grassland";
     public static int LandformTypeAmount = (int)LandformType.None, MaxStack;
