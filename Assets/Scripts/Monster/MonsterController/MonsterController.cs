@@ -7,7 +7,7 @@ public class MonsterController : MonoBehaviour {
     public float Speed;
 
     //basic
-    public Monster data { set; get; }
+    public Monster Data { set; get; }
     protected GameObject role; 
     protected MonsterState State;
 
@@ -26,12 +26,12 @@ public class MonsterController : MonoBehaviour {
 
     protected virtual void Awake() {
         //data = Monster.Load(id);
-        data = new Monster();
-        data.MaxHp = 1000;
-        data.Hp = 1000;
-        data.AttackSpace = 1;
-        data.AttackRange = 5;
-        data.Attack = 100;
+        Data = new Monster();
+        Data.MaxHp = 1000;
+        Data.Hp = 1000;
+        Data.AttackSpace = 1;
+        Data.AttackRange = 5;
+        Data.Attack = 100;
 
         role = GameObject.Find(AnimalConstant.RolePrefab);
     }
@@ -143,7 +143,7 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-        role.GetComponent<RoleController>().BeAttacked((int)data.Attack, transform.position);
+        role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
     }
 
     public virtual void BeAttacked() {

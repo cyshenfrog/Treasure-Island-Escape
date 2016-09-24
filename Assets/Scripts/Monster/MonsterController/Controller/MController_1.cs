@@ -14,11 +14,11 @@ public class MController_1 : MonsterController {
 
     protected override void Awake() {
         base.Awake();
-        data = MonsterManager.Create(id);
+        Data = MonsterManager.Create(id);
     }
 
     protected override void OnMouseDown() {
-        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
+        if (role.GetComponent<RoleController>().Attack(Data, transform.localPosition)) {
 
             State = MonsterState.BEATTACK;
 
@@ -28,7 +28,7 @@ public class MController_1 : MonsterController {
             cacheRolePosition = false;
 
             //monster die
-            if (data.Hp == 0) Die();
+            if (Data.Hp == 0) Die();
         }
     }
 

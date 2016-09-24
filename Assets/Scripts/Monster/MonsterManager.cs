@@ -22,8 +22,10 @@ public class MonsterManager : MonoBehaviour {
     }
 
     public static GameObject Prefab(Monster monster) {
-        GameObject m = Resources.Load("Monster/Prefabs/M" + monster.Id) as GameObject;
-        return Instantiate(m);
+        GameObject source = Resources.Load("Monster/Prefabs/M" + monster.Id) as GameObject;
+        GameObject prefab = Instantiate(source);
+        prefab.GetComponent<MonsterController>().Data = monster;
+        return prefab;
     }
     
 }
