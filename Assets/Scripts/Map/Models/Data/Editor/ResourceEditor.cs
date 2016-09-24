@@ -82,24 +82,24 @@ public class ResourceEditor : EditorWindow
         for(int i = 0; i < count; ++i)
         {
             EditorGUILayout.BeginHorizontal();
+            items[i] = EditorGUILayout.IntField("道具", items[i], GUILayout.Width(200f));
             rd.DropRate[i] = EditorGUILayout.FloatField("掉落率", rd.DropRate[i], GUILayout.Width(200f));
-            items[i] = EditorGUILayout.TextField("道具", items[i]);
             EditorGUILayout.EndHorizontal();
         }
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("New", GUILayout.Width(150f)))
         {
+            items.Add(0);
             rd.DropRate.Add(1f);
-            items.Add("");
         }
         if (GUILayout.Button("Delete", GUILayout.Width(150f)))
         {
             int last = rd.DropRate.Count - 1;
             if (last >= 0)
             {
-                rd.DropRate.RemoveAt(last);
                 items.RemoveAt(last);
+                rd.DropRate.RemoveAt(last);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -179,6 +179,6 @@ public class ResourceEditor : EditorWindow
     string[] landformName = MapConstants.LandformName;
 
     //for data
-    List<string> items = new List<string>();
+    List<int> items = new List<int>();
     int isNeedTool = 0, gm = 1, landform = 0;
 }
