@@ -8,11 +8,11 @@ public class MController_2 : MonsterController {
     private float attackSpace = 0;
 
     protected override void OnMouseDown() {
-        if (role.GetComponent<RoleController>().Attack(data, transform.localPosition)) {
+        if (role.GetComponent<RoleController>().Attack(Data, transform.localPosition)) {
             State = MonsterState.BEATTACK;
             //Debug.Log("??");
             //monster die
-            if (data.Hp == 0) Die();
+            if (Data.Hp == 0) Die();
         }
     }
 
@@ -35,14 +35,14 @@ public class MController_2 : MonsterController {
     }
 
     public override void Attack() {
-        if (attackSpace <= 0 && Vector2.Distance(transform.position, role.transform.position) <= data.AttackRange) {
+        if (attackSpace <= 0 && Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange) {
             base.Attack();
-            attackSpace = data.AttackSpace;
+            attackSpace = Data.AttackSpace;
         }
-        else if (attackSpace > 0 && Vector2.Distance(transform.position, role.transform.position) <= data.AttackRange) {
+        else if (attackSpace > 0 && Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange) {
             attackSpace -= Time.deltaTime;
         }
-        else if (Vector2.Distance(transform.position, role.transform.position) > data.AttackRange && Vector2.Distance(transform.position, role.transform.position) <= AnimalConstant.ChaseDistance) {
+        else if (Vector2.Distance(transform.position, role.transform.position) > Data.AttackRange && Vector2.Distance(transform.position, role.transform.position) <= AnimalConstant.ChaseDistance) {
             chase();
         }
         else if (Vector2.Distance(transform.position, role.transform.position) > AnimalConstant.ChaseDistance) {

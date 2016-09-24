@@ -7,7 +7,7 @@ public class MController_3 : MController_2 {
 
     protected override void Update() {
         base.Update();
-        if (Vector2.Distance(role.transform.position, transform.position) < data.AttackRange)
+        if (Vector2.Distance(role.transform.position, transform.position) < Data.AttackRange)
             State = MonsterState.ATTACK;
     }
 

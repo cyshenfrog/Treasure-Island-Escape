@@ -6,7 +6,14 @@ using System.Xml.Serialization;
 
 public class Monster {
     
-    private static string filePath = Application.dataPath + @"\Resources\RoleControlAndMonsterAITest\Data\Monster\";
+    public enum MonsterType{
+        Mobs,
+        AltarMobs,
+        AltarBoss,
+        Boss
+    }
+
+    public static string filePath = Application.dataPath + "/Resources/Monster/Data/";
     private int id = 0;
 
     private string name;
@@ -55,6 +62,9 @@ public class Monster {
         set { status = value; }
         get{ return status; }
     } */
+
+    public string prefabPath { set; get; }
+    public MapConstants.LandformType LivingArea { set; get; }
 
     public int Id {
         set { id = value; }
@@ -214,4 +224,6 @@ public class Monster {
             }
         }
     }
+    //public GameObject g;
+    
 }
