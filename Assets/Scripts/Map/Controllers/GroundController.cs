@@ -19,6 +19,8 @@ public class GroundController : MonoBehaviour
         StaticWorldWidthInWC = WorldWidth * .01f;
         StaticWorldHeightInWC = WorldHeight * .01f;
 
+        MapConstants.MaxStack = MaxStack;
+
         preSightRange = PreSight + 2;
 
         //to calculate how many tileData do this world have to
@@ -682,7 +684,7 @@ public class GroundController : MonoBehaviour
 
     //SightList localPosition must be 0, 0, 0
     public Transform Role, SightList;
-    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight, MaxStack;
     public float DistanceThreshold, MapRefreshTime;
 
     Transform[,] mapPool;

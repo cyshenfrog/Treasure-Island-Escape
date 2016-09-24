@@ -54,5 +54,5 @@ public static class MapConstants
     //public static 
 
     public static string LandformPath = @"Map\Grassland";
-    public static int LandformTypeAmount = (int)LandformType.None, MaxStack = 100;
+    public static int LandformTypeAmount = (int)LandformType.None, MaxStack;
 }
