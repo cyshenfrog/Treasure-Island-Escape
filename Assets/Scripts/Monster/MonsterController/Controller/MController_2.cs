@@ -8,6 +8,9 @@ public class MController_2 : MonsterController {
     private float attackSpace = 0;
 
     protected override void OnMouseDown() {
+        //check pointer is not over ugui
+        base.OnMouseDown();
+
         if (role.GetComponent<RoleController>().Attack(Data, transform.localPosition)) {
             State = MonsterState.BEATTACK;
             //Debug.Log("??");

@@ -65,6 +65,7 @@ public class Monster {
 
     public string prefabPath { set; get; }
     public MapConstants.LandformType LivingArea { set; get; }
+    public MonsterType MType { set; get; }
 
     public int Id {
         set { id = value; }
@@ -224,6 +225,5 @@ public class Monster {
             }
         }
     }
-    //public GameObject g;
     
 }

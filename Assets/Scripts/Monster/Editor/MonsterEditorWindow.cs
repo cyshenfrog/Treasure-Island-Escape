@@ -34,6 +34,9 @@ public class MonsterEditorWindow : EditorWindow {
         "Sea",
         "None" };
 
+    int mType = 0;
+    string[] mTypeOpt = { "一般怪物", "祭壇怪物", "祭壇王", "區域王" };
+
     void OnGUI() {
         
         
@@ -50,6 +53,7 @@ public class MonsterEditorWindow : EditorWindow {
                 file = file.Replace(filePath, "").Replace(".xml", "");
                 Monster m = Monster.Load(Int32.Parse(file));
                 livingArea = (int)m.LivingArea;
+                mType = (int)m.MType;
                 field[0] = m.Name;
                 field[1] = m.BaseMaxHp.ToString();
                 field[2] = m.BaseAttackRange.ToString();
@@ -61,6 +65,7 @@ public class MonsterEditorWindow : EditorWindow {
         }
 
         livingArea = EditorGUILayout.Popup(livingArea, tileType);
+        mType = EditorGUILayout.Popup(mType, mTypeOpt);
 
         for (int i = 0; i < fieldName.Length; i++) {
             GUILayout.BeginHorizontal();
@@ -83,6 +88,7 @@ public class MonsterEditorWindow : EditorWindow {
             if (check) {
                 Monster m = new Monster();
                 m.LivingArea = (MapConstants.LandformType)livingArea;
+                m.MType = (Monster.MonsterType)mType;
                 m.Id = id;
                 m.Name = field[0];
                 m.BaseMaxHp = Int32.Parse(field[1]);

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 public class MonsterManager : MonoBehaviour {
 
-    private static Dictionary<MapConstants.LandformType, Dictionary<int, List<int>>> Group;
-    //dictionary : tile-type, monster-group, monster id
+    private static string prefabPath = "Monster/Prefabs/M";
 
+    //dictionary : tile-type, monster-group, monster id
+    private static Dictionary<MapConstants.LandformType, Dictionary<int, List<int>>> Group;
+   
     public static void Initial() {
         Group = new Dictionary<MapConstants.LandformType, Dictionary<int, List<int>>>();
     }
@@ -21,9 +23,10 @@ public class MonsterManager : MonoBehaviour {
         return Monster.Load(randomId);
     }
 
-    public static GameObject Prefab(Monster monster) {
-        GameObject source = Resources.Load("Monster/Prefabs/M" + monster.Id) as GameObject;
+    public static GameObject Prefab(Monster monster, Vector2 pos) {
+        GameObject source = Resources.Load(prefabPath + monster.Id) as GameObject;
         GameObject prefab = Instantiate(source);
+        prefab.transform.position = pos;
         prefab.GetComponent<MonsterController>().Data = monster;
         return prefab;
     }

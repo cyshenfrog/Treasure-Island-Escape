@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class MonsterController : MonoBehaviour {
@@ -54,6 +55,9 @@ public class MonsterController : MonoBehaviour {
     }
 
     protected virtual void OnMouseDown() {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+        
     }
 
     protected void stateMachine() {

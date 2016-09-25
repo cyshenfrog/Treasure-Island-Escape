@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class MController_6 : MController_2 {
@@ -7,11 +8,13 @@ public class MController_6 : MController_2 {
     private int collectTimes = 0;
     
     protected override void Update() {
-        //BroadcastMessage("stateMachine", SendMessageOptions.DontRequireReceiver);
         stateMachine();
     }
 
     protected override void OnMouseDown() {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         if (State == MonsterState.IDlE && role.GetComponent<RoleController>().Collect(transform.position)) {
             collectTimes++;
             Debug.Log("collect times: " + collectTimes);
