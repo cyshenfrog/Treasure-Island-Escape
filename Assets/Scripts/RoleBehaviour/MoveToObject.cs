@@ -1,39 +1,44 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
+using System;
 
-public class MoveToObject : MonoBehaviour {
+public class MoveToObject : MonoBehaviour, IPointerClickHandler {
 
-    private GameObject role;  //the role that player control
+    private RoleController role;  //the role that player control
+    private Bag bag;
 
     static public Item pickUpTarget;
 
     void Start() {
-        role = GameObject.Find("Role");
+        role = GameObject.Find("Role").GetComponent<RoleController>();
+        bag = role.GetComponent<Bag>();
     }
 
     void Update() {
         if (Input.GetKeyDown("space")) {
-            role.GetComponent<RoleController>().SendObjPosition(transform.localPosition);
+            role.SendObjPosition(transform.position);
+            pickUpTarget = transform.GetComponent<Item>();
         }
+        if (role.State != RoleState.PICKUP && pickUpTarget != null)
+            pickUpTarget = null;
     }
 
-    void OnMouseDown() {
+    public void OnPointerClick(PointerEventData eventData)
+    {
         //call api to move the position of object 
-        role.GetComponent<RoleController>().MoveToTarget(transform.position);
-        pickUpTarget = transform.GetComponent<Item>();
-    }
-
-    /*
-    void OnCollisionEnter(Collision c) {
-        if (c.gameObject.name == "Role") {
-            Destroy(gameObject);
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            role.MoveToTarget(transform.position);
+            pickUpTarget = transform.GetComponent<Item>();
         }
-    }*/
-
+    }
+    
+    
     void OnDestroy()
     {
         if (role != null) {
-            role.GetComponent<RoleController>().CancelMoveToTarget();
+            role.CancelMoveToTarget();
         }
     }
 

@@ -15,8 +15,8 @@ public class CookingSystem : InventoryManager
     {
         get { return necessarySlots; }
     }
-    private List<CraftSystemSlot> optionalSlots;
-    public List<CraftSystemSlot> OptionalSlots
+    private List<Slot> optionalSlots;
+    public List<Slot> OptionalSlots
     {
         get { return optionalSlots; }
     }
@@ -51,12 +51,12 @@ public class CookingSystem : InventoryManager
         }
 
         //get optional slots
-        optionalSlots = new List<CraftSystemSlot>();
+        optionalSlots = new List<Slot>();
         Transform optionalItemLayout;
         optionalItemLayout = transform.Find("ItemLayout");
         foreach (Transform child in optionalItemLayout)
         {
-            CraftSystemSlot slot = child.GetComponent<CraftSystemSlot>();
+            Slot slot = child.GetComponent<Slot>();
             if (slot != null)
             {
                 optionalSlots.Add(slot);
@@ -123,11 +123,7 @@ public class CookingSystem : InventoryManager
             tooltip.text = itemToolTip;
         }
     }
-
-    public new void moveItem(GameObject clicked)
-    {
-    }
-
+    
     public void moveResultItem(GameObject clicked)
     {
         if (movingSlot.isEmpty)
@@ -172,7 +168,7 @@ public class CookingSystem : InventoryManager
                         if (!necessarySlots[l].isEmpty)
                         {
                             Slot slot = inventory[j].AllSlots[k].GetComponent<Slot>();
-                            if (!slot.isEmpty && necessarySlots[l].currentItem.itemName == slot.currentItem.itemName && need[l] > 0)
+                            if (!slot.isEmpty && necessarySlots[l].currentItem.type == slot.currentItem.type && need[l] > 0)
                             {
                                 if (need[l] >= slot.items.Count)
                                 {
@@ -238,7 +234,7 @@ public class CookingSystem : InventoryManager
                     if (!necessarySlots[k].isEmpty)
                     {
                         Slot slot = inventory[i].AllSlots[j].GetComponent<Slot>();
-                        if (!slot.isEmpty && necessarySlots[k].currentItem.itemName == slot.currentItem.itemName)
+                        if (!slot.isEmpty && necessarySlots[k].currentItem.type == slot.currentItem.type)
                         {
                             count[k] += slot.items.Count;
                         }
@@ -255,6 +251,8 @@ public class CookingSystem : InventoryManager
                 String[] split = temp.text.Split('/');
                 if (count[i] >= int.Parse(split[1]))
                     necessarySlots[i].itemImage.color = Color.white;
+                else
+                    necessarySlots[i].itemImage.color = Color.gray;
                 necessarySlots[i].owned_need.text = string.Concat(count[i].ToString(), "/");
                 temp.text = string.Concat(temp.text, split[1]);
             }
@@ -283,7 +281,7 @@ public class CookingSystem : InventoryManager
                     Slot temp = inventory[i].AllSlots[j].GetComponent<Slot>();
                     if (temp.isEmpty)
                         return true;
-                    if (!temp.isEmpty && temp.currentItem.itemName == item.itemName && temp.isStackable)
+                    if (!temp.isEmpty && temp.currentItem.type == item.type && temp.isStackable)
                     {
                         count -= (item.maxStackSize - temp.items.Count);
                         if (count <= 0)

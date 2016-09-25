@@ -17,7 +17,7 @@ public class InventoryManager : MonoBehaviour {
     public static GameObject SelectStackSize {
         get { return selectStackSize; }
     }
-    public static Text movingItemSize;
+    public static InputField movingItemSize;
     public static int splitAmount;
     public static int maxStackCount;
     public static Slot movingSlot;
@@ -29,7 +29,7 @@ public class InventoryManager : MonoBehaviour {
         if (selectStackSize == null)
         {
             selectStackSize = GameObject.Find("MoveItemStackSize");
-            movingItemSize = GameObject.Find("MovingItemSize").GetComponent<Text>();
+            movingItemSize = GameObject.Find("MovingItemSize").GetComponent<InputField>();
             movingSlot = GameObject.Find("MovingSlot").GetComponent<Slot>();
             selectStackSize.SetActive(false);
         }
@@ -50,11 +50,11 @@ public class InventoryManager : MonoBehaviour {
         {
             Slot tmp = clicked.GetComponent<Slot>();
 
-            if (!tmp.isEmpty && tmp.currentItem.itemName == movingSlot.currentItem.itemName && tmp.isStackable)
+            if (!tmp.isEmpty && tmp.currentItem.type == movingSlot.currentItem.type && tmp.isStackable)
             {
                 mergeStack(movingSlot, tmp);
             }
-            else if (!tmp.isEmpty && tmp.currentItem.itemName != movingSlot.currentItem.itemName)
+            else if (!tmp.isEmpty && tmp.currentItem.type != movingSlot.currentItem.type)
             {
                 //Debug.Log(tmp.currentItem + " " + movingSlot.currentItem);
                 Stack<Item> tempTo = new Stack<Item>(tmp.Items);
@@ -235,6 +235,7 @@ public class InventoryManager : MonoBehaviour {
 
     public void changeText(int i)
     {
+        //change text by clicking left and right arrow
         splitAmount += i;
         if (splitAmount < 0)
             splitAmount = 0;
@@ -242,9 +243,37 @@ public class InventoryManager : MonoBehaviour {
             splitAmount = maxStackCount;
         movingItemSize.text = splitAmount.ToString();
     }
+    public void changeText()    
+    {
+        //check if user input is larger than maxStackCount
+        //if it is, set text to maxStackCount. Otherwise, set text to user input.
+        int result;
+        if (!int.TryParse(movingItemSize.text, out result))
+        {
+            movingItemSize.text = "0";
+            splitAmount = 0;
+        }
+        else {
+            if (result > maxStackCount)
+            {
+                movingItemSize.text = maxStackCount.ToString();
+                splitAmount = maxStackCount;
+            }
+            else if (result < 0)
+            {
+                movingItemSize.text = "0";
+                splitAmount = 0;
+            }
+            else
+            {
+                splitAmount = result;
+            }
+        }
+    }
     public void cancelSplitStack()
     {
         splitAmount = 0;
         splitStack();
     }
+
 }

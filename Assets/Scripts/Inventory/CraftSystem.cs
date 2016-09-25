@@ -142,7 +142,7 @@ public class CraftSystem : InventoryManager
                         if (!allSlots[l].isEmpty)
                         {
                             Slot slot = inventory[j].AllSlots[k].GetComponent<Slot>();
-                            if (!slot.isEmpty && allSlots[l].currentItem.itemName == slot.currentItem.itemName && need[l] > 0)
+                            if (!slot.isEmpty && allSlots[l].currentItem.type == slot.currentItem.type && need[l] > 0)
                             {
                                 if(need[l] >= slot.items.Count)
                                 {
@@ -208,7 +208,7 @@ public class CraftSystem : InventoryManager
                     if (!allSlots[k].isEmpty)
                     {
                         Slot slot = inventory[i].AllSlots[j].GetComponent<Slot>();
-                        if (!slot.isEmpty && allSlots[k].currentItem.itemName == slot.currentItem.itemName)
+                        if (!slot.isEmpty && allSlots[k].currentItem.type == slot.currentItem.type)
                         {
                             count[k] += slot.items.Count;
                         }
@@ -225,6 +225,8 @@ public class CraftSystem : InventoryManager
                 String[] split = temp.text.Split('/');
                 if (count[i] >= int.Parse(split[1]))
                     allSlots[i].itemImage.color = Color.white;
+                else
+                    allSlots[i].itemImage.color = Color.gray;
                 allSlots[i].owned_need.text = string.Concat(count[i].ToString(), "/");
                 temp.text = string.Concat(temp.text, split[1] );
             }
@@ -253,7 +255,7 @@ public class CraftSystem : InventoryManager
                     Slot temp = inventory[i].AllSlots[j].GetComponent<Slot>();
                     if (temp.isEmpty)
                         return true;
-                    if (!temp.isEmpty && temp.currentItem.itemName == item.itemName && temp.isStackable)
+                    if (!temp.isEmpty && temp.currentItem.type == item.type && temp.isStackable)
                     {
                         count -= (item.maxStackSize - temp.items.Count);
                         if (count <= 0)

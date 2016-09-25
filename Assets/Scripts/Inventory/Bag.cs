@@ -10,18 +10,43 @@ public class Bag : MonoBehaviour {
     {
         roleController = GameObject.Find("Role").GetComponent<RoleController>();
     }
-
-    void OnTriggerEnter(Collider other)
+    
+    void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Item" && roleController.State == RoleState.PICKUP)
+        if (roleController.State == RoleState.PICKUP)
         {
-            Item item = other.GetComponent<Item>();
-            if (item.itemName == MoveToObject.pickUpTarget.itemName && other.transform.position == MoveToObject.pickUpTarget.transform.position)
+            if (other.transform.parent == null && other.tag == "Item" && MoveToObject.pickUpTarget != null)
             {
-                if (pickUpItem(other.GetComponent<Item>()))
+                Item item = other.GetComponent<Item>();
+                if (item.type == MoveToObject.pickUpTarget.type)
                 {
-                    Destroy(other.gameObject);
+                    if (pickUpItem(other.GetComponent<Item>()))
+                    {
+                        Destroy(other.gameObject);
+                    }
                 }
+            }
+            else if (other.transform.tag == "Items" && MoveToObject.pickUpTarget != null)
+            {
+                int childDeleted = 0;
+                foreach (Transform child in other.transform)
+                {
+                    Item item = child.transform.GetComponent<Item>();
+                    if (item.type == MoveToObject.pickUpTarget.type)
+                    {
+                        if (pickUpItem(child.GetComponent<Item>()))
+                        {
+                            Destroy(child.gameObject);
+                            ++childDeleted;
+                        }
+                    }
+                    else //if item type != pickUpTarget type. There is no need to continue the foreach loop.
+                    {
+                        break;
+                    }
+                }
+                if (other.transform.childCount == childDeleted)
+                    Destroy(other.gameObject);
             }
         }
     }
@@ -80,7 +105,7 @@ public class Bag : MonoBehaviour {
             CraftSystem craftSystem = temp.GetComponent<CraftSystem>();
             for (int i = 0; i < 5; ++i)
             {
-                if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.itemName == item.itemName)
+                if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.type == item.type)
                 {
                     craftSystem.searchItemsInBag();
                     return;
@@ -96,7 +121,7 @@ public class Bag : MonoBehaviour {
             CookingSystem cookingSystem = temp.GetComponent<CookingSystem>();
             for (int i = 0; i < 2; ++i)
             {
-                if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.itemName == item.itemName)
+                if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.type == item.type)
                 {
                     cookingSystem.searchItemsInBag();
                     return;

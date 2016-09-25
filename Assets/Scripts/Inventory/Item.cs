@@ -11,7 +11,6 @@ public class Item : MonoBehaviour {
     public int maxStackSize;
 
     public float str, stamine;
-    public string itemName;
     public string description;
 
     public GameObject dropItem;
@@ -45,7 +44,7 @@ public class Item : MonoBehaviour {
             abilityDescription += "\n stamine " + stamine.ToString();
         }
         
-        return string.Format("<color=" + color +"><size=50>{0}</size></color><size=48><i><color=lime>\n{1}</color></i>{2}</size>", itemName, description, abilityDescription);
+        return string.Format("<color=" + color +"><size=50>{0}</size></color><size=48><i><color=lime>\n{1}</color></i>{2}</size>", type, description, abilityDescription);
     }
     public void setStatus(Item item)
     {
@@ -56,7 +55,6 @@ public class Item : MonoBehaviour {
 
         str = item.str;
         stamine = item.stamine;
-        itemName = item.itemName;
         description = item.description;
 
         dropItem = item.dropItem;

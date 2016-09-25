@@ -94,7 +94,10 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     {
         if (!isEmpty)
         {
-            items.Pop().use();
+            Item temp = items.Pop();
+            updateCookingSystem(temp);
+            updateCraftSystem(temp);
+            temp.use();
             stackText.text = items.Count > 1 ? items.Count.ToString() : null;
             if (isEmpty)
             {
@@ -132,7 +135,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
         {
             useItem();
         }
-        else if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftShift) && !isEmpty && !GameObject.Find("HoverIcon(Clone)") && transform.tag != "MaterialSlot" && transform.tag != "ResultSlot")
+        else if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftShift) && !isEmpty && !GameObject.Find("HoverIcon(Clone)") && transform.tag != "ResultSlot")
         {
             //Vector2 position;
             //RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, canvas.worldCamera, out position);
@@ -148,6 +151,39 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     public void OnPointerExit(PointerEventData eventData)
     {
         hideToolTip();
+    }
+
+    void updateCraftSystem(Item item)
+    {
+        GameObject temp = GameObject.Find("MakingWindow");
+        if (temp)
+        {
+            CraftSystem craftSystem = temp.GetComponent<CraftSystem>();
+            for (int i = 0; i < 5; ++i)
+            {
+                if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.type == item.type)
+                {
+                    craftSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
+    }
+    void updateCookingSystem(Item item)
+    {
+        GameObject temp = GameObject.Find("CookingWindow");
+        if (temp)
+        {
+            CookingSystem cookingSystem = temp.GetComponent<CookingSystem>();
+            for (int i = 0; i < 2; ++i)
+            {
+                if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.type == item.type)
+                {
+                    cookingSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
     }
     public bool isEmpty
     {

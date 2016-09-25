@@ -40,14 +40,19 @@ public class Inventory : InventoryManager {
                 from.GetComponent<Image>().color = Color.white;
                 
                 dropItem = from.currentItem.dropItem;
-                
                 if (dropItem != null)
                 {
                     float angle = Random.Range(0.0f, Mathf.PI * 2);
                     Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
+
+                    GameObject dropItems = createDropItemsParent(player.transform.position - 3 * v);
+                    
                     foreach (Item item in from.Items)
                     {
-                        Instantiate(dropItem, player.transform.position - 3 * v, Quaternion.identity);
+                        GameObject temp = Instantiate(dropItem);
+                        temp.transform.position = player.transform.position - 3 * v;
+                        temp.transform.parent = dropItems.transform;
+                        temp.tag = "Untagged";
                     }
                 }
                 //from.transform.parent.GetComponent<Inventory>().emptySlot++;
@@ -55,21 +60,35 @@ public class Inventory : InventoryManager {
                 Destroy(hoverObj);
                 to = null;
                 from = null;
+
+                Item itemToSearch = dropItem.GetComponent<Item>();
+                updateCookingSystem(itemToSearch);
+                updateCraftSystem(itemToSearch);
                 
                 //transform.parent.GetChild(2).GetComponent<Inventory>().emptySlot++; //效能有待加強
-                
             }
             else if(!eventSystem.IsPointerOverGameObject(-1) && !movingSlot.isEmpty)
             {
                 dropItem = movingSlot.currentItem.dropItem;
                 float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f );
+
+                GameObject dropItems = createDropItemsParent(player.transform.position - 3 * v);
+
                 foreach (Item item in movingSlot.Items)
                 {
-                    Instantiate(dropItem, player.transform.position - 3 * v, Quaternion.identity);
+                    GameObject temp = Instantiate(dropItem);
+                    temp.transform.position = player.transform.position - 3 * v;
+                    temp.transform.parent = dropItems.transform;
+                    temp.tag = "Untagged";
                 }
+                
                 movingSlot.clearSlot();
                 Destroy(hoverObj);
+
+                Item itemToSearch = dropItem.GetComponent<Item>();
+                updateCookingSystem(itemToSearch);
+                updateCraftSystem(itemToSearch);
             }
         }
         if(hoverObj)
@@ -123,6 +142,15 @@ public class Inventory : InventoryManager {
         }
     }
     
+    GameObject createDropItemsParent(Vector3 position)
+    {
+        GameObject dropItems = new GameObject("Drop");
+        dropItems.tag = "Items";
+        dropItems.AddComponent<BoxCollider>().isTrigger = true;
+        dropItems.transform.position = position;
+        return dropItems;
+    }
+
     public bool placeEmpty(Item item)
     {
         
@@ -137,5 +165,37 @@ public class Inventory : InventoryManager {
         }               
         return false;
         
+    }
+    void updateCraftSystem(Item item)
+    {
+        GameObject temp = GameObject.Find("MakingWindow");
+        if (temp)
+        {
+            CraftSystem craftSystem = temp.GetComponent<CraftSystem>();
+            for (int i = 0; i < 5; ++i)
+            {
+                if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.type == item.type)
+                {
+                    craftSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
+    }
+    void updateCookingSystem(Item item)
+    {
+        GameObject temp = GameObject.Find("CookingWindow");
+        if (temp)
+        {
+            CookingSystem cookingSystem = temp.GetComponent<CookingSystem>();
+            for (int i = 0; i < 2; ++i)
+            {
+                if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.type == item.type)
+                {
+                    cookingSystem.searchItemsInBag();
+                    return;
+                }
+            }
+        }
     }
 }
