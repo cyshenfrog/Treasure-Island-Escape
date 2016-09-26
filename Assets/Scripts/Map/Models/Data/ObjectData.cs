@@ -47,8 +47,16 @@ public abstract class ObjData
         set { no = value; }
     }
 
+    /*
+    public int Number
+    {
+        get { return number; }
+        set { number = value; }
+    }
+    */
+
     //position and center are world positions
     protected Vector3 position, center;
     protected Sprite sprite;
-    protected int no, state, type0, type1, type2, type3;
+    protected int no, number, state, type0, type1, type2, type3;
 }

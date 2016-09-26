@@ -105,6 +105,23 @@ public class GroundController : MonoBehaviour
         }
     }
 
+    public static Transform GetMapPoolByTileData(TileData td)
+    {
+        //cast should be done last
+
+        Debug.Log((int)(td.Position.x / cellWidthInWC) + " " + (int)(td.Position.y / cellHeightInWC));
+
+        try
+        {
+            return mapPool[(int)(td.Position.x / cellWidthInWC), (int)(td.Position.y / cellHeightInWC)];
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("GetMapPoolByTileData Error: " + e);
+            return null;
+        }
+    }
+
     Color ChooseColor(int type, float value)
     {
         int index = -1;
@@ -687,7 +704,9 @@ public class GroundController : MonoBehaviour
     public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight, MaxStack;
     public float DistanceThreshold, MapRefreshTime;
 
-    Transform[,] mapPool;
+    static Transform[,] mapPool;
+    static float cellWidthInWC, cellHeightInWC;
+
     Transform[][] sight, map;
     TileData[][] groundData;
     //TileData nowTileData;
@@ -738,7 +757,6 @@ public class GroundController : MonoBehaviour
 
     Vector3[] sightBottomLeft;
     float[][] worldNoise, worldPerlinNoise;
-    float cellWidthInWC, cellHeightInWC;
     //InWC
     float minSightWidthBoundary, maxSightWidthBoundary, minSightHeightBoundary, maxSightHeightBoundary;
     int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, halfSightWidthCount, halfSightHeightCount, preSightRange, landformTypeAmount = MapConstants.LandformTypeAmount;

@@ -408,6 +408,21 @@ public static class TileDataManager
         }
     }
 
+    public static void RegisterTileData(Vector3 position, Monster m)
+    {
+        TileData td = GroundController.GetTileDataByWorldPosition(position);
+
+        if(td.LooseObj == null)
+        {
+            //can be register
+            td.LooseObj = m;
+        }
+        else
+        {
+            Debug.LogError("RegisterTileData Error: Attemp to register more than two looseObjs in a tiledata");
+        }
+    }
+
     /*
     public static bool BFSs(List<TileData> BFSList, TileData[][] groundData, Form islandForm)
     {

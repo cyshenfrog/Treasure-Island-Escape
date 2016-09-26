@@ -13,6 +13,9 @@ public class TileData
         this.fromTile = fromTile != null ? fromTile : this;
         center = this;
         materialTypes[0] = lm;
+
+        looseObj = null;
+        rdList = new List<ResourceData>();
     }
 
     public MapConstants.LandformType[] MaterialTypes
@@ -64,6 +67,12 @@ public class TileData
         set { directions = value; }
     }
 
+    public List<ResourceData> RdList
+    {
+        get { return rdList; }
+        set { rdList = value; }
+    }
+
     public Vector2 Position
     {
         get { return position; }
@@ -87,6 +96,12 @@ public class TileData
     public TileData BuildingCenter
     {
         get { return buildingCenter; }
+    }
+
+    public Monster LooseObj
+    {
+        get { return looseObj; }
+        set { looseObj = value; }
     }
 
     public bool IsRunable
@@ -140,10 +155,12 @@ public class TileData
     protected Vector2[] directions = new Vector2[] { Vector2.left + Vector2.up, Vector2.up, Vector2.right + Vector2.up, Vector2.left, Vector2.right, Vector2.left + Vector2.down, Vector2.down, Vector2.right + Vector2.down };
     //used for blending images
     protected Vector2[] materialDirections = new Vector2[4];
+    protected List<ResourceData> rdList;
     protected MapConstants.LandformType[] materialTypes = new MapConstants.LandformType[] { MapConstants.LandformType.None, MapConstants.LandformType.None, MapConstants.LandformType.None, MapConstants.LandformType.None };
     //unknown
     protected MapConstants.BuildingType buildingType;
     protected TileData center, fromTile, buildingCenter;
+    protected Monster looseObj;
     protected Vector2 position, buildingPosition;
     protected Action<TileData> mtChanged;
     protected bool isRunable, isConstructable, isConstructed;
