@@ -15,7 +15,7 @@
   <GatherTime>5</GatherTime>
   <GrowthTime>2</GrowthTime>
   <Id>0</Id>
-  <Max>10</Max>
+  <Max>20</Max>
   <ToolId>0</ToolId>
   <OnPickFinishedMode>0</OnPickFinishedMode>
   <IsNeedTool>false</IsNeedTool>

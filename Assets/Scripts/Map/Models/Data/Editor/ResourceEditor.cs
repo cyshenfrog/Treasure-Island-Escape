@@ -14,9 +14,43 @@ public class ResourceEditor : EditorWindow
         GetWindow(typeof(ResourceEditor));
     }
 
+    void WriteType()
+    {
+        //to get all fileNames
+        string[] fileNames = Directory.GetFiles(filePath,"Resource_*.xml");
+
+        int length = fileNames.Length;
+        for(int i = 0; i < length; ++i)
+        {
+            StringBuilder sb = new StringBuilder();
+            string s = fileNames[i];
+            int pathLength = s.Length;
+
+            for(int j = pathLength - 5; j >= 0; --j)
+            {
+                if(s[j] != '_')
+                    sb.Insert(0, s[j]);
+                else
+                    break;
+            }
+
+            fileNames[i] = sb.ToString();
+        }
+        
+        StreamWriter sw = new FileInfo(scriptPath).CreateText();
+
+        sw.WriteLine("public enum ResourceType\r\n{");
+        int temp = length - 1;
+        for(int i = 0; i < temp; ++i)
+            sw.WriteLine('\t' + fileNames[i] + ',');
+        sw.WriteLine('\t' + fileNames[temp] + "\r\n}");
+
+        sw.Close();
+    }
+
     void Load()
     {
-        string file = filePath + fileName + ".xml";
+        string file = filePath + "Resource_" + fileName + ".xml";
 
         if(File.Exists(file))
         {
@@ -43,10 +77,10 @@ public class ResourceEditor : EditorWindow
                 if (!Directory.Exists(filePath))
                     Directory.CreateDirectory(filePath);
 
+                EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
+
                 rd = new ResourceData();
                 Save();
-
-                EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
             }
             catch(Exception e)
             {
@@ -107,7 +141,7 @@ public class ResourceEditor : EditorWindow
 
     void Save()
     {
-        string file = filePath + fileName + ".xml";
+        string file = filePath + "Resource_" + fileName + ".xml";
 
         //to detect if the filePath is legal
         if (!Directory.Exists(filePath))
@@ -138,6 +172,8 @@ public class ResourceEditor : EditorWindow
             serializer.Serialize(stream, rd);
         }
 
+        WriteType();
+
         EditorUtility.DisplayDialog("迷之音", "存入" + fileName + "了!", "好");
     }
     
@@ -145,9 +181,9 @@ public class ResourceEditor : EditorWindow
     {
         scrollView = EditorGUILayout.BeginScrollView(scrollView);
 
-        //to load file
+        //to load file by name
         EditorGUILayout.BeginHorizontal();
-        fileName = EditorGUILayout.TextField("Loaded Filename: ", fileName, GUILayout.Width(300f));
+        fileName = EditorGUILayout.TextField("Loaded fileName: ", fileName, GUILayout.Width(300f));
 
         if (GUILayout.Button("Load", GUILayout.Width(150f)))
             if (EditorUtility.DisplayDialog("迷之音", "確定要讀入" + fileName + "嘛?", "是", "再考慮"))
@@ -160,8 +196,6 @@ public class ResourceEditor : EditorWindow
 
         //to save
         EditorGUILayout.BeginHorizontal();
-        fileName = EditorGUILayout.TextField("Saved Filename: ", fileName, GUILayout.Width(300f));
-
         if (GUILayout.Button("Save", GUILayout.Width(150f)))
             if (EditorUtility.DisplayDialog("迷之音", "確定要存入" + fileName + "嘛?", "是", "否"))
                 Save();
@@ -170,7 +204,9 @@ public class ResourceEditor : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-    static string fileName = "Resource", filePath = Application.dataPath + @"\Resources\Resource\";
+    static string fileName = "", filePath = Application.dataPath + @"\Resources\Resource\";
+    static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
+    static int id = 0;
 
     ResourceData rd = null;
     Vector2 scrollView = Vector2.zero;
