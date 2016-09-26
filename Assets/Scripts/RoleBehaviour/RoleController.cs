@@ -257,7 +257,7 @@ public class RoleController : MonoBehaviour {
 
         if(index != -1)
             MoveToTarget(objPosition[index]);
-
+           //test manual merge
     }
 
     public void CancelMoveToTarget() {
