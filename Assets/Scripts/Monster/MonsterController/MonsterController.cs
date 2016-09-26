@@ -56,8 +56,7 @@ public class MonsterController : MonoBehaviour {
 
     protected virtual void OnMouseDown() {
         if (EventSystem.current.IsPointerOverGameObject())
-            return;
-        
+            return;       
     }
 
     protected void stateMachine() {
