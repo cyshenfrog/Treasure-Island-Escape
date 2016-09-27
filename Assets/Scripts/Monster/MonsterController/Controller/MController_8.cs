@@ -67,6 +67,9 @@ public class MController_8 : MController_2 {
                 targetVertex = i;
             }
         }
+
+        Debug.Log(GetComponent<SpriteRenderer>().sprite.rect);
+        Debug.Log(GetComponent<SpriteRenderer>().sprite.pivot);
     }
 
     protected override void Update() {
@@ -76,7 +79,6 @@ public class MController_8 : MController_2 {
     public override void Move() {
 
         Vector2 pos = transform.position;
-
 
         for (int i = 0; i < vertex.Count; i++) {
             if (pos == vertex[i]) {
@@ -94,6 +96,7 @@ public class MController_8 : MController_2 {
         Vector2 target = (atan > -45 && atan <= 45) || (atan > 135 || atan <= -135) ?
             transform.position.y == vertex[targetVertex].y ? vertex[targetVertex] : new Vector2(transform.position.x, vertex[targetVertex].y) :
             transform.position.x == vertex[targetVertex].x ? vertex[targetVertex] : new Vector2(vertex[targetVertex].x, transform.position.y);
+
         transform.position = Vector2.MoveTowards(transform.position, target, Time.deltaTime * Speed);
 
     }
