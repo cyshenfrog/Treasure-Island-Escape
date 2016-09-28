@@ -33,6 +33,7 @@ public class MonsterEditorWindow : EditorWindow {
         "Volcano",
         "Sea",
         "None" };
+    bool isCluster = false;
 
     int mType = 0;
     string[] mTypeOpt = { "一般怪物", "祭壇怪物", "祭壇王", "區域王" };
@@ -54,6 +55,7 @@ public class MonsterEditorWindow : EditorWindow {
                 Monster m = Monster.Load(Int32.Parse(file));
                 livingArea = (int)m.LivingArea;
                 mType = (int)m.MType;
+                isCluster = m.Cluster;
                 field[0] = m.Name;
                 field[1] = m.BaseMaxHp.ToString();
                 field[2] = m.BaseAttackRange.ToString();
@@ -64,8 +66,15 @@ public class MonsterEditorWindow : EditorWindow {
             }
         }
 
-        livingArea = EditorGUILayout.Popup(livingArea, tileType);
-        mType = EditorGUILayout.Popup(mType, mTypeOpt);
+        GUILayout.Label("------------");
+        GUILayout.Label("Settings");
+
+        livingArea = EditorGUILayout.Popup(livingArea, tileType, GUILayout.Width(150));
+        mType = EditorGUILayout.Popup(mType, mTypeOpt, GUILayout.Width(150));
+        isCluster = EditorGUILayout.ToggleLeft("群聚", isCluster);
+
+        GUILayout.Label("------------");
+        GUILayout.Label("Data");
 
         for (int i = 0; i < fieldName.Length; i++) {
             GUILayout.BeginHorizontal();
@@ -89,6 +98,7 @@ public class MonsterEditorWindow : EditorWindow {
                 Monster m = new Monster();
                 m.LivingArea = (MapConstants.LandformType)livingArea;
                 m.MType = (Monster.MonsterType)mType;
+                m.Cluster = isCluster;
                 m.Id = id;
                 m.Name = field[0];
                 m.BaseMaxHp = Int32.Parse(field[1]);

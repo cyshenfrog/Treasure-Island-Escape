@@ -81,6 +81,9 @@ public class MonsterController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// moving according to randomDirection and lastTimes
+    /// </summary>
     public virtual void Move() {
 
         switch (randomDirection)
