@@ -18,7 +18,7 @@ public class Bag : MonoBehaviour {
             if (other.transform.parent == null && other.tag == "Item" && MoveToObject.pickUpTarget != null)
             {
                 Item item = other.GetComponent<Item>();
-                if (item.type == MoveToObject.pickUpTarget.type)
+                if (item.type == MoveToObject.pickUpTarget.type && other.transform.position == MoveToObject.pickUpTarget.transform.position)
                 {
                     if (pickUpItem(other.GetComponent<Item>()))
                     {
@@ -32,7 +32,7 @@ public class Bag : MonoBehaviour {
                 foreach (Transform child in other.transform)
                 {
                     Item item = child.transform.GetComponent<Item>();
-                    if (item.type == MoveToObject.pickUpTarget.type)
+                    if (item.type == MoveToObject.pickUpTarget.type && item.transform.position == MoveToObject.pickUpTarget.transform.position)
                     {
                         if (pickUpItem(child.GetComponent<Item>()))
                         {
