@@ -53,12 +53,13 @@ public class GroundController : MonoBehaviour
         //to display the random map
 
         //to create the noise
-        worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
-        worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
+        //worldNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
+        //worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
+        worldPerlinNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
 
         //Display(false);
-        Display();
-        //DisplayWorld();
+        //Display();
+        DisplayWorld();
 
         
         for (int i = 0; i < landformTypeAmount; ++i)
@@ -86,6 +87,8 @@ public class GroundController : MonoBehaviour
             */
 
             InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
+
+        //Debug.Log(mapPool[0, 0].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
     }
 
     public static TileData GetTileDataByWorldPosition(Vector3 worldPosition)
@@ -259,6 +262,7 @@ public class GroundController : MonoBehaviour
                             tile.name = "Tile " + tileX.ToString() + ',' + tileY.ToString();
 
                             tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
+                            Debug.Log(tile.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
 
                             //to put tile into mapPool
                             mapPool[tileX, tileY] = tile;
