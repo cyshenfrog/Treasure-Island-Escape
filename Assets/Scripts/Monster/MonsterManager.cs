@@ -27,6 +27,7 @@ public class MonsterManager : MonoBehaviour {
         GameObject source = Resources.Load(prefabPath + monster.Id) as GameObject;
         GameObject prefab = Instantiate(source);
         prefab.transform.position = pos;
+        //TileDataManager.RegisterTileData(pos, monster);
         prefab.GetComponent<MonsterController>().Data = monster;
         return prefab;
     }

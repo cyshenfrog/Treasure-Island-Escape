@@ -66,6 +66,7 @@ public class Monster {
     public string prefabPath { set; get; }
     public MapConstants.LandformType LivingArea { set; get; }
     public MonsterType MType { set; get; }
+    public bool Cluster { set; get; }
 
     public int Id {
         set { id = value; }

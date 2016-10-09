@@ -56,8 +56,7 @@ public class MonsterController : MonoBehaviour {
 
     protected virtual void OnMouseDown() {
         if (EventSystem.current.IsPointerOverGameObject())
-            return;
-        
+            return;       
     }
 
     protected void stateMachine() {
@@ -82,6 +81,9 @@ public class MonsterController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// moving according to randomDirection and lastTimes
+    /// </summary>
     public virtual void Move() {
 
         switch (randomDirection)

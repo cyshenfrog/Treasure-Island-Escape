@@ -3,6 +3,9 @@ using System.Collections;
 
 public class WorldEventControl : MonoBehaviour {
 
+    public bool isSandStorm;
+    public bool isSnowStorm;
+
     RoleController player;
     Item[] Trees;
 
@@ -27,9 +30,24 @@ public class WorldEventControl : MonoBehaviour {
 
     }
 
+    void onEnterDesert()
+    {
+
+    }
+
     bool IsKeyItemCollected(bool isCollected)
     {
 
         return true;
+    }
+
+    void playWetherAnime()
+    {
+
+    }
+
+    void stopWetherAnime()
+    {
+
     }
 }
