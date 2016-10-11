@@ -21,9 +21,9 @@ public class MoveToObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         bag = role.GetComponent<Bag>();
         if (itemName == null)
         {
-            itemName = GameObject.Find("ItemName");
-            sizeText = itemName.transform.Find("ItemNameSize").GetComponent<Text>();
-            visualText = sizeText.transform.Find("ItemNameText").GetComponent<Text>();
+            itemName = GameObject.Find("ItemNameTag");
+            sizeText = itemName.transform.Find("ItemNameTagSize").GetComponent<Text>();
+            visualText = sizeText.transform.Find("ItemNameTagText").GetComponent<Text>();
             itemName.SetActive(false);
         }
     }
