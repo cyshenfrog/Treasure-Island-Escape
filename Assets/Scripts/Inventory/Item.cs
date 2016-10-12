@@ -7,6 +7,7 @@ public class Item : MonoBehaviour {
 
     public itemType type;
     public Quality quality;
+    public int weight;
     public Sprite icon;
     public int maxStackSize;
 
@@ -50,6 +51,7 @@ public class Item : MonoBehaviour {
     {
         type = item.type;
         quality = item.quality;
+        weight = item.weight;
         icon = item.icon;
         maxStackSize = item.maxStackSize;
 

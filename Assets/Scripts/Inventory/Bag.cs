@@ -4,6 +4,8 @@ using System.Collections;
 public class Bag : MonoBehaviour {
 
     public Inventory inventory1, inventory2, inventory3;
+    private int affordableWeight = 500;
+    private int currentWeight;
     private RoleController roleController;
 
     void Start()
@@ -53,6 +55,10 @@ public class Bag : MonoBehaviour {
 
     public bool pickUpItem(Item item)
     {
+
+        if ((affordableWeight - currentWeight) < item.weight)   //make sure player can afford the weight
+            return false;
+
         if (item.maxStackSize == 1)
         {
             if (inventory1.placeEmpty(item))
