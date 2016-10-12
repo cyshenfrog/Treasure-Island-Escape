@@ -100,6 +100,7 @@ public class ResourceData : ObjData
     List<float> dropRate = new List<float>();
 
     MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
+    Vector2 pivot; 
     GrowthMode gm = GrowthMode.Growth;
     string name = "";
     float gatherTime = 5f, growthTime = 2f;
