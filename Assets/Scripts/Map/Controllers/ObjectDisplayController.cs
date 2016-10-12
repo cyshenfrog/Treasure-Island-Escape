@@ -19,7 +19,7 @@ public class ObjectDisplayController : MonoBehaviour
 
     }
 
-    void RandomlyGenerate(int mode, int randomTimes, ResourceData rd)
+    void RandomlyGenerate(int mode, int randomTimes, ResourceAttribute rd)
     {
         int max = rd.Max, landform = (int)rd.Landform;
         Vector2[] keys = landformList[landform].Keys.ToArray();

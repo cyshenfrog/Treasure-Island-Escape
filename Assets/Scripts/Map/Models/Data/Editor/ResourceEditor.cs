@@ -55,11 +55,11 @@ public class ResourceEditor : EditorWindow
         if(File.Exists(file))
         {
             //to read the file
-            var serializer = new XmlSerializer(typeof(ResourceData));
+            var serializer = new XmlSerializer(typeof(ResourceAttribute));
 
             using (var stream = new FileStream(file, FileMode.Open))
             {
-                rd = (ResourceData)serializer.Deserialize(stream);
+                rd = (ResourceAttribute)serializer.Deserialize(stream);
             }
 
             isNeedTool = rd.IsNeedTool ? 1 : 0;
@@ -79,7 +79,7 @@ public class ResourceEditor : EditorWindow
 
                 EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
 
-                rd = new ResourceData();
+                rd = new ResourceAttribute();
                 Save();
             }
             catch(Exception e)
@@ -92,7 +92,7 @@ public class ResourceEditor : EditorWindow
     void Draw()
     {
         EditorGUILayout.BeginHorizontal();
-        rd.Id = EditorGUILayout.IntField("編號", rd.Id, GUILayout.Width(200f));
+        rd.ResourceId = EditorGUILayout.IntField("編號", rd.ResourceId, GUILayout.Width(200f));
         rd.Name = EditorGUILayout.TextField("名稱", rd.Name);
         EditorGUILayout.EndHorizontal();
 
@@ -161,10 +161,10 @@ public class ResourceEditor : EditorWindow
             }
 
         rd.IsNeedTool = isNeedTool == 1 ? true : false;
-        rd.Gm = (ResourceData.GrowthMode)gm;
+        rd.Gm = (ResourceAttribute.GrowthMode)gm;
         rd.Landform = (MapConstants.LandformType)landform;
 
-        var serializer = new XmlSerializer(typeof(ResourceData));
+        var serializer = new XmlSerializer(typeof(ResourceAttribute));
 
         //to ensure the encoding
         using (var stream = new StreamWriter(file, false, Encoding.UTF8))
@@ -208,7 +208,7 @@ public class ResourceEditor : EditorWindow
     static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
     static int id = 0;
 
-    ResourceData rd = null;
+    ResourceAttribute rd = null;
     Vector2 scrollView = Vector2.zero;
     
     string[] YesNoMode = new string[] { "否", "是" }, DisappearChangeMode = new string[] { "消失", "改變" };
