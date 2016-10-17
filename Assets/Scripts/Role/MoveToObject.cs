@@ -57,8 +57,11 @@ public class MoveToObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         float minDistance = 1000000;
         int index = -1, i=0;
         List<GameObject> itemList = new List<GameObject>();
+        //find item with tag
         GameObject[] singleItems = GameObject.FindGameObjectsWithTag("Item");
         GameObject[] stackItems = GameObject.FindGameObjectsWithTag("Items");
+
+        //add items to a list
         foreach (GameObject item in singleItems)
         {
             itemList.Add(item);
@@ -67,6 +70,8 @@ public class MoveToObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         {
             itemList.Add(item);
         }
+
+        //find closest item
         foreach (GameObject item in itemList)
         {
             float distance = Vector2.Distance(item.transform.position, role.transform.position);
@@ -77,6 +82,7 @@ public class MoveToObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
             }
             ++i;
         }
+        
         if (index == -1)
             return null;
         else {

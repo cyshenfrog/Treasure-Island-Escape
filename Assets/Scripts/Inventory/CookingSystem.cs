@@ -308,7 +308,7 @@ public class CookingSystem : InventoryManager
     
     public void RightArrowClicked()
     {
-        if (!resultSlot.isEmpty && resultSlot.isStackable)
+        if (!resultSlot.isEmpty && resultSlot.isStackable && resultSlot.GetComponent<Image>().color == Color.gray)
         {
             for(int i =0; i< 2; ++i)
             {
@@ -325,7 +325,7 @@ public class CookingSystem : InventoryManager
     }
     public void LeftArrowClicked()
     {
-        if (resultSlot.items.Count > 1)
+        if (resultSlot.items.Count > 1 && resultSlot.GetComponent<Image>().color == Color.gray)
         {
             for (int i = 0; i < 2; ++i)
             {
