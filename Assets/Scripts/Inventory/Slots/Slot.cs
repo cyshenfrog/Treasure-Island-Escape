@@ -14,6 +14,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     }
 
     private Image itemImage;
+    private Image slotColor;
     private Text stackText;
     public Sprite slotEmpty;
     // Use this for initialization
@@ -25,6 +26,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
 
 	void Start () {
         stackText = gameObject.GetComponentInChildren<Text>();
+        slotColor = transform.GetComponent<Image>();
         itemImage = transform.Find("ItemImage").GetComponent<Image>();
 
         items = new Stack<Item>();
@@ -99,7 +101,16 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     {
         itemImage.sprite = icon;
     }
-
+    public void changeSlotColorToWhite()
+    {
+        itemImage.color = Color.white;
+        slotColor.color = Color.white;
+    }
+    public void changeSlotColorToGray()
+    {
+        itemImage.color = Color.gray;
+        slotColor.color = Color.gray;
+    }
     private void useItem()
     {
         if (!isEmpty)
@@ -141,7 +152,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, I
     }
     public void OnPointerClick(PointerEventData eventData)
     {
-        if(eventData.button == PointerEventData.InputButton.Right && !GameObject.Find("HoverIcon(Clone)") && transform.parent.transform.tag != "Bank" && transform.tag != "MaterialSlot" && transform.GetComponent<Image>().color!=Color.gray)
+        if(eventData.button == PointerEventData.InputButton.Right && !GameObject.Find("HoverIcon(Clone)") && transform.parent.transform.tag != "Bank" && transform.tag != "MaterialSlot" && itemImage.color!=Color.gray)
         {
             useItem();
         }

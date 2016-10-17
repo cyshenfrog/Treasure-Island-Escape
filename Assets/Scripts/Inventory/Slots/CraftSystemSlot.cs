@@ -7,6 +7,7 @@ public class CraftSystemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
 
     public Image itemImage;
+    public Image slotColor;
     public Text owned_need;
 
     public Stack<Item> items;
@@ -31,9 +32,10 @@ public class CraftSystemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         items = new Stack<Item>();
 
-        Transform background = transform.Find("Background");
-        itemImage = background.Find("Icon").GetComponent<Image>();
-        owned_need = background.Find("Number").GetComponent<Text>();
+        //Transform background = transform.Find("Background");
+        slotColor = transform.GetComponent<Image>();
+        itemImage = transform.Find("ItemImage").GetComponent<Image>();
+        owned_need = transform.Find("slotText").GetComponent<Text>();
 
         if (toolTip == null && Slot.toolTip!=null)
         {
@@ -87,7 +89,16 @@ public class CraftSystemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         itemImage.sprite = icon;
     }
-    
+    public void changeSlotColorToWhite()
+    {
+        itemImage.color = Color.white;
+        slotColor.color = Color.white;
+    }
+    public void changeSlotColorToGray()
+    {
+        itemImage.color = Color.gray;
+        slotColor.color = Color.gray;
+    }
     public void clearSlot()
     {
         items.Clear();

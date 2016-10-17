@@ -26,6 +26,7 @@ public class Bag : MonoBehaviour {
                     {
                         Destroy(other.gameObject);
                     }
+                    roleController.State = RoleState.IDLE;
                 }
             }
             else if (other.transform.tag == "Items" && MoveToObject.pickUpTarget != null)
@@ -49,6 +50,7 @@ public class Bag : MonoBehaviour {
                 }
                 if (other.transform.childCount == childDeleted)
                     Destroy(other.gameObject);
+                roleController.State = RoleState.IDLE;
             }
         }
     }
