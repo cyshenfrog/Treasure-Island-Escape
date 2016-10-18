@@ -20,19 +20,22 @@ public class MController_1 : MonsterController {
     protected override void OnMouseDown() {
         //check pointer is not over ugui
         base.OnMouseDown();
+        role.GetComponent<RoleController>().Attack(this, transform.localPosition);
 
-        if (role.GetComponent<RoleController>().Attack(Data, transform.localPosition)) {
+    }
 
-            State = MonsterState.BEATTACK;
+    public override void EnterBeAttack() {
 
-            //refresh data of be attacked
-            lastTimes = 0;
-            beAttackedState = STATE_STARTPLAYANIM;
-            cacheRolePosition = false;
+        Data.Hp -= (int)role.GetComponent<RoleController>().Data.Attack;
+        State = MonsterState.BEATTACK;
 
-            //monster die
-            if (Data.Hp == 0) Die();
-        }
+        //refresh data of be attacked
+        lastTimes = 0;
+        beAttackedState = STATE_STARTPLAYANIM;
+        cacheRolePosition = false;
+
+        //monster die
+        if (Data.Hp == 0) Die();
     }
 
     public override void BeAttacked() 

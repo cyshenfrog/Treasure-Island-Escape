@@ -7,7 +7,7 @@ public class RoleController : MonoBehaviour {
     public float Speed;
     public Animator anim;
 
-    private Role data;                   //role data
+    public Role Data { set; get; }                   //role data
 
     private Vector3 coordinateTarget = Vector3.zero;  //be used to moveToTarget, decide where role will move to 
     private List<Vector2> objPosition = new List<Vector2>();
@@ -19,10 +19,10 @@ public class RoleController : MonoBehaviour {
     public RoleState State { set; get; }
 
     void Awake() {
-        data = new Chef();
-        data.Attack = 10;
-        data.MaxHp = 1000;
-        data.Hp = 1000;
+        Data = new Chef();
+        Data.Attack = 10;
+        Data.MaxHp = 1000;
+        Data.Hp = 1000;
     }
 	void Start () {
         State = RoleState.IDLE;
@@ -205,12 +205,12 @@ public class RoleController : MonoBehaviour {
         objPosition = new List<Vector2>();
     }
 
-    public bool Attack(Monster m, Vector3 target) {
+    public bool Attack(MonsterController controller, Vector3 target) {
 
         State = RoleState.ATTACK;
-
+        
         if (Vector2.Distance(transform.position, target) <= AnimalConstant.RoleAttackRange) {
-            anim.GetBehaviour<AttackAction>().SetObject(m, (int)data.Attack);
+            anim.GetBehaviour<AttackAction>().TriggeredController(controller);
             playAnimation("Attack", target);
             //animation callback to unlock state;
 
@@ -225,10 +225,10 @@ public class RoleController : MonoBehaviour {
     public void BeAttacked(int attack, Vector2 pos) {
 
         if (State != RoleState.TYRANTS) {
-            data.Hp -= attack;
-            Debug.Log("Role Hp : " + data.Hp + "/" + data.MaxHp);
+            Data.Hp -= attack;
+            Debug.Log("Role Hp : " + Data.Hp + "/" + Data.MaxHp);
             State = RoleState.BEATTACK;
-            if (data.Hp <= 0) {
+            if (Data.Hp <= 0) {
                 Die();
             }
             else {

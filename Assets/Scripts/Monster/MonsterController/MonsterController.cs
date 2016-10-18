@@ -9,9 +9,9 @@ public class MonsterController : MonoBehaviour {
 
     //basic
     public Monster Data { set; get; }
+    public MonsterState State { set; get; }
     protected GameObject role; 
-    protected MonsterState State;
-
+    
     //idle and move parameters
     protected int lastTimes = 0;
     protected int randomDirection;
@@ -150,6 +150,10 @@ public class MonsterController : MonoBehaviour {
 
     public virtual void Attack() {
         role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
+    }
+
+    public virtual void EnterBeAttack() {
+        Debug.Log("enter be attack state");
     }
 
     public virtual void BeAttacked() {

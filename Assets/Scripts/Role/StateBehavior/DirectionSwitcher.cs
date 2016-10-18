@@ -29,7 +29,6 @@ public class DirectionSwitcher : StateMachineBehaviour {
     private Vector2 xOnly() {
         float x = Target.x >= 0 ? 1 : -1,
               y = 0;
-
         return new Vector2(x, y);
     }
 
