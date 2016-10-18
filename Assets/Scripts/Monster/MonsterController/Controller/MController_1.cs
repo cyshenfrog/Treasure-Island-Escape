@@ -65,10 +65,10 @@ public class MController_1 : MonsterController {
             if (lastTimes == 0) {
                 lastTimes = Random.Range(10, 40);
 
-                do
-                {
+                do {
                     //random run direction (excludes role direction)
                     randomDirection = Random.Range(0, 4);
+                    
                 } while (randomDirection == roleDirectionX || randomDirection == roleDirectionY);
             }
             Run();

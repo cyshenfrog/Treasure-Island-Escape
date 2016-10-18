@@ -13,30 +13,45 @@ public class DirectionSwitcher : StateMachineBehaviour {
     public static Vector2 Target = Vector2.right;
     public DirectionType DirectionApply;
 
-    private Vector2 quadrant() {
-        float x = Target.x >= 0 ? 1 : -1,
-              y = Target.y > 0 ? 1 : -1;
+    private static Vector2 quadrant(Vector2 target) {
+        float x = target.x >= 0 ? 1 : -1,
+              y = target.y > 0 ? 1 : -1;
         return new Vector2(x, y);
     }
 
-    private Vector2 axis() {
-        float x = Mathf.Abs(Target.x) >= Mathf.Abs(Target.y) ? Target.x / Mathf.Abs(Target.x) : 0,
-              y = Mathf.Abs(Target.x) >= Mathf.Abs(Target.y) ? 0 : Target.y / Mathf.Abs(Target.y);
+    private static Vector2 axis(Vector2 target) {
+        float x = Mathf.Abs(target.x) >= Mathf.Abs(target.y) ? target.x / Mathf.Abs(target.x) : 0,
+              y = Mathf.Abs(target.x) >= Mathf.Abs(target.y) ? 0 : target.y / Mathf.Abs(target.y);
 
         return new Vector2(x, y);
     }
 
-    private Vector2 xOnly() {
-        float x = Target.x >= 0 ? 1 : -1,
+    private static Vector2 xOnly(Vector2 target) {
+        float x = target.x >= 0 ? 1 : -1,
               y = 0;
         return new Vector2(x, y);
     }
 
-    private Vector2 yOnly() {
+    private static Vector2 yOnly(Vector2 target) {
         float x = 0,
-              y = Target.y >= 0 ? 1 : -1;
+              y = target.y >= 0 ? 1 : -1;
 
         return new Vector2(x, y);
+    }
+
+    public static Vector2 DirectionSwitch(Vector2 vector, DirectionType dir) {
+        switch (dir) {
+            case DirectionType.Axis:
+                return axis(vector);
+            case DirectionType.Quadrant:
+                return quadrant(vector);
+            case DirectionType.XOnly:
+                return xOnly(vector);
+            case DirectionType.YOnly:
+                return yOnly(vector);
+            default:
+                return Vector2.zero;
+        }
     }
 
     private Vector2 generateParam() {
@@ -44,16 +59,16 @@ public class DirectionSwitcher : StateMachineBehaviour {
 
         switch (DirectionApply) {
             case DirectionType.Axis:
-                param = axis();
+                param = axis(Target);
                 break;
             case DirectionType.Quadrant:
-                param = quadrant();
+                param = quadrant(Target);
                 break;
             case DirectionType.XOnly:
-                param = xOnly();
+                param = xOnly(Target);
                 break;
             case DirectionType.YOnly:
-                param = yOnly();
+                param = yOnly(Target);
                 break;
             default:
                 param = Vector2.zero;

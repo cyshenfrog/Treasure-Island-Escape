@@ -92,6 +92,8 @@ public class RoleController : MonoBehaviour {
             tyrants -= Time.deltaTime;
             if (tyrants <= 0) {
                 State = RoleState.IDLE;
+
+                //reset tyrants
                 tyrants = AnimalConstant.RoleTyrants;
             }
         }
@@ -148,11 +150,9 @@ public class RoleController : MonoBehaviour {
         else
         {
             if (coordinateTarget.x == transform.position.x || coordinateTarget.y == transform.position.y) {
-
-                if (coordinateTarget.x > transform.position.x) anim.SetTrigger("walkRight");
-                else if (coordinateTarget.x < transform.position.x) anim.SetTrigger("walkLeft");
-                else if (coordinateTarget.y > transform.position.y) anim.SetTrigger("walkUp");
-                else if (coordinateTarget.y < transform.position.y) anim.SetTrigger("walkDown");
+                Vector2 direction = coordinateTarget - transform.position;
+                DirectionSwitcher.Target = direction;
+                anim.SetTrigger("Walk");
                 transform.position = Vector3.MoveTowards(transform.position, coordinateTarget, Time.deltaTime * Speed);
             }
             else {
@@ -165,9 +165,8 @@ public class RoleController : MonoBehaviour {
                     x > 0 ? new Vector3(transform.position.x + deltaY, coordinateTarget.y, 0) : new Vector3(transform.position.x - deltaY, coordinateTarget.y, 0) :
                     y > 0 ? new Vector3(coordinateTarget.x, transform.position.y + deltaX, 0) : new Vector3(coordinateTarget.x, transform.position.y - deltaX, 0);
 
-                if (coordinateTarget.x > transform.position.x) anim.SetTrigger("walkRight");
-                else anim.SetTrigger("walkLeft");
-
+                DirectionSwitcher.Target = relayStation - transform.position;
+                anim.SetTrigger("Walk");
                 transform.position = Vector3.MoveTowards(transform.position, relayStation, Time.deltaTime * Speed);
 
             }
