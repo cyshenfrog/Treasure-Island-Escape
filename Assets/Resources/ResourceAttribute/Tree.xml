@@ -6,19 +6,24 @@
     <y>0</y>
     <z>0</z>
   </Center>
+  <Position>
+    <x>0</x>
+    <y>0</y>
+    <z>0</z>
+  </Position>
   <State>0</State>
   <OID>0</OID>
   <DropItems />
   <DropRate />
   <Landform>Grassland</Landform>
-  <Gm>Growth</Gm>
-  <OnPickFinishedMode>Rest</OnPickFinishedMode>
-  <Name>LiveStone</Name>
+  <Gm>Single</Gm>
+  <OnPickFinishedMode>Destory</OnPickFinishedMode>
+  <Name>Tree</Name>
   <GatherTime>5</GatherTime>
-  <GrowthTime>15</GrowthTime>
-  <ResourceID>4</ResourceID>
-  <Max>3</Max>
-  <ToolId>5</ToolId>
+  <GrowthTime>5</GrowthTime>
+  <ResourceID>2</ResourceID>
+  <Max>14</Max>
+  <ToolId>15</ToolId>
   <Width>3</Width>
   <Height>5</Height>
   <IsNeedTool>true</IsNeedTool>

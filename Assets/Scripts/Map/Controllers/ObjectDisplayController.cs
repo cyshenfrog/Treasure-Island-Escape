@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Xml.Serialization;
+using System;
 
 
 
@@ -10,25 +11,65 @@ public class ObjectDisplayController : MonoBehaviour
 {
     void Awake()
     {
-        GetResourceAttributes();
-        
-        for(int i = 0; i < resourceAttributeCount; ++i)
-        {
-            int max = resourceAttributes[i].Max;
-            RandomlyGenerateResource(resourceAttributes[i], 0, max);
-        }
-
 
     }
 
     void Start()
     {
+        cellWidthInWC = GroundController.CellWidthInWC;
+        cellHeightInWC = GroundController.CellHeightInWC;
+        ObjDisplay.Init();
+
         landformList = GroundRandomer.Self.LandformList;
+
+        GetResourceAttributes();
+
+        for (int i = 0; i < resourceAttributeCount; ++i)
+        {
+            int max = resourceAttributes[i].Max;
+            RandomlyGenerateResource(resourceAttributes[i], 0, max);
+        }
     }
 
     void Update()
     {
 
+    }
+
+    public static Color32[] ResizeCanvas(Texture2D texture, int width, int height)
+    {
+        var newPixels = ResizeCanvas(texture.GetPixels32(), texture.width, texture.height, width, height);
+        texture.Resize(width, height);
+        texture.SetPixels32(newPixels);
+        texture.Apply();
+        return newPixels;
+    }
+
+    private static Color32[] ResizeCanvas(IList<Color32> pixels, int oldWidth, int oldHeight, int width, int height)
+    {
+        var newPixels = new Color32[(width * height)];
+        var wBorder = (width - oldWidth) / 2;
+        var hBorder = (height - oldHeight) / 2;
+
+        for (int r = 0; r < height; r++)
+        {
+            var oldR = r - hBorder;
+            if (oldR < 0) { continue; }
+            if (oldR >= oldHeight) { break; }
+
+            for (int c = 0; c < width; c++)
+            {
+                var oldC = c - wBorder;
+                if (oldC < 0) { continue; }
+                if (oldC >= oldWidth) { break; }
+
+                var oldI = oldR * oldWidth + oldC;
+                var i = r * width + c;
+                newPixels[i] = pixels[oldI];
+            }
+        }
+
+        return newPixels;
     }
 
     void RandomlyGenerateResource(ResourceAttribute ra, int mode, int randomTimes)
@@ -40,7 +81,7 @@ public class ObjectDisplayController : MonoBehaviour
         switch (mode)
         {
             case 0:
-                //simply random
+                //simply random one
                 for(int i = randomTimes; i > 0; --i)
                 {
                     //to get a tiledata randomly
@@ -50,14 +91,16 @@ public class ObjectDisplayController : MonoBehaviour
 
                     while (con)
                     {
-                        random = Random.Range(0, length);
+                        random = UnityEngine.Random.Range(0, length);
                         td = landformList[landform][keys[random]];
                         con = td.FixedObj != null;
                     }
 
-                    ObjData od = ObjData.Create(ra, nextOID++, td.Position);
-                    ObjDisplay display = new ObjDisplay(ra, od);
-                    td.FixedObj = display;
+                    ObjData od = ObjData.Create(ra, nextOID, td.Position);
+                    GameObject newGo = Instantiate(objGameObject);
+                    newGo.GetComponent<ObjDisplay>().Init(ra, od);
+                    newGo.name = ra.Name + nextOID++.ToString();
+                    td.FixedObj = newGo;
 
                     //to refresh
                     //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
@@ -93,6 +136,56 @@ public class ObjectDisplayController : MonoBehaviour
                 {
                     resourceAttributes[i] = (ResourceAttribute)serializer.Deserialize(stream);
                 }
+
+                //to get their sprites
+                resourceAttributes[i].Sprites = Resources.LoadAll<Sprite>(loadResourceAttributeImagePath + ((ResourceType)i).ToString());
+
+                //to revise those sprites
+                int length = resourceAttributes[i].Sprites.Length;
+                Debug.Log(length);
+                int width = (int)(resourceAttributes[i].Width * cellWidthInWC * 100) + 1, height = (int)(resourceAttributes[i].Height * cellHeightInWC * 100) + 1;
+
+#if UNITY_EDITOR
+                Debug.Log("width = " + width + " height = " + height);
+#endif
+                
+                for (int j = 0; j < length; ++j)
+                {
+                    Texture2D t = resourceAttributes[i].Sprites[j].texture;
+                    ResizeCanvas(t, width, height);
+
+                    /*
+                     * 等比例??
+                    float oldWidth = t.width, oldHeight = t.height;
+                    float widthRatio = oldWidth / width, heightRatio = oldHeight / height;
+                    Debug.Log(oldWidth + " " + oldHeight + " " + widthRatio + " " + heightRatio);
+                    
+                    Color32[] colors = t.GetPixels32();
+                    Color32[] newColors = new Color32[width * height];
+                    
+                    for (int k = 0; k < height; ++k)
+                    {
+                        for(int l = 0; l < width; ++l)
+                        {
+                            try
+                            {
+                                newColors[k * width + l] = colors[(int)(k * heightRatio * oldWidth) + (int)(l * widthRatio)];
+                            }
+                            catch
+                            {
+                                Debug.LogError("k = " + k + " l = " + l);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    t.Resize(width, height);
+                    t.SetPixels32(newColors);
+                    t.Apply();
+                    */
+
+                    resourceAttributes[i].Sprites[j] = Sprite.Create(t, new Rect(0f, 0f, width, height), pivot);
+                }
             }
             else
             {
@@ -104,11 +197,16 @@ public class ObjectDisplayController : MonoBehaviour
         }
     }
 
+    public GameObject objGameObject;
+
+
     Dictionary<Vector2, TileData>[] landformList;
     ResourceAttribute[] resourceAttributes;
     ///ResourceDisplay[]
+    Vector2 pivot = .5f * Vector2.right;
 
-    string resourceAttributePath = DataConstant.ResourceAttributePath;
+    string resourceAttributePath = DataConstant.ResourceAttributePath, loadResourceAttributeImagePath = DataConstant.LoadResourceAttributeImagePath;
+    float cellWidthInWC, cellHeightInWC;
     //integer overflow???
     int nextOID = 0, resourceAttributeCount;
 }

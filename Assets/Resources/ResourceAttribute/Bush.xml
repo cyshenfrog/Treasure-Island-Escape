@@ -5,18 +5,23 @@
     <y>0</y>
     <z>0</z>
   </Center>
+  <Position>
+    <x>0</x>
+    <y>0</y>
+    <z>0</z>
+  </Position>
   <State>0</State>
   <OID>0</OID>
   <DropItems />
   <DropRate />
   <Landform>Grassland</Landform>
-  <Gm>Growth</Gm>
+  <Gm>Single</Gm>
   <OnPickFinishedMode>Destory</OnPickFinishedMode>
-  <Name>SquareTree</Name>
-  <GatherTime>5</GatherTime>
-  <GrowthTime>10</GrowthTime>
-  <ResourceID>3</ResourceID>
-  <Max>2</Max>
+  <Name>Bush</Name>
+  <GatherTime>2</GatherTime>
+  <GrowthTime>2</GrowthTime>
+  <ResourceID>1</ResourceID>
+  <Max>20</Max>
   <ToolId>0</ToolId>
   <Width>3</Width>
   <Height>5</Height>

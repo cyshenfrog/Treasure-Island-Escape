@@ -77,6 +77,9 @@ public class ResourceAttributeEditor : EditorWindow
                 if (!Directory.Exists(filePath))
                     Directory.CreateDirectory(filePath);
 
+                if (!Directory.Exists(fileImagePath + fileName))
+                    Directory.CreateDirectory(fileImagePath + fileName);
+
                 EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
 
                 rd = new ResourceAttribute(fileName);
@@ -91,6 +94,7 @@ public class ResourceAttributeEditor : EditorWindow
 
     void Draw()
     {
+        //to produce automatically?
         EditorGUILayout.BeginHorizontal();
         rd.ResourceID = EditorGUILayout.IntField("編號", rd.ResourceID, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
@@ -100,6 +104,11 @@ public class ResourceAttributeEditor : EditorWindow
         rd.GatherTime = EditorGUILayout.FloatField("採集時間", rd.GatherTime, GUILayout.Width(200f));
         rd.Max = EditorGUILayout.IntField("數量上限", rd.Max, GUILayout.Width(200f));
         rd.GrowthTime = EditorGUILayout.FloatField("重生頻率", rd.GrowthTime, GUILayout.Width(200f));
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        rd.Width = EditorGUILayout.IntField("寬度", rd.Width, GUILayout.Width(200f));
+        rd.Height = EditorGUILayout.IntField("高度", rd.Height, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
@@ -162,6 +171,7 @@ public class ResourceAttributeEditor : EditorWindow
         rd.IsNeedTool = isNeedTool == 1 ? true : false;
         rd.Gm = (ResourceAttribute.GenerateMode)gm;
         rd.Landform = (MapConstants.LandformType)landform;
+        Debug.Log(rd.Name);
 
         var serializer = new XmlSerializer(typeof(ResourceAttribute));
 
@@ -203,7 +213,7 @@ public class ResourceAttributeEditor : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-    static string fileName = "", filePath = DataConstant.ResourceAttributePath;
+    static string fileName = "", filePath = DataConstant.ResourceAttributePath, fileImagePath = DataConstant.ResourceAttributeImagePath;
     static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
     static int id = 0;
 

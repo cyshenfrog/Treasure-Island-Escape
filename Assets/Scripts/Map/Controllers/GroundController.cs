@@ -34,8 +34,8 @@ public class GroundController : MonoBehaviour
         halfSightHeightCount = (int)(sightHeightCount * .5f);
 
         //1 pixel = 0.01 in world coordinates
-        cellWidthInWC = CellWidth * .01f;
-        cellHeightInWC = CellHeight * .01f;
+        CellWidthInWC = CellWidth * .01f;
+        CellHeightInWC = CellHeight * .01f;
         
         tile = Resources.Load<GameObject>(@"Map\Tile").transform;
         //tile.GetComponent<BoxCollider>().size = cellWidthInWC * Vector3.right + cellHeightInWC * Vector3.up;
@@ -142,11 +142,11 @@ public class GroundController : MonoBehaviour
     {
         //cast should be done last
 
-        Debug.Log((int)(td.Position.x / cellWidthInWC) + " " + (int)(td.Position.y / cellHeightInWC));
+        Debug.Log((int)(td.Position.x / CellWidthInWC) + " " + (int)(td.Position.y / CellHeightInWC));
 
         try
         {
-            return mapPool[(int)(td.Position.x / cellWidthInWC), (int)(td.Position.y / cellHeightInWC)];
+            return mapPool[(int)(td.Position.x / CellWidthInWC), (int)(td.Position.y / CellHeightInWC)];
         }
         catch(Exception e)
         {
@@ -188,7 +188,6 @@ public class GroundController : MonoBehaviour
             {
                 int width = (int)tdPosition.x % spriteHeight;
                 int height = (int)tdPosition.y % spriteWidth;
-                Debug.Log(tdPosition.ToString() + " " + width + " " + height);
                 return landformSprites[(int)type, height * spriteWidth + width];
             }
             else
@@ -345,7 +344,7 @@ public class GroundController : MonoBehaviour
                             //to initialize
                             tile = Instantiate(tile);
                             tile.parent = SightList;
-                            tile.position = tileX * cellWidthInWC * Vector3.right + tileY * cellHeightInWC * Vector3.up;
+                            tile.position = tileX * CellWidthInWC * Vector3.right + tileY * CellHeightInWC * Vector3.up;
                             tile.localScale = Vector3.one;
                             tile.name = "Tile " + tileX.ToString() + ',' + tileY.ToString();
 
@@ -358,7 +357,7 @@ public class GroundController : MonoBehaviour
                     }
                 }
 
-                sightBottomLeft[i + j * preSightRange] = sightX * cellWidthInWC * Vector3.right + sightY * cellHeightInWC * Vector3.up;
+                sightBottomLeft[i + j * preSightRange] = sightX * CellWidthInWC * Vector3.right + sightY * CellHeightInWC * Vector3.up;
             }
         }
         
@@ -381,7 +380,7 @@ public class GroundController : MonoBehaviour
                         //to initialize
                         tile = Instantiate(tile);
                         tile.parent = SightList;
-                        tile.position = i * cellWidthInWC * Vector3.right + j * cellHeightInWC * Vector3.up;
+                        tile.position = i * CellWidthInWC * Vector3.right + j * CellHeightInWC * Vector3.up;
                         tile.localScale = Vector3.one;
 
                         //redundent
@@ -413,7 +412,7 @@ public class GroundController : MonoBehaviour
         Vector3 from = sightBottomLeft[(int)sightDirection.Center], to = Role.position;
         //Debug.Log(from + " " + to);
         float distanceX = to.x - from.x, distanceY = to.y - from.y;
-        bool right = distanceX > sightWidthCount * cellWidthInWC, left = distanceX < 0, up = distanceY > sightHeightCount * cellHeightInWC, down = distanceY < 0; 
+        bool right = distanceX > sightWidthCount * CellWidthInWC, left = distanceX < 0, up = distanceY > sightHeightCount * CellHeightInWC, down = distanceY < 0; 
 
         //TileData newTileData = GetTileDataByWorldPosition(Role.position);
         //if (nowTileData != newTileData)
@@ -449,10 +448,10 @@ public class GroundController : MonoBehaviour
                 //moving in x direction
                 if (right || left)
                 {
-                    Vector3 newXVector = newXCount * cellWidthInWC * Vector3.right;
-                    Vector3 newYUpVector = (newYCount + 2 * sightHeightCount) * cellHeightInWC * Vector3.up;
-                    Vector3 newYMiddleVector = (newYCount + sightHeightCount) * cellHeightInWC * Vector3.up;
-                    Vector3 newYDownVector = newYCount * cellHeightInWC * Vector3.up;
+                    Vector3 newXVector = newXCount * CellWidthInWC * Vector3.right;
+                    Vector3 newYUpVector = (newYCount + 2 * sightHeightCount) * CellHeightInWC * Vector3.up;
+                    Vector3 newYMiddleVector = (newYCount + sightHeightCount) * CellHeightInWC * Vector3.up;
+                    Vector3 newYDownVector = newYCount * CellHeightInWC * Vector3.up;
 
                     if (right)
                     {
@@ -494,7 +493,7 @@ public class GroundController : MonoBehaviour
                                         //to create new tile into mapPool
                                         mapPool[sumX, sumY] = tile = Instantiate(tile);
                                         tile.parent = SightList;
-                                        tile.position = sumX * cellWidthInWC * Vector3.right + sumY * cellHeightInWC * Vector3.up;
+                                        tile.position = sumX * CellWidthInWC * Vector3.right + sumY * CellHeightInWC * Vector3.up;
                                         tile.localScale = Vector3.one;
                                         tile.name = "Tile " + sumX.ToString() + ',' + sumY.ToString();
 
@@ -525,10 +524,10 @@ public class GroundController : MonoBehaviour
                 //moving in y direction
                 if (up || down)
                 {
-                    Vector3 newYVector = newYCount * cellHeightInWC * Vector3.up;
-                    Vector3 newXRightVector = (newXCount + 2 * sightWidthCount) * cellWidthInWC * Vector3.right;
-                    Vector3 newXMiddleVector = (newXCount + sightWidthCount) * cellWidthInWC * Vector3.right;
-                    Vector3 newXLeftVector = newXCount * cellWidthInWC * Vector3.right;
+                    Vector3 newYVector = newYCount * CellHeightInWC * Vector3.up;
+                    Vector3 newXRightVector = (newXCount + 2 * sightWidthCount) * CellWidthInWC * Vector3.right;
+                    Vector3 newXMiddleVector = (newXCount + sightWidthCount) * CellWidthInWC * Vector3.right;
+                    Vector3 newXLeftVector = newXCount * CellWidthInWC * Vector3.right;
 
                     if (up)
                     {
@@ -570,7 +569,7 @@ public class GroundController : MonoBehaviour
                                         //to create new tile into mapPool
                                         mapPool[sumX, sumY] = tile = Instantiate(tile);
                                         tile.parent = SightList;
-                                        tile.position = sumX * cellWidthInWC * Vector3.right + sumY * cellHeightInWC * Vector3.up;
+                                        tile.position = sumX * CellWidthInWC * Vector3.right + sumY * CellHeightInWC * Vector3.up;
                                         tile.localScale = Vector3.one;
                                         tile.name = "Tile " + sumX.ToString() + ',' + sumY.ToString();
 
@@ -799,7 +798,7 @@ public class GroundController : MonoBehaviour
         //RefreshMap();
     }
 
-    public static float StaticWorldWidthInWC, StaticWorldHeightInWC;
+    public static float StaticWorldWidthInWC, StaticWorldHeightInWC, CellWidthInWC, CellHeightInWC;
     public static int StaticCellWidth, StaticCellHeight, StaticSightWidth, StaticSightHeight, StaticWorldWidth, StaticWorldHeight;
 
     //SightList localPosition must be 0, 0, 0
@@ -808,7 +807,6 @@ public class GroundController : MonoBehaviour
     public float DistanceThreshold, MapRefreshTime;
 
     static Transform[,] mapPool;
-    static float cellWidthInWC, cellHeightInWC;
 
     bool IsNotRoleNearBoundary
     {
