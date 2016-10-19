@@ -5,7 +5,6 @@ using System.Collections;
 public class MonsterController : MonoBehaviour {
 
     public int id;
-    public float Speed;
 
     //basic
     public Monster Data { set; get; }
@@ -18,19 +17,12 @@ public class MonsterController : MonoBehaviour {
     protected int randomAction;
     protected int randomDirection;
 
-    protected int facing = -1;
-
-    //be attacked parameters
-    protected int beAttackedState = 0;
-    protected const int STATE_STARTPLAYANIM = 0;
-    protected const int STATE_ANIM = 1;
-    protected const int STATE_FINISFANIM = 2;
-
     protected virtual void Awake() {
         //data = Monster.Load(id);
         Data = new Monster();
         Data.MaxHp = 1000;
         Data.Hp = 1000;
+        Data.Speed = 1;
         Data.AttackSpace = 1;
         Data.AttackRange = 5;
         Data.Attack = 100;
@@ -57,7 +49,8 @@ public class MonsterController : MonoBehaviour {
 
     protected virtual void OnMouseDown() {
         if (EventSystem.current.IsPointerOverGameObject())
-            return;       
+            return;
+              
     }
 
     protected void stateMachine() {
@@ -77,6 +70,9 @@ public class MonsterController : MonoBehaviour {
             case MonsterState.ATTACK:
                 Attack();
                 break;
+            case MonsterState.DEAD:
+                Die();
+                break;
             default:
                 break;
         }
@@ -88,7 +84,7 @@ public class MonsterController : MonoBehaviour {
     public virtual void Move() {
 
         Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
-        transform.Translate(direction * Speed * Time.deltaTime);
+        transform.Translate(direction * Data.Speed * Time.deltaTime);
         lastTimes--;
     }
 
@@ -96,9 +92,9 @@ public class MonsterController : MonoBehaviour {
     /// Running according to randomUnit
     /// </summary>
     public virtual void Run() {
-        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
-        transform.Translate(direction * Speed * Time.deltaTime * AnimalConstant.RunMagnification);
-
+        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit);
+        transform.Translate(direction * Data.Speed * Time.deltaTime * AnimalConstant.RunMagnification);
+        lastTimes--;
     }
 
     public virtual void Idle() {
@@ -109,23 +105,8 @@ public class MonsterController : MonoBehaviour {
         role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
     }
 
-    public virtual void EnterBeAttack() {
-        Debug.Log("enter be attack state");
-    }
-
     public virtual void BeAttacked() {
-        switch (beAttackedState) {
-            case STATE_STARTPLAYANIM:
-                //playanimation
-                beAttackedState = STATE_ANIM;
-                break;
-            case STATE_ANIM:
-                //callback 
-                beAttackedState = STATE_FINISFANIM;
-                break;
-            default:
-                break;
-        }
+        if (Data.Hp <= 0) State = MonsterState.DEAD;
     }
 
     public virtual void Night() { }
