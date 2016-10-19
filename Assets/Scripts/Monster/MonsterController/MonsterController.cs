@@ -83,7 +83,7 @@ public class MonsterController : MonoBehaviour {
     }
 
     /// <summary>
-    /// moving according to randomDirection and lastTimes
+    /// moving according to randomUnit
     /// </summary>
     public virtual void Move() {
 
@@ -92,10 +92,12 @@ public class MonsterController : MonoBehaviour {
         lastTimes--;
     }
 
+    /// <summary>
+    /// Running according to randomUnit
+    /// </summary>
     public virtual void Run() {
         Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
         transform.Translate(direction * Speed * Time.deltaTime * AnimalConstant.RunMagnification);
-        lastTimes--;
 
     }
 

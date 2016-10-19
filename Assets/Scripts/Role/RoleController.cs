@@ -44,7 +44,6 @@ public class RoleController : MonoBehaviour {
             default:
                 break;
         }
-        
     }
 
     private void playAnimation(string triggerName, Vector2 targetWorldPosition) {
@@ -97,10 +96,7 @@ public class RoleController : MonoBehaviour {
                 tyrants = AnimalConstant.RoleTyrants;
             }
         }
-
         control(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-
     }
 
     /// <summary>
@@ -209,7 +205,7 @@ public class RoleController : MonoBehaviour {
         State = RoleState.ATTACK;
         
         if (Vector2.Distance(transform.position, target) <= AnimalConstant.RoleAttackRange) {
-            anim.GetBehaviour<AttackAction>().TriggeredController(controller);
+            anim.GetBehaviour<RoleAttackBehavior>().Controlled(controller);
             playAnimation("Attack", target);
             //animation callback to unlock state;
 
@@ -223,7 +219,7 @@ public class RoleController : MonoBehaviour {
 
     public void BeAttacked(int attack, Vector2 pos) {
 
-        if (State != RoleState.TYRANTS) {
+        if (State != RoleState.TYRANTS || Data.Hp <= 0) {
             Data.Hp -= attack;
             Debug.Log("Role Hp : " + Data.Hp + "/" + Data.MaxHp);
             State = RoleState.BEATTACK;
