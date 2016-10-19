@@ -57,6 +57,37 @@ public class GroundController : MonoBehaviour
         //worldPerlinNoise = GeneratePerlinNoise(worldNoise, 6);
         worldPerlinNoise = GenerateWhiteNoise(WorldWidth, WorldHeight);
 
+        //to load the landform sprites
+        spriteWidth = LandformTextureWidth / CellWidth;
+        spriteHeight = LandformTextureHeight / CellHeight;
+        int spriteCount = spriteWidth * spriteWidth;
+        landformSprites = new Sprite[landformTypeAmount, spriteCount];
+        Debug.Log("landformsprites length = " + landformSprites.Length + " spriteWidth = " + spriteWidth + " spriteHeight = " + spriteHeight);
+
+        for(int i = 0; i < 2; ++i)
+        {
+            string path = landformSpriteDirectoryPath + ((MapConstants.LandformType)i).ToString() + @"Slices\" + ((MapConstants.LandformType)i).ToString() + '_';
+            for (int j = 0; j < spriteCount; ++j)
+            {
+                landformSprites[i, j] = Resources.Load<Sprite>(path + j.ToString());
+            }
+        }
+
+
+
+        /*
+        //for all
+        for (int i = 0; i < landformTypeAmount; ++i)
+        {
+            string path = landformSpriteDirectoryPath + ((MapConstants.LandformType)i).ToString() + @"Slices\" + ((MapConstants.LandformType)i).ToString() + '_';
+            for (int j = 0; j < spriteCount; ++j)
+            {
+                landformSprites[i, j] = Resources.Load<Sprite>(path + j.ToString());
+            }
+        }
+        */
+
+
         //Display(false);
         //Display();
         DisplayWorld();
@@ -86,7 +117,6 @@ public class GroundController : MonoBehaviour
             tile.name = "Tile " + (worldWidthCount - 1).ToString() + ',' + (worldHeightCount - 1).ToString();
             */
 
-            InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
 
         //Debug.Log(mapPool[0, 0].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
     }
@@ -152,51 +182,112 @@ public class GroundController : MonoBehaviour
         MapConstants.LandformType type = td.MaterialTypes[0];
         Vector3 tdPosition = td.Position;
 
-        //important!! This should create more 2 width and height for SpriteCreate! Otherwise, the sprite will have some strange edges
-        Texture2D t1 = new Texture2D(CellWidth + 2, CellHeight + 2);
-
-        if (td.MaterialTypes[1] == MapConstants.LandformType.None)
+        if(type == MapConstants.LandformType.Grassland || type == MapConstants.LandformType.Forest)
         {
-            //this is a simple materialType
-            for (int k = 0; k < CellWidth + 2; ++k)
+            if(td.MaterialTypes[1] == MapConstants.LandformType.None)
             {
-                for (int l = 0; l < CellHeight + 2; ++l)
+                int width = (int)tdPosition.x % spriteHeight;
+                int height = (int)tdPosition.y % spriteWidth;
+                Debug.Log(tdPosition.ToString() + " " + width + " " + height);
+                return landformSprites[(int)type, height * spriteWidth + width];
+            }
+            else
+            {
+                //important!! This should create more 2 width and height for SpriteCreate! Otherwise, the sprite will have some strange edges
+                Texture2D t1 = new Texture2D(CellWidth + 2, CellHeight + 2);
+
+                int type0 = (int)td.MaterialTypes[0], type1 = (int)td.MaterialTypes[1];
+
+                if (type1 != (int)MapConstants.LandformType.Grassland && type1 != (int)MapConstants.LandformType.Forest)
+                    return null;
+
+                int width = (int)tdPosition.x % spriteHeight;
+                int height = (int)tdPosition.y % spriteWidth;
+                Sprite s0 = landformSprites[type0, height * spriteWidth + width];
+                Sprite s1 = landformSprites[type1, height * spriteWidth + width];
+
+                //this is an edge
+
+                //Can an edge have two materialTypes only?
+
+                //temp
+                for (int k = 0; k < CellWidth; ++k)
                 {
-                    try
+                    for (int l = 0; l < CellHeight; ++l)
                     {
-                        t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
-                    }
-                    catch(IndexOutOfRangeException e)
-                    {
-                        t1.SetPixel(k, l, Color.white);
+                        try
+                        {
+                            t1.SetPixel(k, l, Interpolate(s0.texture.GetPixel(k, l), s1.texture.GetPixel(k, l), worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
+                            //t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
+                        }
+                        catch (IndexOutOfRangeException e)
+                        {
+                            t1.SetPixel(k, l, Color.white);
+                        }
                     }
                 }
+                t1.Apply();
+
+                return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
             }
-            t1.Apply();
         }
         else
         {
-            //this is an edge
+            return null;
+        }
 
-            //Can an edge have two materialTypes only?
+        /*
+        else
+        {
+            //important!! This should create more 2 width and height for SpriteCreate! Otherwise, the sprite will have some strange edges
+            Texture2D t1 = new Texture2D(CellWidth + 2, CellHeight + 2);
 
-            //temp
-            for (int k = 0; k < CellWidth + 2; ++k)
+            if (td.MaterialTypes[1] == MapConstants.LandformType.None)
             {
-                for (int l = 0; l < CellHeight + 2; ++l)
+                //this is a simple materialType
+                for (int k = 0; k < CellWidth + 2; ++k)
                 {
-                    try
+                    for (int l = 0; l < CellHeight + 2; ++l)
                     {
-                        t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
-                    }
-                    catch(IndexOutOfRangeException e)
-                    {
-                        t1.SetPixel(k, l, Color.white);
+                        try
+                        {
+                            t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
+                        }
+                        catch (IndexOutOfRangeException e)
+                        {
+                            t1.SetPixel(k, l, Color.white);
+                        }
                     }
                 }
+                t1.Apply();
             }
-            t1.Apply();
+            else
+            {
+                //this is an edge
 
+                //Can an edge have two materialTypes only?
+
+                //temp
+                for (int k = 0; k < CellWidth + 2; ++k)
+                {
+                    for (int l = 0; l < CellHeight + 2; ++l)
+                    {
+                        try
+                        {
+                            t1.SetPixel(k, l, ChooseColor((int)type, worldPerlinNoise[(int)tdPosition.x * CellWidth + k - 1][(int)tdPosition.y * CellHeight + l - 1]));
+                        }
+                        catch (IndexOutOfRangeException e)
+                        {
+                            t1.SetPixel(k, l, Color.white);
+                        }
+                    }
+                }
+                t1.Apply();
+            }
+
+            return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
+        }
+        */
             /*
             //to blend two textures
             Texture2D t0 = textures[(int)td.MaterialTypes[0]], t1 = textures[(int)td.MaterialTypes[1]], blendedimage = new Texture2D(CellHeight, CellWidth);
@@ -208,9 +299,6 @@ public class GroundController : MonoBehaviour
             blendedimage.Apply();
             sr.sprite = Sprite.Create(blendedimage, new Rect(0, 0, CellWidth, CellHeight), Vector2.zero);
             */
-        }
-
-        return Sprite.Create(t1, new Rect(1, 1, CellWidth, CellHeight), Vector2.zero);
     }
 
     void Display()
@@ -273,6 +361,8 @@ public class GroundController : MonoBehaviour
                 sightBottomLeft[i + j * preSightRange] = sightX * cellWidthInWC * Vector3.right + sightY * cellHeightInWC * Vector3.up;
             }
         }
+        
+        InvokeRepeating("RefreshMap", 0f, MapRefreshTime);
     }
 
     void DisplayWorld()
@@ -293,7 +383,16 @@ public class GroundController : MonoBehaviour
                         tile.parent = SightList;
                         tile.position = i * cellWidthInWC * Vector3.right + j * cellHeightInWC * Vector3.up;
                         tile.localScale = Vector3.one;
-                        tile.name = "Tile " + i.ToString() + ',' + j.ToString() + ' ' + GetTileDataByWorldPosition(tile.position).MaterialTypes[0];
+
+                        //redundent
+                        TileData td = GetTileDataByWorldPosition(tile.position);
+                        tile.name = "Tile " + i.ToString() + ',' + j.ToString() + ' ' + td.MaterialTypes[0];
+
+                        if(td.MaterialTypes[1] != MapConstants.LandformType.None)
+                        {
+                            tile.name += td.MaterialTypes[1];
+                        }
+
                         tile.GetComponent<SpriteRenderer>().sprite = MakeSprite(tile.position);
 
                         //to put tile into mapPool
@@ -595,9 +694,9 @@ public class GroundController : MonoBehaviour
 
     Color Interpolate(Color c0, Color c1, float alpha)
     {
-        return alpha > .5f ? c1 : c0;
+        //return alpha > .5f ? c1 : c0;
 
-        //return c0 * (1 - alpha) + c1 * alpha;
+        return c0 * (1 - alpha) + c1 * alpha;
         /*
         float u = 1f - alpha;
         return new Color(c0.r * u + c1.r * alpha, c0.g * u + c1.g * alpha, c0.b * u + c1.b * alpha);
@@ -705,16 +804,11 @@ public class GroundController : MonoBehaviour
 
     //SightList localPosition must be 0, 0, 0
     public Transform Role, SightList;
-    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight, MaxStack;
+    public int WorldWidth, WorldHeight, CellWidth, CellHeight, SightWidth, SightHeight, PreSight, MaxStack, LandformTextureWidth, LandformTextureHeight;
     public float DistanceThreshold, MapRefreshTime;
 
     static Transform[,] mapPool;
     static float cellWidthInWC, cellHeightInWC;
-
-    Transform[][] sight, map;
-    TileData[][] groundData;
-    //TileData nowTileData;
-    Transform tile;
 
     bool IsNotRoleNearBoundary
     {
@@ -759,10 +853,18 @@ public class GroundController : MonoBehaviour
         TopRight
     }
 
+    Transform[][] sight, map;
+    TileData[][] groundData;
+    Sprite[,] landformSprites;
     Vector3[] sightBottomLeft;
     float[][] worldNoise, worldPerlinNoise;
+
+    //TileData nowTileData;
+    Transform tile;
+    string landformSpriteDirectoryPath = @"Map\";
     //InWC
     float minSightWidthBoundary, maxSightWidthBoundary, minSightHeightBoundary, maxSightHeightBoundary;
     int worldWidthCount, worldHeightCount, sightWidthCount, sightHeightCount, halfSightWidthCount, halfSightHeightCount, preSightRange, landformTypeAmount = MapConstants.LandformTypeAmount;
+    int spriteWidth, spriteHeight;
     bool isNotRoleNearBoundary;
 }

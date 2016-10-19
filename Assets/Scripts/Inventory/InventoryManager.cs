@@ -87,7 +87,7 @@ public class InventoryManager : MonoBehaviour {
             if (from == null && !temp.isEmpty && !Input.GetKey(KeyCode.LeftShift))
             {
                 from = temp;
-                from.GetComponent<Image>().color = Color.gray;
+                temp.changeSlotColorToGray();
                 createHoverIcon();
                 hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
             }
@@ -103,7 +103,7 @@ public class InventoryManager : MonoBehaviour {
                     if (!to.isEmpty && to.currentItem.type == from.currentItem.type)
                     {
                         mergeStack(from, to);
-                        from.GetComponent<Image>().color = Color.white;
+                        from.GetComponent<Slot>().changeSlotColorToWhite();
                         from = null;
                         to = null;
                         Destroy(hoverObj);
@@ -119,7 +119,7 @@ public class InventoryManager : MonoBehaviour {
                         {
                             from.addItems(tempTo);
                         }
-                        from.GetComponent<Image>().color = Color.white;
+                        from.GetComponent<Slot>().changeSlotColorToWhite();
                         from = null;
                         to = null;
                         Destroy(hoverObj);

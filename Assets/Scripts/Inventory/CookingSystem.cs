@@ -7,6 +7,7 @@ using System;
 
 public class CookingSystem : InventoryManager
 {
+    public Bag bag;
     public Inventory[] inventory = new Inventory[3];
 
     private Text title;
@@ -20,6 +21,10 @@ public class CookingSystem : InventoryManager
     {
         get { return optionalSlots; }
     }
+    private Slot resultSlot;
+    public Slot ResultSlot {
+        get { return resultSlot; }
+    }
     private Text tooltip;
 
     private Button btn; //tempary variable
@@ -30,6 +35,7 @@ public class CookingSystem : InventoryManager
     // Use this for initialization
     void Start()
     {
+        bag = GameObject.Find("Role").GetComponent<Bag>();
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
         CreateCookingLayout();
     }
@@ -66,6 +72,10 @@ public class CookingSystem : InventoryManager
             }
         }
 
+        //get result slot
+        resultSlot = transform.Find("Result").Find("slot").GetComponent<Slot>();
+        btn = resultSlot.GetComponent<Button>();
+        btn.onClick.AddListener(delegate { moveResultItem(resultSlot.gameObject); });
         //get tooltip
         tooltip = transform.Find("TextBackground").Find("Text").GetComponent<Text>();
     }
@@ -95,7 +105,7 @@ public class CookingSystem : InventoryManager
                         necessarySlots[i].clearSlot();
                     }
                     necessarySlots[i].addItem(material);
-                    necessarySlots[i].itemImage.color = Color.gray;
+                    necessarySlots[i].changeSlotColorToGray();
                     necessarySlots[i].owned_need.text = string.Concat("0/", split[i * 2 + 1]);
                 }
                 else
@@ -107,17 +117,17 @@ public class CookingSystem : InventoryManager
             //check if user has enough material for necessary items
             searchItemsInBag();
             
-            /*
-            path = string.Concat("Inventory/Items", itemToCraft);
+            
+            path = string.Concat("Inventory/Items/", itemToCraft);
             material = (Resources.Load(path, typeof(GameObject)) as GameObject).GetComponent<Item>();
             
-            if (!allSlots[5].isEmpty)
+            if (!resultSlot.isEmpty)
             {
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();
             }
-            allSlots[5].addItem(material);
-            allSlots[5].GetComponent<Image>().color = Color.gray;
-            */
+            resultSlot.addItem(material);
+            resultSlot.changeSlotColorToGray();
+            
 
             //show tool tip
             tooltip.text = itemToolTip;
@@ -136,7 +146,7 @@ public class CookingSystem : InventoryManager
                 if (clicked.GetComponent<Image>().color != Color.gray)
                 {
                     from = temp;
-                    clicked.GetComponent<Image>().color = Color.gray;
+                    temp.changeSlotColorToGray();
                     createHoverIcon();
                     hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
                 }
@@ -146,12 +156,12 @@ public class CookingSystem : InventoryManager
     public void craft()
     {
         int[] need = new int[2];
-        if (itemCrafting != null)
+        if (!resultSlot.isEmpty && resultSlot.GetComponent<Image>().color == Color.gray)
         {
             int i;
             for (i = 0; i < 2; i++)
             {
-                Text temp = necessarySlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = necessarySlots[i].owned_need;
                 String[] split = temp.text.Split('/');  // owened / needed
                 need[i] = int.Parse(split[1]);
                 if (int.Parse(split[1]) > int.Parse(split[0]))  // if need > owned
@@ -186,6 +196,8 @@ public class CookingSystem : InventoryManager
                 }
             }
 
+            resultSlot.changeSlotColorToWhite();
+
             searchItemsInBag();
             //allSlots[5].GetComponent<Image>().color = Color.white;
         }
@@ -193,28 +205,28 @@ public class CookingSystem : InventoryManager
     }
 
     void putBackMaterial()
-    {/*
-        if (allSlots[5].GetComponent<Image>().color == Color.white && !allSlots[5].isEmpty)
+    {
+        if (resultSlot.GetComponent<Image>().color == Color.white && !resultSlot.isEmpty)
         {
-            if ( BagIsAvailiable( allSlots[5].currentItem, allSlots[5].items.Count ) )
+            if ( BagIsAvailiable( resultSlot.currentItem, resultSlot.items.Count ) )
             {
-                foreach (Item item in allSlots[5].Items)
+                foreach (Item item in resultSlot.Items)
                 {
-                    playerScript.pickUpItem(allSlots[5].currentItem);
+                    bag.pickUpItem(resultSlot.currentItem);
                 }
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();
             }
             else
-            {
+            {/*
                 float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
-                foreach (Item item in allSlots[5].Items)
+                foreach (Item item in resultSlot.Items)
                 {
-                    Instantiate(allSlots[5].currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
+                    Instantiate(resultSlot.currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
                 }
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();*/
             }
-        }*/
+        }
     }
 
     public void searchItemsInBag()
@@ -250,9 +262,9 @@ public class CookingSystem : InventoryManager
                 Text temp = necessarySlots[i].owned_need;
                 String[] split = temp.text.Split('/');
                 if (count[i] >= int.Parse(split[1]))
-                    necessarySlots[i].itemImage.color = Color.white;
+                    necessarySlots[i].changeSlotColorToWhite();
                 else
-                    necessarySlots[i].itemImage.color = Color.gray;
+                    necessarySlots[i].changeSlotColorToGray();
                 necessarySlots[i].owned_need.text = string.Concat(count[i].ToString(), "/");
                 temp.text = string.Concat(temp.text, split[1]);
             }
@@ -293,37 +305,39 @@ public class CookingSystem : InventoryManager
         return false;
     }
 
-    /*
+    
     public void RightArrowClicked()
     {
-        if (!allSlots[5].isEmpty && allSlots[5].isStackable)
+        if (!resultSlot.isEmpty && resultSlot.isStackable && resultSlot.GetComponent<Image>().color == Color.gray)
         {
-            for(int i =0; i< 5; ++i)
+            for(int i =0; i< 2; ++i)
             {
-                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = necessarySlots[i].owned_need;
                 String[] split = temp.text.Split('/');
                 int need = int.Parse(split[1]);
-                need += need / allSlots[5].items.Count;
+                need += need / resultSlot.items.Count;
                 temp.text = string.Concat(split[0], "/");
                 temp.text = string.Concat(temp.text, need);
             }
-            allSlots[5].addItem(allSlots[5].currentItem);
+            searchItemsInBag();
+            resultSlot.addItem(resultSlot.currentItem);
         }
     }
     public void LeftArrowClicked()
     {
-        if (allSlots[5].items.Count > 1)
+        if (resultSlot.items.Count > 1 && resultSlot.GetComponent<Image>().color == Color.gray)
         {
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 2; ++i)
             {
-                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = necessarySlots[i].owned_need;
                 String[] split = temp.text.Split('/');
                 int need = int.Parse(split[1]);
-                need -= need / allSlots[5].items.Count;
+                need -= need / resultSlot.items.Count;
                 temp.text = string.Concat(split[0], "/");
                 temp.text = string.Concat(temp.text, need);
             }
-            allSlots[5].removeItem();
+            searchItemsInBag();
+            resultSlot.removeItem();
         }
-    }*/
+    }
 }

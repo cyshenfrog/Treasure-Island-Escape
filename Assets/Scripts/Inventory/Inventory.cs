@@ -37,7 +37,7 @@ public class Inventory : InventoryManager {
         {
             if (!eventSystem.IsPointerOverGameObject(-1) && from != null)
             {
-                from.GetComponent<Image>().color = Color.white;
+                from.GetComponent<Slot>().changeSlotColorToWhite();
                 
                 dropItem = from.currentItem.dropItem;
                 if (dropItem != null)

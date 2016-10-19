@@ -11,12 +11,14 @@ public class MController_2 : MonsterController {
         //check pointer is not over ugui
         base.OnMouseDown();
 
-        if (role.GetComponent<RoleController>().Attack(Data, transform.localPosition)) {
-            State = MonsterState.BEATTACK;
-            //Debug.Log("??");
-            //monster die
-            if (Data.Hp == 0) Die();
-        }
+        role.GetComponent<RoleController>().Attack(this, transform.position);
+    }
+
+    public override void EnterBeAttack() {
+        State = MonsterState.BEATTACK;
+        //Debug.Log("??");
+        //monster die
+        if (Data.Hp == 0) Die();
     }
 
     protected virtual void chase() {

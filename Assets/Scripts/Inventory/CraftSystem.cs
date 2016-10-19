@@ -7,6 +7,7 @@ using System;
 
 public class CraftSystem : InventoryManager
 {
+    public Bag bag;
     public Inventory[] inventory = new Inventory[3];
 
     private Text title;
@@ -14,6 +15,11 @@ public class CraftSystem : InventoryManager
     public List<CraftSystemSlot> AllSlots
     {
         get { return allSlots; }
+    }
+    private Slot resultSlot;
+    public Slot ResultSlot
+    {
+        get { return resultSlot; }
     }
     private Text tooltip;
 
@@ -25,6 +31,7 @@ public class CraftSystem : InventoryManager
     // Use this for initialization
     void Start()
     {
+        bag = GameObject.Find("Role").GetComponent<Bag>();
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
         CreateCraftLayout();
     }
@@ -42,6 +49,10 @@ public class CraftSystem : InventoryManager
                 allSlots.Add(slot);
             }
         }
+        
+        resultSlot = transform.Find("Result").Find("slot").GetComponent<Slot>();
+        btn = resultSlot.GetComponent<Button>();
+        btn.onClick.AddListener(delegate { moveResultItem(resultSlot.gameObject); });
 
         tooltip = transform.Find("TextBackground").Find("Text").GetComponent<Text>();
     }
@@ -82,17 +93,15 @@ public class CraftSystem : InventoryManager
             //check if user has enough material for itemToCraft
             searchItemsInBag();
 
-            /*
-            path = string.Concat("Inventory/Items", itemToCraft);
+            path = string.Concat("Inventory/Items/", itemToCraft);
             material = (Resources.Load(path, typeof(GameObject)) as GameObject).GetComponent<Item>();
-            
-            if (!allSlots[5].isEmpty)
+
+            if (!resultSlot.isEmpty)
             {
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();
             }
-            allSlots[5].addItem(material);
-            allSlots[5].GetComponent<Image>().color = Color.gray;
-            */
+            resultSlot.addItem(material);
+            resultSlot.changeSlotColorToGray();
 
             //show tool tip
             tooltip.text = itemToolTip;
@@ -110,7 +119,27 @@ public class CraftSystem : InventoryManager
                 if (clicked.GetComponent<Image>().color != Color.gray)
                 {
                     from = temp;
-                    clicked.GetComponent<Image>().color = Color.gray;
+                    clicked.GetComponent<Slot>().changeSlotColorToGray();
+                    createHoverIcon();
+                    hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
+                }
+            }
+        }
+    }
+
+    public void moveResultItem(GameObject clicked)
+    {
+        if (movingSlot.isEmpty)
+        {
+            if (!GameObject.Find("MoveItemStackSize"))
+                click = clicked;
+            Slot temp = clicked.GetComponent<Slot>();
+            if (from == null && !temp.isEmpty && temp.tag != "MaterialSlot")
+            {
+                if (clicked.GetComponent<Image>().color != Color.gray)
+                {
+                    from = temp;
+                    temp.changeSlotColorToGray();
                     createHoverIcon();
                     hoverText.text = from.Items.Count > 1 ? from.Items.Count.ToString() : string.Empty;
                 }
@@ -120,12 +149,12 @@ public class CraftSystem : InventoryManager
     public void craft()
     {
         int[] need = new int[5];
-        if (itemCrafting != null)
+        if (!resultSlot.isEmpty && resultSlot.GetComponent<Image>().color == Color.gray)
         {
             int i;
             for (i = 0; i < 5; i++)
             {
-                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = allSlots[i].owned_need;
                 String[] split = temp.text.Split('/');  // owened / needed
                 need[i] = int.Parse(split[1]);
                 if (int.Parse(split[1]) > int.Parse(split[0]))  // if need > owned
@@ -160,6 +189,7 @@ public class CraftSystem : InventoryManager
                 }
             }
 
+            resultSlot.changeSlotColorToWhite();
             searchItemsInBag();
             //allSlots[5].GetComponent<Image>().color = Color.white;
         }
@@ -167,30 +197,29 @@ public class CraftSystem : InventoryManager
     }
 
     void putBackMaterial()
-    {/*
-        if (allSlots[5].GetComponent<Image>().color == Color.white && !allSlots[5].isEmpty)
+    {
+        if (resultSlot.GetComponent<Image>().color == Color.white && !resultSlot.isEmpty)
         {
-            if ( BagIsAvailiable( allSlots[5].currentItem, allSlots[5].items.Count ) )
+            if (BagIsAvailiable(resultSlot.currentItem, resultSlot.items.Count))
             {
-                foreach (Item item in allSlots[5].Items)
+                foreach (Item item in resultSlot.Items)
                 {
-                    playerScript.pickUpItem(allSlots[5].currentItem);
+                    bag.pickUpItem(resultSlot.currentItem);
                 }
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();
             }
             else
-            {
+            {/*
                 float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
-                foreach (Item item in allSlots[5].Items)
+                foreach (Item item in resultSlot.Items)
                 {
-                    Instantiate(allSlots[5].currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
+                    Instantiate(resultSlot.currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
                 }
-                allSlots[5].clearSlot();
+                resultSlot.clearSlot();*/
             }
-        }*/
+        }
     }
-
     public void searchItemsInBag()
     {
         int[] count = new int [5];
@@ -266,38 +295,39 @@ public class CraftSystem : InventoryManager
         }
         return false;
     }
-    
-    /*
+
     public void RightArrowClicked()
     {
-        if (!allSlots[5].isEmpty && allSlots[5].isStackable)
+        if (!resultSlot.isEmpty && resultSlot.isStackable && resultSlot.GetComponent<Image>().color == Color.gray)
         {
-            for(int i =0; i< 5; ++i)
+            for (int i = 0; i < 2; ++i)
             {
-                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = allSlots[i].owned_need;
                 String[] split = temp.text.Split('/');
                 int need = int.Parse(split[1]);
-                need += need / allSlots[5].items.Count;
+                need += need / resultSlot.items.Count;
                 temp.text = string.Concat(split[0], "/");
                 temp.text = string.Concat(temp.text, need);
             }
-            allSlots[5].addItem(allSlots[5].currentItem);
+            searchItemsInBag();
+            resultSlot.addItem(resultSlot.currentItem);
         }
     }
     public void LeftArrowClicked()
     {
-        if (allSlots[5].items.Count > 1)
+        if (resultSlot.items.Count > 1 && resultSlot.GetComponent<Image>().color == Color.gray)
         {
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 2; ++i)
             {
-                Text temp = allSlots[i].transform.GetChild(1).GetComponent<Text>();
+                Text temp = allSlots[i].owned_need;
                 String[] split = temp.text.Split('/');
                 int need = int.Parse(split[1]);
-                need -= need / allSlots[5].items.Count;
+                need -= need / resultSlot.items.Count;
                 temp.text = string.Concat(split[0], "/");
                 temp.text = string.Concat(temp.text, need);
             }
-            allSlots[5].removeItem();
+            searchItemsInBag();
+            resultSlot.removeItem();
         }
-    }*/
+    }
 }

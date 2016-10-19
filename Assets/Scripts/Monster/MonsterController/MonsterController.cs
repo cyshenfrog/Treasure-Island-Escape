@@ -9,13 +9,14 @@ public class MonsterController : MonoBehaviour {
 
     //basic
     public Monster Data { set; get; }
+    public MonsterState State { set; get; }
     protected GameObject role; 
-    protected MonsterState State;
-
+    
     //idle and move parameters
     protected int lastTimes = 0;
-    protected int randomDirection;
+    protected Vector2 randomUnit;
     protected int randomAction;
+    protected int randomDirection;
 
     protected int facing = -1;
 
@@ -45,7 +46,7 @@ public class MonsterController : MonoBehaviour {
     protected virtual void Update() {
         if (lastTimes <= 0 && (State == MonsterState.IDlE || State == MonsterState.MOVE)) {
             randomAction = Random.Range(0, 2);
-            randomDirection = Random.Range(0, 4);
+            randomUnit = Random.insideUnitCircle.normalized;
             lastTimes = Random.Range(10, 40);
 
             State = (MonsterState)randomAction;
@@ -86,70 +87,28 @@ public class MonsterController : MonoBehaviour {
     /// </summary>
     public virtual void Move() {
 
-        switch (randomDirection)
-        {
-            case AnimalConstant.Left:
-                transform.position = new Vector3(transform.position.x - Speed * Time.deltaTime, transform.position.y, transform.position.z);
-                //transform.Translate(Vector2.left * Speed * Time.deltaTime);
-                break;
-            case AnimalConstant.Right:
-                transform.position = new Vector3(transform.position.x + Speed * Time.deltaTime, transform.position.y, transform.position.z);
-                break;
-            case AnimalConstant.Down:
-                transform.position = new Vector3(transform.position.x, transform.position.y - Speed * Time.deltaTime, transform.position.z);
-                break;
-            case AnimalConstant.Up:
-                transform.position = new Vector3(transform.position.x, transform.position.y + Speed * Time.deltaTime, transform.position.z);
-                break;
-            default:
-                break;
-        }
+        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
+        transform.Translate(direction * Speed * Time.deltaTime);
         lastTimes--;
     }
 
-    public virtual void Run()
-    {
-
-        switch (randomDirection)
-        {
-            case AnimalConstant.Left:
-                transform.position = new Vector3(transform.position.x - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.y, transform.position.z);
-                break;
-            case AnimalConstant.Right:
-                transform.position = new Vector3(transform.position.x + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.y, transform.position.z);
-                break;
-            case AnimalConstant.Down:
-                transform.position = new Vector3(transform.position.x, transform.position.y - Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.z);
-                break;
-            case AnimalConstant.Up:
-                transform.position = new Vector3(transform.position.x, transform.position.y + Speed * Time.deltaTime * AnimalConstant.RunMagnification, transform.position.z);
-                break;
-            default:
-                break;
-        }
+    public virtual void Run() {
+        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
+        transform.Translate(direction * Speed * Time.deltaTime * AnimalConstant.RunMagnification);
         lastTimes--;
+
     }
 
     public virtual void Idle() {
-
-        switch (randomDirection) {
-            case 0:
-                //play animation
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            default:
-                break;
-        }
         lastTimes--;
     }
 
     public virtual void Attack() {
         role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
+    }
+
+    public virtual void EnterBeAttack() {
+        Debug.Log("enter be attack state");
     }
 
     public virtual void BeAttacked() {
