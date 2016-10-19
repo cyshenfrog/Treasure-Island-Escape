@@ -77,13 +77,13 @@ public class TargetBarSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             toolTip.SetActive(true);
 
             //canvas will scale with screen size. Therefore, we have to scale offset with screen size too.
-            float scaleFactor = 0;
+            float scaleFactor;
             Vector2 screenSize = new Vector2(Screen.width, Screen.height);
             float logWidth = Mathf.Log(screenSize.x / 1920.0f, 2);
             float logHeight = Mathf.Log(screenSize.y / 1080.0f, 2);
             float logWeightedAverage = Mathf.Lerp(logWidth, logHeight, 1);
             scaleFactor = Mathf.Pow(2, logWeightedAverage);
-
+            
             float xPos = transform.position.x + 150*scaleFactor;
             float yPos = transform.position.y - 125*scaleFactor;
             float zPos = transform.position.z + 1*scaleFactor;
