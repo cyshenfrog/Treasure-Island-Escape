@@ -2,19 +2,30 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 public class ResourceAttribute : ObjData
 {
-    public ResourceAttribute()
-    {
+    //for serialization
+    public ResourceAttribute() { }
 
+    public ResourceAttribute(string name)
+    {
+        this.name = name;
     }
 
-    public enum GrowthMode
+    public enum GenerateMode
     {
         None,
-        Growth,
-        Recovery
+        Single,
+        Group
+    }
+
+    public enum PickFinishedMode
+    {
+        None,
+        Destory,
+        Rest
     }
 
     /*
@@ -25,10 +36,31 @@ public class ResourceAttribute : ObjData
     }
     */
 
-    public List<int> Items
+    [XmlIgnore]
+    public Action OnPicked
     {
-        get { return items; }
-        set { items = value; }
+        get { return onPicked; }
+        set { onPicked = value; }
+    }
+
+    [XmlIgnore]
+    public Action OnPickFinished
+    {
+        get { return onPickFinished; }
+        set { onPickFinished = value; }
+    }
+
+    [XmlIgnore]
+    public List<Sprite> Sprites
+    {
+        get { return sprites; }
+        set { sprites = value; }
+    }
+
+    public List<int> DropItems
+    {
+        get { return dropItems; }
+        set { dropItems = value; }
     }
 
     public List<float> DropRate
@@ -43,10 +75,16 @@ public class ResourceAttribute : ObjData
         set { landform = value; }
     }
 
-    public GrowthMode Gm
+    public GenerateMode Gm
     {
         get { return gm; }
         set { gm = value; }
+    }
+
+    public PickFinishedMode OnPickFinishedMode
+    {
+        get { return onPickFinishedMode; }
+        set { onPickFinishedMode = value; }
     }
 
     public string Name
@@ -67,10 +105,10 @@ public class ResourceAttribute : ObjData
         set { growthTime = value; }
     }
 
-    public int ResourceId
+    public int ResourceID
     {
-        get { return resourceId; }
-        set { resourceId = value; }
+        get { return resourceID; }
+        set { resourceID = value; }
     }
     
     public int Max
@@ -83,12 +121,6 @@ public class ResourceAttribute : ObjData
     {
         get { return toolId; }
         set { toolId = value; }
-    }
-
-    public int OnPickFinishedMode
-    {
-        get { return onPickFinishedMode; }
-        set { onPickFinishedMode = value; }
     }
 
     public int Width
@@ -109,16 +141,17 @@ public class ResourceAttribute : ObjData
         set { isNeedTool = value; }
     }
 
-    Action pickAction = null, onPickFinishedAction = null;
-    //List<Item> items = new List<Item>();
-    List<int> items = new List<int>();
+    Action onPicked = null, onPickFinished = null;
+    List<Sprite> sprites = new List<Sprite>();
+    List<int> dropItems = new List<int>();
     List<float> dropRate = new List<float>();
 
     MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
-    Vector2 pivot; 
-    GrowthMode gm = GrowthMode.Growth;
-    string name = "";
+    //Vector2 pivot; 
+    GenerateMode gm = GenerateMode.Single;
+    PickFinishedMode onPickFinishedMode = PickFinishedMode.Destory;
+    string name;
     float gatherTime = 5f, growthTime = 2f;
-    int resourceId = 0, max = 10, toolId = 0, onPickFinishedMode = 0, width = 3, height = 5;
+    int resourceID = 0, max = 10, toolId = 0, width = 3, height = 5;
     bool isNeedTool = false;
 }

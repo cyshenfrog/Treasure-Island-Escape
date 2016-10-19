@@ -10,22 +10,13 @@ public class ResourceData : ObjData
 
     }
 
-    public int Id
+    /*
+    public int OID
     {
-        get { return id; }
-        set { id = value; }
+        get { return oID; }
+        set { oID = value; }
     }
 
-    Action pickAction = null, onPickFinishedAction = null;
-    //List<Item> items = new List<Item>();
-    List<int> items = new List<int>();
-    List<float> dropRate = new List<float>();
-
-    MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
-    Vector2 pivot; 
-    //GrowthMode gm = GrowthMode.Growth;
-    string name = "";
-    float gatherTime = 5f, growthTime = 2f;
-    int id = 0, max = 10, toolId = 0, onPickFinishedMode = 0;
-    bool isNeedTool = false;
+    int oID;
+    */
 }

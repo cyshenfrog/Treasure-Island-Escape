@@ -2,7 +2,10 @@
 using System.Collections;
 
 [RequireComponent(typeof(BoxCollider))]
-public abstract class BuildingDisplay : ObjDisplay
+public class BuildingDisplay : ObjDisplay
 {
-    //...
+    public BuildingDisplay(ResourceAttribute ra, ObjData od): base (ra, od)
+    {
+
+    }
 }

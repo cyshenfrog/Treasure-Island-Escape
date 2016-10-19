@@ -39,7 +39,13 @@ public class DirectionSwitcher : StateMachineBehaviour {
         return new Vector2(x, y);
     }
 
-    public static Vector2 DirectionSwitch(Vector2 vector, DirectionType dir) {
+    /// <summary>
+    /// Mapping the input vector to new vector according to DirectionType
+    /// </summary>
+    /// <param name="vector"></param>
+    /// <param name="dir"></param>
+    /// <returns></returns>
+    public static Vector2 DirectionSwitch(Vector2 vector, DirectionType dir = DirectionType.Axis) {
         switch (dir) {
             case DirectionType.Axis:
                 return axis(vector);

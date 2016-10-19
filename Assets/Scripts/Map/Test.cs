@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#undef DEBUG
+
+using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,6 +8,14 @@ public class Test : MonoBehaviour
 {
 	void Awake ()
     {
+
+#if DEBUG
+        Debug.Log("YO");
+#else
+        Debug.Log("NO");
+#endif
+
+        /*
         int widthCount = WorldWidth / CellWidth, heightCount = WorldHeight / CellHeight;
 
         //to get random world
@@ -50,6 +60,7 @@ public class Test : MonoBehaviour
         }
 
         nowTileData = GetTileDataByWorldPosition(Role.position);
+        */
     }
 
     Color ChooseColor(int type, float value)

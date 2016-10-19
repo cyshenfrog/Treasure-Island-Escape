@@ -6,7 +6,9 @@ public class MController_1 : MonsterController {
     //被打逃跑
 
     //be attack
-    private Vector2 rolePosition;
+    private Vector2 beAttackedPosition;
+    private Vector2 relativePosition;
+
     private bool cacheRolePosition = false;
     
     private int roleDirectionX;
@@ -24,64 +26,41 @@ public class MController_1 : MonsterController {
 
     }
 
-    public override void EnterBeAttack() {
-
-        Data.Hp -= (int)role.GetComponent<RoleController>().Data.Attack;
-        State = MonsterState.BEATTACK;
-
-        //refresh data of be attacked
-        lastTimes = 0;
-        beAttackedState = STATE_STARTPLAYANIM;
-        cacheRolePosition = false;
-
+    public override void BeAttacked() {
         //monster die
-        if (Data.Hp == 0) Die();
-    }
+        if (Data.Hp <= 0) {
+            State = MonsterState.DEAD;
+            return;
+        }
 
-    public override void BeAttacked() 
-    {
-        base.BeAttacked();
-        if(beAttackedState == STATE_FINISFANIM) runAway();
+        if (!cacheRolePosition) {
+            cacheRolePosition = true;
+            beAttackedPosition = role.transform.position;
+            relativePosition = role.transform.position - transform.position;
+        }
+
+        runAway();      
     }
 
     protected virtual void runAway() {
-        //check if trigger run action
-        if (!cacheRolePosition)
-        {
-            //if not , record role direction data
-            rolePosition = role.transform.localPosition;
-            cacheRolePosition = true;
-            float deltaX = rolePosition.x - transform.localPosition.x;
-            float deltaY = rolePosition.y - transform.localPosition.y;
+        if (Vector2.Distance(beAttackedPosition, transform.position) < AnimalConstant.RunAwayDistance) {
 
-            roleDirectionX = deltaX == 0 ? AnimalConstant.Origin : deltaX > 0 ? AnimalConstant.Right : AnimalConstant.Left;
-            roleDirectionY = deltaY == 0 ? AnimalConstant.Origin : deltaY > 0 ? AnimalConstant.Up : AnimalConstant.Down;
-        }
-
-        float distance = Vector2.Distance(rolePosition, transform.localPosition);
-
-        if (distance < AnimalConstant.RunAwayDistance) {
-
-            if (lastTimes == 0) {
+            if (lastTimes <= 0) {
                 lastTimes = Random.Range(10, 40);
 
                 do {
                     //random run direction (excludes role direction)
-                    randomDirection = Random.Range(0, 4);
-                    
-                } while (randomDirection == roleDirectionX || randomDirection == roleDirectionY);
+                    randomUnit = Random.insideUnitCircle;
+
+                } while (Mathf.Sign(randomUnit.x) == Mathf.Sign(relativePosition.x) || Mathf.Sign(randomUnit.y) == Mathf.Sign(relativePosition.y));
             }
+
             Run();
         }
-        else
-        {
+        else {
             //finish run state
-            cacheRolePosition = false;
             State = MonsterState.IDlE;
-            beAttackedState = STATE_STARTPLAYANIM;
+            cacheRolePosition = false;           
         }
-
-    }
-
-    
+    }  
 }

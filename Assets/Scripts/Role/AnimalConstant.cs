@@ -18,7 +18,7 @@ public static class AnimalConstant {
     public const float RolePickUpRange = 10;   //撿取範圍    
     public const float RoleCollectRange = 5;   //採集範圍
 
-    public const float RoleTyrants = 2f;       //被打後無敵時間
+    public const float RoleTyrants = 2f;       //無敵時間
     //////////////////////////////////////////////////////////////
     //怪物相關
     public const float RunMagnification = 2;  //跑步跟移動的比值

@@ -6,19 +6,20 @@ using System.IO;
 using System.Xml.Serialization;
 using System;
 
-public class ResourceEditor : EditorWindow
+public class ResourceAttributeEditor : EditorWindow
 {
-    [MenuItem("Editor/ResourceEditor")]
+    [MenuItem("Editor/ResourceAttributeEditor")]
     static void CallEditorWindow()
     {
-        GetWindow(typeof(ResourceEditor));
+        GetWindow(typeof(ResourceAttributeEditor));
     }
 
     void WriteType()
     {
         //to get all fileNames
-        string[] fileNames = Directory.GetFiles(filePath,"Resource_*.xml");
+        string[] fileNames = Directory.GetFiles(filePath, "*.xml");
 
+        //to correct the fileName
         int length = fileNames.Length;
         for(int i = 0; i < length; ++i)
         {
@@ -28,7 +29,7 @@ public class ResourceEditor : EditorWindow
 
             for(int j = pathLength - 5; j >= 0; --j)
             {
-                if(s[j] != '_')
+                if(s[j] != '\\')
                     sb.Insert(0, s[j]);
                 else
                     break;
@@ -40,17 +41,16 @@ public class ResourceEditor : EditorWindow
         StreamWriter sw = new FileInfo(scriptPath).CreateText();
 
         sw.WriteLine("public enum ResourceType\r\n{");
-        int temp = length - 1;
-        for(int i = 0; i < temp; ++i)
+        for(int i = 0; i < length; ++i)
             sw.WriteLine('\t' + fileNames[i] + ',');
-        sw.WriteLine('\t' + fileNames[temp] + "\r\n}");
+        sw.WriteLine("\tCount\r\n}");
 
         sw.Close();
     }
 
     void Load()
     {
-        string file = filePath + "Resource_" + fileName + ".xml";
+        string file = filePath + fileName + ".xml";
 
         if(File.Exists(file))
         {
@@ -79,7 +79,7 @@ public class ResourceEditor : EditorWindow
 
                 EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
 
-                rd = new ResourceAttribute();
+                rd = new ResourceAttribute(fileName);
                 Save();
             }
             catch(Exception e)
@@ -92,8 +92,7 @@ public class ResourceEditor : EditorWindow
     void Draw()
     {
         EditorGUILayout.BeginHorizontal();
-        rd.ResourceId = EditorGUILayout.IntField("編號", rd.ResourceId, GUILayout.Width(200f));
-        rd.Name = EditorGUILayout.TextField("名稱", rd.Name);
+        rd.ResourceID = EditorGUILayout.IntField("編號", rd.ResourceID, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
@@ -109,7 +108,7 @@ public class ResourceEditor : EditorWindow
             rd.ToolId = EditorGUILayout.IntField("採集工具編號", rd.ToolId, GUILayout.Width(200f));
         }
 
-        rd.OnPickFinishedMode = EditorGUILayout.Popup("採集後動作", rd.OnPickFinishedMode, DisappearChangeMode, GUILayout.Width(200f));
+        rd.OnPickFinishedMode = (ResourceAttribute.PickFinishedMode)EditorGUILayout.Popup("採集後動作", (int)rd.OnPickFinishedMode, DisappearChangeMode, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
 
         int count = rd.DropRate.Count;
@@ -141,7 +140,7 @@ public class ResourceEditor : EditorWindow
 
     void Save()
     {
-        string file = filePath + "Resource_" + fileName + ".xml";
+        string file = filePath + fileName + ".xml";
 
         //to detect if the filePath is legal
         if (!Directory.Exists(filePath))
@@ -150,18 +149,18 @@ public class ResourceEditor : EditorWindow
         //to put some info into rd
         int count = items.Count;
         for (int i = 0; i < count; ++i)
-            if (rd.Items.Count == i)
+            if (rd.DropItems.Count == i)
             {
                 /*
                 Item item = new Item();
                 item.type = (itemType)items[i];
                 rd.Items.Add(item);
                 */
-                rd.Items.Add(items[i]);
+                rd.DropItems.Add(items[i]);
             }
 
         rd.IsNeedTool = isNeedTool == 1 ? true : false;
-        rd.Gm = (ResourceAttribute.GrowthMode)gm;
+        rd.Gm = (ResourceAttribute.GenerateMode)gm;
         rd.Landform = (MapConstants.LandformType)landform;
 
         var serializer = new XmlSerializer(typeof(ResourceAttribute));
@@ -183,7 +182,7 @@ public class ResourceEditor : EditorWindow
 
         //to load file by name
         EditorGUILayout.BeginHorizontal();
-        fileName = EditorGUILayout.TextField("Loaded fileName: ", fileName, GUILayout.Width(300f));
+        fileName = EditorGUILayout.TextField("ResourceName: ", fileName, GUILayout.Width(300f));
 
         if (GUILayout.Button("Load", GUILayout.Width(150f)))
             if (EditorUtility.DisplayDialog("迷之音", "確定要讀入" + fileName + "嘛?", "是", "再考慮"))
@@ -204,14 +203,14 @@ public class ResourceEditor : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-    static string fileName = "", filePath = Application.dataPath + @"\Resources\Resource\";
+    static string fileName = "", filePath = DataConstant.ResourceAttributePath;
     static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
     static int id = 0;
 
     ResourceAttribute rd = null;
     Vector2 scrollView = Vector2.zero;
     
-    string[] YesNoMode = new string[] { "否", "是" }, DisappearChangeMode = new string[] { "消失", "改變" };
+    string[] YesNoMode = new string[] { "否", "是" }, DisappearChangeMode = new string[] { "無", "消失", "休息" };
     string[] landformName = MapConstants.LandformName;
 
     //for data

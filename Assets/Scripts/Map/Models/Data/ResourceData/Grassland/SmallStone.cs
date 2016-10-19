@@ -3,10 +3,10 @@ using System.Collections;
 
 public class SmallStone : ResourceData
 {
-    public SmallStone(Vector3 center, int no)
+    public SmallStone(Vector3 center, int oID)
     {
         this.center = center;
-        this.no = no;
+        this.oID = oID;
 
         //Max = 15;
         max = 15;

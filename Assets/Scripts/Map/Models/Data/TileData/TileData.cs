@@ -104,6 +104,12 @@ public class TileData
         set { looseObj = value; }
     }
 
+    public object FixedObj
+    {
+        get { return fixedObj; }
+        set { fixedObj = value; }
+    }
+
     public bool IsRunable
     {
         get
@@ -163,6 +169,7 @@ public class TileData
     protected Monster looseObj;
     protected Vector2 position, buildingPosition;
     protected Action<TileData> mtChanged;
+    protected object fixedObj = null;
     protected bool isRunable, isConstructable, isConstructed;
 
 
