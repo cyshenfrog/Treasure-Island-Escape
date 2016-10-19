@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class ResourceDisplay : ObjDisplay
+public class ResourceDisplay : ObjDisplay
 {
-    //...
+    public ResourceDisplay(ResourceAttribute ra, ObjData od): base (ra, od)
+    {
+
+    }
 }

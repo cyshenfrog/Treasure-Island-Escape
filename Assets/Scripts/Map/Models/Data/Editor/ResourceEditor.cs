@@ -6,19 +6,20 @@ using System.IO;
 using System.Xml.Serialization;
 using System;
 
-public class ResourceEditor : EditorWindow
+public class ResourceAttributeEditor : EditorWindow
 {
-    [MenuItem("Editor/ResourceEditor")]
+    [MenuItem("Editor/ResourceAttributeEditor")]
     static void CallEditorWindow()
     {
-        GetWindow(typeof(ResourceEditor));
+        GetWindow(typeof(ResourceAttributeEditor));
     }
 
     void WriteType()
     {
         //to get all fileNames
-        string[] fileNames = Directory.GetFiles(filePath, "ResourceAttribute_*.xml");
+        string[] fileNames = Directory.GetFiles(filePath, "*.xml");
 
+        //to correct the fileName
         int length = fileNames.Length;
         for(int i = 0; i < length; ++i)
         {
@@ -28,7 +29,7 @@ public class ResourceEditor : EditorWindow
 
             for(int j = pathLength - 5; j >= 0; --j)
             {
-                if(s[j] != '_')
+                if(s[j] != '\\')
                     sb.Insert(0, s[j]);
                 else
                     break;
@@ -49,7 +50,7 @@ public class ResourceEditor : EditorWindow
 
     void Load()
     {
-        string file = filePath + "ResourceAttribute_" + fileName + ".xml";
+        string file = filePath + fileName + ".xml";
 
         if(File.Exists(file))
         {
@@ -139,7 +140,7 @@ public class ResourceEditor : EditorWindow
 
     void Save()
     {
-        string file = filePath + "ResourceAttribute_" + fileName + ".xml";
+        string file = filePath + fileName + ".xml";
 
         //to detect if the filePath is legal
         if (!Directory.Exists(filePath))
@@ -159,7 +160,7 @@ public class ResourceEditor : EditorWindow
             }
 
         rd.IsNeedTool = isNeedTool == 1 ? true : false;
-        rd.Gm = (ResourceAttribute.GrowthMode)gm;
+        rd.Gm = (ResourceAttribute.GenerateMode)gm;
         rd.Landform = (MapConstants.LandformType)landform;
 
         var serializer = new XmlSerializer(typeof(ResourceAttribute));
@@ -202,7 +203,7 @@ public class ResourceEditor : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-    static string fileName = "", filePath = DataConstant.ResourcePath;
+    static string fileName = "", filePath = DataConstant.ResourceAttributePath;
     static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
     static int id = 0;
 

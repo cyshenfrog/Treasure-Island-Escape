@@ -14,11 +14,11 @@ public class ResourceAttribute : ObjData
         this.name = name;
     }
 
-    public enum GrowthMode
+    public enum GenerateMode
     {
         None,
-        Growth,
-        Recovery
+        Single,
+        Group
     }
 
     public enum PickFinishedMode
@@ -50,6 +50,13 @@ public class ResourceAttribute : ObjData
         set { onPickFinished = value; }
     }
 
+    [XmlIgnore]
+    public List<Sprite> Sprites
+    {
+        get { return sprites; }
+        set { sprites = value; }
+    }
+
     public List<int> DropItems
     {
         get { return dropItems; }
@@ -68,7 +75,7 @@ public class ResourceAttribute : ObjData
         set { landform = value; }
     }
 
-    public GrowthMode Gm
+    public GenerateMode Gm
     {
         get { return gm; }
         set { gm = value; }
@@ -135,12 +142,13 @@ public class ResourceAttribute : ObjData
     }
 
     Action onPicked = null, onPickFinished = null;
+    List<Sprite> sprites = new List<Sprite>();
     List<int> dropItems = new List<int>();
     List<float> dropRate = new List<float>();
 
     MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
     //Vector2 pivot; 
-    GrowthMode gm = GrowthMode.Growth;
+    GenerateMode gm = GenerateMode.Single;
     PickFinishedMode onPickFinishedMode = PickFinishedMode.Destory;
     string name;
     float gatherTime = 5f, growthTime = 2f;

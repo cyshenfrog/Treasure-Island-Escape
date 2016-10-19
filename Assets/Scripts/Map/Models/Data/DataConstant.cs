@@ -2,5 +2,5 @@
 
 public static class DataConstant
 {
-    public static string ResourcePath = Application.dataPath + @"\Resources\Resource\";
+    public static string ResourceAttributePath = Application.dataPath + @"\Resources\ResourceAttribute\";
 }

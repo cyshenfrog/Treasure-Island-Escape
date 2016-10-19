@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class TerrainFeatureDisplay : ObjDisplay
+public class TerrainFeatureDisplay : ObjDisplay
 {
     //...
+    public TerrainFeatureDisplay(ResourceAttribute ra, ObjData od): base(ra, od)
+    {
+
+    }
 }

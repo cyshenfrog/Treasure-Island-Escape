@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResourceAttribute xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Bodies />
+  <Center>
+    <x>0</x>
+    <y>0</y>
+    <z>0</z>
+  </Center>
+  <State>0</State>
+  <OID>0</OID>
+  <DropItems />
+  <DropRate />
+  <Landform>Grassland</Landform>
+  <Gm>Growth</Gm>
+  <OnPickFinishedMode>Rest</OnPickFinishedMode>
+  <Name>LiveStone</Name>
+  <GatherTime>5</GatherTime>
+  <GrowthTime>15</GrowthTime>
+  <ResourceID>4</ResourceID>
+  <Max>3</Max>
+  <ToolId>5</ToolId>
+  <Width>3</Width>
+  <Height>5</Height>
+  <IsNeedTool>true</IsNeedTool>
+</ResourceAttribute>

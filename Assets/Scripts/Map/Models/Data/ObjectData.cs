@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class ObjData
+public class ObjData
 {
     public static ObjData Create(int type0 = 0, int type1 = 0, int type2 = 0, int type3 = 0)
     {
@@ -10,6 +10,15 @@ public abstract class ObjData
             //...
             default: return null;
         }
+    }
+
+    public static ObjData Create(ResourceAttribute ra, int oID, Vector2 position)
+    {
+        ObjData od = new ObjData();
+        od.oID = oID;
+        od.state = 0;
+        od.position = position;
+        return od;
     }
 
     //this is used to create sub obj under a main(center) obj
@@ -57,6 +66,5 @@ public abstract class ObjData
 
     //position and center are world positions
     protected Vector3 position, center;
-    protected Sprite sprite;
     protected int oID, number, state, type0, type1, type2, type3;
 }
