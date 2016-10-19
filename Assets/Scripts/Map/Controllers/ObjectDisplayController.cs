@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Xml.Serialization;
+
+
 
 public class ObjectDisplayController : MonoBehaviour
 {
@@ -50,5 +54,39 @@ public class ObjectDisplayController : MonoBehaviour
         }
     }
 
+    void GetResourceAttributes()
+    {
+        string resourcePath = DataConstant.ResourcePath;
+
+        int count = (int)ResourceType.Count;
+
+        resourceAttributes = new ResourceAttribute[count];
+
+        for(int i = 0; i < count; ++i)
+        {
+            string file = resourceAttributePath + "ResourceAttribute_" + ((ResourceType)i).ToString() + ".xml";
+
+            if (File.Exists(file))
+            {
+                //to read the file
+                var serializer = new XmlSerializer(typeof(ResourceAttribute));
+
+                using (var stream = new FileStream(file, FileMode.Open))
+                {
+                    resourceAttributes[i] = (ResourceAttribute)serializer.Deserialize(stream);
+                }
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.LogError("");
+#endif
+            }
+        }
+    }
+
     Dictionary<Vector2, TileData>[] landformList;
+    ResourceAttribute[] resourceAttributes;
+
+    string resourceAttributePath = DataConstant.ResourcePath;
 }

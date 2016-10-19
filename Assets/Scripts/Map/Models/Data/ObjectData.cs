@@ -41,10 +41,10 @@ public abstract class ObjData
         set { state = value; }
     }
 
-    public int No
+    public int OID
     {
-        get { return no; }
-        set { no = value; }
+        get { return oID; }
+        set { oID = value; }
     }
 
     /*
@@ -58,5 +58,5 @@ public abstract class ObjData
     //position and center are world positions
     protected Vector3 position, center;
     protected Sprite sprite;
-    protected int no, number, state, type0, type1, type2, type3;
+    protected int oID, number, state, type0, type1, type2, type3;
 }
