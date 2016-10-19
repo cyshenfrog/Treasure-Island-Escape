@@ -7,8 +7,8 @@ public class RoleAttackBehavior : StateMachineBehaviour {
     public MonsterController MController { set; get; }
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        MController.EnterBeAttack();
-        Debug.Log("Monster Hp : " + MObj.Hp + "/" + MObj.MaxHp);
+        MObj.Hp -= (int)animator.gameObject.transform.parent.GetComponent<RoleController>().Data.Attack;
+        MController.State = MonsterState.BEATTACK;
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {

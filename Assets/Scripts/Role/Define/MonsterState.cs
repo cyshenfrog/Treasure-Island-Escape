@@ -4,4 +4,5 @@
     ATTACK,
     BEATTACK,
     NIGHT,
+    DEAD,
 }

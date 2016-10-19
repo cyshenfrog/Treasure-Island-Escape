@@ -97,7 +97,7 @@ public class MController_8 : MController_2 {
             transform.position.y == vertex[targetVertex].y ? vertex[targetVertex] : new Vector2(transform.position.x, vertex[targetVertex].y) :
             transform.position.x == vertex[targetVertex].x ? vertex[targetVertex] : new Vector2(vertex[targetVertex].x, transform.position.y);
 
-        transform.position = Vector2.MoveTowards(transform.position, target, Time.deltaTime * Speed);
+        transform.position = Vector2.MoveTowards(transform.position, target, Time.deltaTime * Data.Speed);
 
     }
 

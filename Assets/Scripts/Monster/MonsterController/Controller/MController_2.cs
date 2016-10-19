@@ -10,28 +10,21 @@ public class MController_2 : MonsterController {
     protected override void OnMouseDown() {
         //check pointer is not over ugui
         base.OnMouseDown();
-
         role.GetComponent<RoleController>().Attack(this, transform.position);
     }
 
-    public override void EnterBeAttack() {
-        State = MonsterState.BEATTACK;
-        //Debug.Log("??");
-        //monster die
-        if (Data.Hp == 0) Die();
+    public override void BeAttacked() {
+        if (Data.Hp == 0) {
+            State = MonsterState.DEAD;
+            return;
+        }
+
+        State = MonsterState.ATTACK;       
     }
 
     protected virtual void chase() {
         randomUnit = role.transform.position - transform.position;
         Run();
-    }
-
-    public override void BeAttacked() {
-        base.BeAttacked();
-        if (beAttackedState == STATE_FINISFANIM) {
-            State = MonsterState.ATTACK;
-            beAttackedState = STATE_STARTPLAYANIM;
-        }      
     }
 
     public override void Attack() {
