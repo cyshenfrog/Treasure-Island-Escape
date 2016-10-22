@@ -5,7 +5,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Inventory : InventoryManager {
-    
+
+    public ItemManager itemManager;
+
     private List<GameObject> allSlots;
 
     public List<GameObject> AllSlots
@@ -28,7 +30,7 @@ public class Inventory : InventoryManager {
     // Use this for initialization
     void Start () {
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-
+        itemManager = GameObject.Find("ItemManager").GetComponent<ItemManager>();
         CreateInventoryLayout();
     }
     void Update()
@@ -43,17 +45,10 @@ public class Inventory : InventoryManager {
                 if (dropItem != null)
                 {
                     float angle = Random.Range(0.0f, Mathf.PI * 2);
-                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
+                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0.0f);
 
-                    GameObject dropItems = createDropItemsParent(player.transform.position - 3 * v);
-                    
-                    foreach (Item item in from.Items)
-                    {
-                        GameObject temp = Instantiate(dropItem);
-                        temp.transform.position = player.transform.position - 3 * v;
-                        temp.transform.parent = dropItems.transform;
-                        temp.tag = "Untagged";
-                    }
+                    itemManager.dropItem(dropItem, from.items.Count, player.transform.position - 3 * v);
+
                 }
                 //from.transform.parent.GetComponent<Inventory>().emptySlot++;
                 from.clearSlot();
@@ -70,19 +65,11 @@ public class Inventory : InventoryManager {
             else if(!eventSystem.IsPointerOverGameObject(-1) && !movingSlot.isEmpty)
             {
                 dropItem = movingSlot.currentItem.dropItem;
-                float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
+                float angle = Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f );
 
-                GameObject dropItems = createDropItemsParent(player.transform.position - 3 * v);
+                itemManager.dropItem(dropItem, movingSlot.items.Count, player.transform.position - 3 * v);
 
-                foreach (Item item in movingSlot.Items)
-                {
-                    GameObject temp = Instantiate(dropItem);
-                    temp.transform.position = player.transform.position - 3 * v;
-                    temp.transform.parent = dropItems.transform;
-                    temp.tag = "Untagged";
-                }
-                
                 movingSlot.clearSlot();
                 Destroy(hoverObj);
 

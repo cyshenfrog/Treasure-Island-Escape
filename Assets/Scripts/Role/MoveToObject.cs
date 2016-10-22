@@ -126,7 +126,7 @@ public class MoveToObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
             itemName.GetComponent<RectTransform>().anchoredPosition = WorldObject_ScreenPosition + new Vector2(0, -75);
 
             string content = transform.GetComponent<Item>().type.ToString();
-            if(transform.parent != null && transform.parent.tag == "Items")
+            if(transform.parent != null && transform.tag == "Items")
             {
                 string itemCount = "*" + transform.parent.transform.childCount.ToString(); 
                 content = string.Concat(content, itemCount);

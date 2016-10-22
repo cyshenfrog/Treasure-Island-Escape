@@ -32,10 +32,11 @@ public class Bag : MonoBehaviour {
             else if (other.transform.tag == "Items" && MoveToObject.pickUpTarget != null)
             {
                 int childDeleted = 0;
-                foreach (Transform child in other.transform)
+                Transform parent = other.transform.parent;
+                foreach (Transform child in parent)
                 {
                     Item item = child.transform.GetComponent<Item>();
-                    if (item.type == MoveToObject.pickUpTarget.type && item.transform.position == MoveToObject.pickUpTarget.transform.position)
+                    if (other.transform.parent != null && item.type == MoveToObject.pickUpTarget.type && item.transform.position == MoveToObject.pickUpTarget.transform.position)
                     {
                         if (pickUpItem(child.GetComponent<Item>()))
                         {
@@ -48,9 +49,22 @@ public class Bag : MonoBehaviour {
                         break;
                     }
                 }
-                if (other.transform.childCount == childDeleted)
-                    Destroy(other.gameObject);
+                if (parent.transform.childCount == childDeleted)
+                    Destroy(parent.gameObject);
                 roleController.State = RoleState.IDLE;
+            }
+            else if (other.transform.parent!=null && other.transform.tag == "Item" && MoveToObject.pickUpTarget != null) {
+                Item item = other.GetComponent<Item>();
+                if (item.type == MoveToObject.pickUpTarget.type && other.transform.position == MoveToObject.pickUpTarget.transform.position)
+                {
+                    GameObject parent = other.transform.parent.gameObject;
+                    if (pickUpItem(other.GetComponent<Item>()))
+                    {
+                        Destroy(other.gameObject);
+                        Destroy(parent);
+                    }
+                    roleController.State = RoleState.IDLE;
+                }
             }
         }
     }
