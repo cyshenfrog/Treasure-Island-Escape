@@ -51,7 +51,7 @@ public class ResourceAttribute : ObjData
     }
 
     [XmlIgnore]
-    public List<Sprite> Sprites
+    public Sprite[] Sprites
     {
         get { return sprites; }
         set { sprites = value; }
@@ -142,9 +142,9 @@ public class ResourceAttribute : ObjData
     }
 
     Action onPicked = null, onPickFinished = null;
-    List<Sprite> sprites = new List<Sprite>();
     List<int> dropItems = new List<int>();
     List<float> dropRate = new List<float>();
+    Sprite[] sprites;
 
     MapConstants.LandformType landform = MapConstants.LandformType.Grassland;
     //Vector2 pivot; 

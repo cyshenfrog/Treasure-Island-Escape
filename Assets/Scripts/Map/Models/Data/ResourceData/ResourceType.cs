@@ -1,9 +1,6 @@
 public enum ResourceType
 {
-	Branch,
-	Fruit,
-	LiveStone,
-	SmallStone,
-	SquareTree,
+	Bush,
+	Tree,
 	Count
 }
