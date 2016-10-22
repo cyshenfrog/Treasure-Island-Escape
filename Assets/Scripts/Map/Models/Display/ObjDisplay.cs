@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(BoxCollider))]
-public class ObjDisplay : MonoBehaviour
+public class ObjDisplay : MonoBehaviour, IPointerClickHandler
 {
     public static void Init()
     {
@@ -34,11 +35,26 @@ public class ObjDisplay : MonoBehaviour
 
 
     public void Idle(int mode) { }
-    public void Click() { }
-    public void Collision(Transform collision) { }
-    public void Enable() { }
-    public void Updated() { }
     
+    public void Collision(Transform collision) { }
+
+    public void Enable() { }
+
+    public void Updated() { }
+
+    public void OnPointerClick(PointerEventData e)
+    {
+        if (e.button == PointerEventData.InputButton.Left)
+        {
+            //to let role come here
+            Role.MoveToTarget(transform.position);
+        }
+    }
+
+
+    public RoleController Role;
+    public Action OnPicked, OnPickFinished;
+
     protected ObjData od;
     protected ResourceAttribute ra;
     protected SpriteRenderer sr;

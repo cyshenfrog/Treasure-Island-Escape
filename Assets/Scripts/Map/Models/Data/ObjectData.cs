@@ -62,6 +62,18 @@ public class ObjData
         set { oID = value; }
     }
 
+    public int Type
+    {
+        get { return type; }
+        set { type = value; }
+    }
+
+    public int Kind
+    {
+        get { return kind; }
+        set { kind = value; }
+    }
+
     /*
     public int Number
     {
@@ -72,5 +84,5 @@ public class ObjData
 
     //position and center are world positions
     protected Vector3 position, center;
-    protected int oID, number, state, type0, type1, type2, type3;
+    protected int oID, number, state, type, kind, type2, type3;
 }

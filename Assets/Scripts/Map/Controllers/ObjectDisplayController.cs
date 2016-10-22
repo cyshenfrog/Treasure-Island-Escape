@@ -5,8 +5,6 @@ using System.IO;
 using System.Xml.Serialization;
 using System;
 
-
-
 public class ObjectDisplayController : MonoBehaviour
 {
     void Awake()
@@ -22,7 +20,12 @@ public class ObjectDisplayController : MonoBehaviour
 
         landformList = GroundRandomer.Self.LandformList;
 
+        resourceList = new List<ObjDisplay>[] { bushList };
+
+        allList = new List<ObjDisplay>[][] { resourceList };
+        
         GetResourceAttributes();
+        InitResourceAction();
 
         for (int i = 0; i < resourceAttributeCount; ++i)
         {
@@ -72,49 +75,6 @@ public class ObjectDisplayController : MonoBehaviour
         return newPixels;
     }
 
-    void RandomlyGenerateResource(ResourceAttribute ra, int mode, int randomTimes)
-    {
-        int max = ra.Max, landform = (int)ra.Landform;
-        Vector2[] keys = landformList[landform].Keys.ToArray();
-        int length = keys.Length;
-
-        switch (mode)
-        {
-            case 0:
-                //simply random one
-                for(int i = randomTimes; i > 0; --i)
-                {
-                    //to get a tiledata randomly
-                    TileData td = null;
-                    int random = 0;
-                    bool con = true;
-
-                    while (con)
-                    {
-                        random = UnityEngine.Random.Range(0, length);
-                        td = landformList[landform][keys[random]];
-                        con = td.FixedObj != null;
-                    }
-
-                    ObjData od = ObjData.Create(ra, nextOID, td.Position);
-                    GameObject newGo = Instantiate(objGameObject);
-                    newGo.GetComponent<ObjDisplay>().Init(ra, od);
-                    newGo.name = ra.Name + nextOID++.ToString();
-                    td.FixedObj = newGo;
-
-                    //to refresh
-                    //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
-
-                    //if many rd once??
-                }
-                
-                break;
-            default:
-                Debug.LogError("RandomlyGenerate Error: Unexpected mode");
-                break;
-        }
-    }
-
     void GetResourceAttributes()
     {
         string resourcePath = DataConstant.ResourceAttributePath;
@@ -123,7 +83,7 @@ public class ObjectDisplayController : MonoBehaviour
 
         resourceAttributes = new ResourceAttribute[resourceAttributeCount];
 
-        for(int i = 0; i < resourceAttributeCount; ++i)
+        for (int i = 0; i < resourceAttributeCount; ++i)
         {
             string file = resourceAttributePath + ((ResourceType)i).ToString() + ".xml";
 
@@ -145,10 +105,6 @@ public class ObjectDisplayController : MonoBehaviour
                 Debug.Log(length);
                 int width = (int)(resourceAttributes[i].Width * cellWidthInWC * 100) + 1, height = (int)(resourceAttributes[i].Height * cellHeightInWC * 100) + 1;
 
-#if UNITY_EDITOR
-                Debug.Log("width = " + width + " height = " + height);
-#endif
-                
                 for (int j = 0; j < length; ++j)
                 {
                     Texture2D t = resourceAttributes[i].Sprites[j].texture;
@@ -197,16 +153,95 @@ public class ObjectDisplayController : MonoBehaviour
         }
     }
 
-    public GameObject objGameObject;
+    //purely handmade??
+    void InitResourceAction()
+    {
+        resourcesOnPicked = new Action<ObjData>[resourceAttributeCount];
+        resourcesOnPickFinished = new Action<ObjData>[resourceAttributeCount];
 
+        resourcesOnPicked[(int)ResourceType.Bush] = (od) =>
+        {
+            //to play animation??
+
+
+        };
+
+        resourcesOnPickFinished[(int)ResourceType.Bush] = (od) =>
+        {
+            //to drop items???
+
+            //to destory
+            allList[od.Type][od.Kind].RemoveAt(od.OID);
+            //Destroy(gameObject);
+        };
+    }
+
+    void RandomlyGenerateResource(ResourceAttribute ra, int mode, int randomTimes)
+    {
+        int max = ra.Max, landform = (int)ra.Landform;
+        Vector2[] keys = landformList[landform].Keys.ToArray();
+        int length = keys.Length;
+
+        switch (mode)
+        {
+            case 0:
+                //simply random one
+                for(int i = randomTimes; i > 0; --i)
+                {
+                    //to get a tiledata randomly
+                    TileData td = null;
+                    int random = 0;
+                    bool con = true;
+
+                    while (con)
+                    {
+                        random = UnityEngine.Random.Range(0, length);
+                        td = landformList[landform][keys[random]];
+                        con = td.FixedObj != null;
+                    }
+
+                    ObjData od = ObjData.Create(ra, nextOID, td.Position);
+                    GameObject newGo = Instantiate(objGameObject);
+                    newGo.GetComponent<ObjDisplay>().Init(ra, od);
+                    newGo.name = ra.Name + nextOID++.ToString();
+                    td.FixedObj = newGo;
+
+                    //to refresh
+                    //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
+
+                    //if many rd once??
+                }
+                
+                break;
+            default:
+                Debug.LogError("RandomlyGenerate Error: Unexpected mode");
+                break;
+        }
+    }
+
+   
+
+    public GameObject objGameObject;
+    
+    enum DisplayType
+    {
+        Resource,
+        Count
+    }
 
     Dictionary<Vector2, TileData>[] landformList;
     ResourceAttribute[] resourceAttributes;
+    Action<ObjData>[] resourcesOnPicked, resourcesOnPickFinished;
     ///ResourceDisplay[]
     Vector2 pivot = .5f * Vector2.right;
+
+    //to manager things
+    List<ObjDisplay>[][] allList;
+    List<ObjDisplay>[] resourceList;
+    List<ObjDisplay> bushList = new List<ObjDisplay>();
 
     string resourceAttributePath = DataConstant.ResourceAttributePath, loadResourceAttributeImagePath = DataConstant.LoadResourceAttributeImagePath;
     float cellWidthInWC, cellHeightInWC;
     //integer overflow???
-    int nextOID = 0, resourceAttributeCount;
+    int nextOID = 0, resourceAttributeCount, displayTypeCount = (int)DisplayType.Count;
 }
