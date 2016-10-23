@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-public class ResourceAttribute : ObjData
+public class ResourceAttribute
 {
     //for serialization
     public ResourceAttribute() { }
@@ -13,7 +13,7 @@ public class ResourceAttribute : ObjData
     {
         this.name = name;
     }
-
+    
     public enum GenerateMode
     {
         None,
@@ -37,17 +37,17 @@ public class ResourceAttribute : ObjData
     */
 
     [XmlIgnore]
-    public Action OnPicked
+    public Action<ObjData>[] OnPickeds
     {
-        get { return onPicked; }
-        set { onPicked = value; }
+        get { return onPickeds; }
+        set { onPickeds = value; }
     }
 
     [XmlIgnore]
-    public Action OnPickFinished
+    public Action<ObjData>[] OnPickFinisheds
     {
-        get { return onPickFinished; }
-        set { onPickFinished = value; }
+        get { return onPickFinisheds; }
+        set { onPickFinisheds = value; }
     }
 
     [XmlIgnore]
@@ -105,10 +105,16 @@ public class ResourceAttribute : ObjData
         set { growthTime = value; }
     }
 
-    public int ResourceID
+    public int Type
     {
-        get { return resourceID; }
-        set { resourceID = value; }
+        get { return type; }
+        set { type = value; }
+    }
+
+    public int Kind
+    {
+        get { return kind; }
+        set { kind = value; }
     }
     
     public int Max
@@ -116,7 +122,13 @@ public class ResourceAttribute : ObjData
         get { return max; }
         set { max = value; }
     }
-    
+
+    public int StateCount
+    {
+        get { return stateCount; }
+        set { stateCount = value; }
+    }
+
     public int ToolId
     {
         get { return toolId; }
@@ -141,7 +153,7 @@ public class ResourceAttribute : ObjData
         set { isNeedTool = value; }
     }
 
-    Action onPicked = null, onPickFinished = null;
+    Action<ObjData>[] onPickeds = null, onPickFinisheds = null;
     List<int> dropItems = new List<int>();
     List<float> dropRate = new List<float>();
     Sprite[] sprites;
@@ -152,6 +164,6 @@ public class ResourceAttribute : ObjData
     PickFinishedMode onPickFinishedMode = PickFinishedMode.Destory;
     string name;
     float gatherTime = 5f, growthTime = 2f;
-    int resourceID = 0, max = 10, toolId = 0, width = 3, height = 5;
+    int type = 0, kind = 0, max = 10, stateCount = 1, toolId = 0, width = 3, height = 5;
     bool isNeedTool = false;
 }

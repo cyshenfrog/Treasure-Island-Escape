@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Xml.Serialization;
 using System;
+using System.Collections;
 
 public class ObjectDisplayController : MonoBehaviour
 {
@@ -24,19 +25,28 @@ public class ObjectDisplayController : MonoBehaviour
 
         allList = new List<ObjDisplay>[][] { resourceList };
         
+        resourceAttributeCount = (int)ResourceType.Count;
+
         GetResourceAttributes();
         InitResourceAction();
 
         for (int i = 0; i < resourceAttributeCount; ++i)
         {
             int max = resourceAttributes[i].Max;
-            RandomlyGenerateResource(resourceAttributes[i], 0, max);
+            for(int j = 0; j < max; ++j)
+                GenerateResource(resourceAttributes[i]);
         }
+
+        resourceIsGenerating = new bool[resourceAttributeCount];
+        for (int i = 0; i < resourceAttributeCount; ++i)
+            resourceIsGenerating[i] = false;
+
+        allIsGenerating = new bool[][] { resourceIsGenerating };
     }
 
     void Update()
     {
-
+        gameTime += Time.deltaTime;
     }
 
     public static Color32[] ResizeCanvas(Texture2D texture, int width, int height)
@@ -79,8 +89,6 @@ public class ObjectDisplayController : MonoBehaviour
     {
         string resourcePath = DataConstant.ResourceAttributePath;
 
-        resourceAttributeCount = (int)ResourceType.Count;
-
         resourceAttributes = new ResourceAttribute[resourceAttributeCount];
 
         for (int i = 0; i < resourceAttributeCount; ++i)
@@ -102,7 +110,6 @@ public class ObjectDisplayController : MonoBehaviour
 
                 //to revise those sprites
                 int length = resourceAttributes[i].Sprites.Length;
-                Debug.Log(length);
                 int width = (int)(resourceAttributes[i].Width * cellWidthInWC * 100) + 1, height = (int)(resourceAttributes[i].Height * cellHeightInWC * 100) + 1;
 
                 for (int j = 0; j < length; ++j)
@@ -156,63 +163,174 @@ public class ObjectDisplayController : MonoBehaviour
     //purely handmade??
     void InitResourceAction()
     {
-        resourcesOnPicked = new Action<ObjData>[resourceAttributeCount];
-        resourcesOnPickFinished = new Action<ObjData>[resourceAttributeCount];
+        resourcesOnPickedList = new List<Action<ObjData>>[resourceAttributeCount];
+        resourcesOnPickFinishedList = new List<Action<ObjData>>[resourceAttributeCount];
 
-        resourcesOnPicked[(int)ResourceType.Bush] = (od) =>
+        
+        for(int i = 0; i < resourceAttributeCount; ++i)
         {
-            //to play animation??
+            ResourceAttribute ra = resourceAttributes[i];
 
+            switch(ra.OnPickFinishedMode)
+            {
+                case ResourceAttribute.PickFinishedMode.Destory:
+                    ra.OnPickeds = new Action<ObjData>[] { DestroyPicked };
+                    ra.OnPickFinisheds = new Action<ObjData>[] { DestroyPickFinished };
+                    break;
 
-        };
+                case ResourceAttribute.PickFinishedMode.Rest:
+                    ra.OnPickeds = new Action<ObjData>[] { RestPicked, InRestPicked };
+                    ra.OnPickFinisheds = new Action<ObjData>[] { RestPickFinished, Nothing };
+                    break;
 
-        resourcesOnPickFinished[(int)ResourceType.Bush] = (od) =>
-        {
-            //to drop items???
-
-            //to destory
-            allList[od.Type][od.Kind].RemoveAt(od.OID);
-            //Destroy(gameObject);
-        };
+                default:
+#if UNITY_EDITOR
+                    Debug.LogError("ResourceAttribute Action Error");
+#endif
+                    break;
+            }
+        }
     }
 
-    void RandomlyGenerateResource(ResourceAttribute ra, int mode, int randomTimes)
+    //for resource OnPicked
+    void DestroyPicked(ObjData od)
+    {
+        //to play animation
+        od.Odis.GetComponent<SpriteRenderer>().color = Color.red;
+    }
+
+    //for resource OnPickFinished
+    void DestroyPickFinished(ObjData od)
+    {
+        //to drop items??
+
+        //to destory
+        allList[od.RA.Type][od.RA.Kind].RemoveAt(od.OID);
+        Destroy(od.Odis.gameObject);
+        Destroy(od.Odis);
+
+        //to delete the od??
+
+        //to tell the deletion info to controller
+        if(allIsGenerating[od.RA.Type][od.RA.Kind])
+        {
+            //during generating
+        }
+        else
+        {
+            //to start generating
+            allIsGenerating[od.RA.Type][od.RA.Kind] = true;
+            StartCoroutine("ReGenerateResource", od.RA);
+        }
+    }
+
+    void RestPicked(ObjData od)
+    {
+        //to play animation
+        od.Odis.GetComponent<SpriteRenderer>().color = Color.blue;
+    }
+
+    void InRestPicked(ObjData od)
+    {
+        //to do something???
+        od.Odis.GetComponent<SpriteRenderer>().color = Color.black;
+    }
+
+    void RestPickFinished(ObjData od)
+    {
+        //to drop items??
+
+        //to change the state
+        od.ChangeState(1);
+
+        //to controller
+        if (allIsGenerating[od.RA.Type][od.RA.Kind])
+        {
+            //during generating
+        }
+        else
+        {
+            //to start generating
+            allIsGenerating[od.RA.Type][od.RA.Kind] = true;
+            StartCoroutine("ReGenerateResource", od.RA);
+        }
+    }
+
+    void Nothing(ObjData od)
+    {
+
+    }
+
+
+    IEnumerator ReGenerateResource(ObjData od)
+    {
+        ResourceAttribute ra = od.RA;
+        yield return ra.GrowthTime;
+
+        switch(ra.OnPickFinishedMode)
+        {
+            case ResourceAttribute.PickFinishedMode.Destory:
+                while (allList[ra.Type][ra.Kind].Count < ra.Max)
+                {
+                    GenerateResource(ra);
+                    yield return ra.GrowthTime;
+                }
+                break;
+
+            case ResourceAttribute.PickFinishedMode.Rest:
+                od.ChangeState(0);
+                break;
+
+            default:
+#if UNITY_EDITOR
+                Debug.LogError("ReGenerateResource OnPickFinishedMode unexpected");
+#endif
+                break;
+        }
+
+        //to stop ReGenerateResource
+        allIsGenerating[ra.Type][ra.Kind] = false;
+    }
+
+    void GenerateResource(ResourceAttribute ra)
     {
         int max = ra.Max, landform = (int)ra.Landform;
+        ResourceAttribute.GenerateMode gm = ra.Gm;
         Vector2[] keys = landformList[landform].Keys.ToArray();
         int length = keys.Length;
 
-        switch (mode)
+        switch (gm)
         {
-            case 0:
-                //simply random one
-                for(int i = randomTimes; i > 0; --i)
+            case ResourceAttribute.GenerateMode.Single:
+
+                //to get a tiledata
+                TileData td = null;
+                int random = 0;
+                bool con = true;
+
+                while (con)
                 {
-                    //to get a tiledata randomly
-                    TileData td = null;
-                    int random = 0;
-                    bool con = true;
-
-                    while (con)
-                    {
-                        random = UnityEngine.Random.Range(0, length);
-                        td = landformList[landform][keys[random]];
-                        con = td.FixedObj != null;
-                    }
-
-                    ObjData od = ObjData.Create(ra, nextOID, td.Position);
-                    GameObject newGo = Instantiate(objGameObject);
-                    newGo.GetComponent<ObjDisplay>().Init(ra, od);
-                    newGo.name = ra.Name + nextOID++.ToString();
-                    td.FixedObj = newGo;
-
-                    //to refresh
-                    //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
-
-                    //if many rd once??
+                    random = UnityEngine.Random.Range(0, length);
+                    td = landformList[landform][keys[random]];
+                    con = td.FixedObj != null;
                 }
+
+                int id = resourceList[ra.Kind].Count;
+                ObjData od = ObjData.Create(ra, id, td.Position);
+                ObjDisplay odis = Instantiate(objGameObject).GetComponent<ObjDisplay>();
+                odis.Init(od);
+                odis.Role = Role;
+                odis.transform.name = ra.Name + id.ToString();
+                resourceList[ra.Kind].Add(odis);
+                td.FixedObj = odis;
+
+                //to refresh
+                //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
+
+                //if many rd once??
                 
                 break;
+
             default:
                 Debug.LogError("RandomlyGenerate Error: Unexpected mode");
                 break;
@@ -222,6 +340,7 @@ public class ObjectDisplayController : MonoBehaviour
    
 
     public GameObject objGameObject;
+    public RoleController Role;
     
     enum DisplayType
     {
@@ -231,7 +350,7 @@ public class ObjectDisplayController : MonoBehaviour
 
     Dictionary<Vector2, TileData>[] landformList;
     ResourceAttribute[] resourceAttributes;
-    Action<ObjData>[] resourcesOnPicked, resourcesOnPickFinished;
+    List<Action<ObjData>>[] resourcesOnPickedList, resourcesOnPickFinishedList;
     ///ResourceDisplay[]
     Vector2 pivot = .5f * Vector2.right;
 
@@ -240,7 +359,11 @@ public class ObjectDisplayController : MonoBehaviour
     List<ObjDisplay>[] resourceList;
     List<ObjDisplay> bushList = new List<ObjDisplay>();
 
+
+    bool[][] allIsGenerating;
+    bool[] resourceIsGenerating;
     string resourceAttributePath = DataConstant.ResourceAttributePath, loadResourceAttributeImagePath = DataConstant.LoadResourceAttributeImagePath;
+    double gameTime = 0d;
     float cellWidthInWC, cellHeightInWC;
     //integer overflow???
     int nextOID = 0, resourceAttributeCount, displayTypeCount = (int)DisplayType.Count;

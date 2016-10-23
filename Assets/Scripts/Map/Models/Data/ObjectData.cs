@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 public class ObjData
 {
@@ -15,9 +16,12 @@ public class ObjData
     public static ObjData Create(ResourceAttribute ra, int oID, Vector2 position)
     {
         ObjData od = new ObjData();
+        od.RA = ra;
         od.oID = oID;
         od.state = 0;
         od.position = position;
+        od.state = 0;
+
         return od;
     }
 
@@ -29,6 +33,12 @@ public class ObjData
             //...
             default: return null;
         }
+    }
+
+    public void ChangeState(int state)
+    {
+        this.state = state;
+        Odis.GetComponent<SpriteRenderer>().sprite = RA.Sprites[state];
     }
 
     //bodies are localPosition
@@ -62,18 +72,6 @@ public class ObjData
         set { oID = value; }
     }
 
-    public int Type
-    {
-        get { return type; }
-        set { type = value; }
-    }
-
-    public int Kind
-    {
-        get { return kind; }
-        set { kind = value; }
-    }
-
     /*
     public int Number
     {
@@ -81,8 +79,13 @@ public class ObjData
         set { number = value; }
     }
     */
+    
+    [XmlIgnore]
+    public ObjDisplay Odis = null;
+    [XmlIgnore]
+    public ResourceAttribute RA;
 
     //position and center are world positions
     protected Vector3 position, center;
-    protected int oID, number, state, type, kind, type2, type3;
+    protected int oID, number, state;
 }

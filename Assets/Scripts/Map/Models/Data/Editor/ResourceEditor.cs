@@ -83,6 +83,7 @@ public class ResourceAttributeEditor : EditorWindow
                 EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
 
                 rd = new ResourceAttribute(fileName);
+                
                 Save();
             }
             catch(Exception e)
@@ -96,11 +97,11 @@ public class ResourceAttributeEditor : EditorWindow
     {
         //to produce automatically?
         EditorGUILayout.BeginHorizontal();
-        rd.ResourceID = EditorGUILayout.IntField("編號", rd.ResourceID, GUILayout.Width(200f));
+        rd.Kind = EditorGUILayout.IntField("編號", rd.Kind, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        landform = EditorGUILayout.Popup("生長地區", landform, landformName, GUILayout.Width(200f));
+        landform = EditorGUILayout.Popup("生長地區", landform, landformName, GUILayout.Width(300f));
         rd.GatherTime = EditorGUILayout.FloatField("採集時間", rd.GatherTime, GUILayout.Width(200f));
         rd.Max = EditorGUILayout.IntField("數量上限", rd.Max, GUILayout.Width(200f));
         rd.GrowthTime = EditorGUILayout.FloatField("重生頻率", rd.GrowthTime, GUILayout.Width(200f));
@@ -109,6 +110,7 @@ public class ResourceAttributeEditor : EditorWindow
         EditorGUILayout.BeginHorizontal();
         rd.Width = EditorGUILayout.IntField("寬度", rd.Width, GUILayout.Width(200f));
         rd.Height = EditorGUILayout.IntField("高度", rd.Height, GUILayout.Width(200f));
+        rd.StateCount = EditorGUILayout.IntField("狀態總數", rd.StateCount, GUILayout.Width(200f));
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
@@ -171,7 +173,6 @@ public class ResourceAttributeEditor : EditorWindow
         rd.IsNeedTool = isNeedTool == 1 ? true : false;
         rd.Gm = (ResourceAttribute.GenerateMode)gm;
         rd.Landform = (MapConstants.LandformType)landform;
-        Debug.Log(rd.Name);
 
         var serializer = new XmlSerializer(typeof(ResourceAttribute));
 
@@ -182,6 +183,8 @@ public class ResourceAttributeEditor : EditorWindow
         }
 
         WriteType();
+
+        AssetDatabase.Refresh();
 
         EditorUtility.DisplayDialog("迷之音", "存入" + fileName + "了!", "好");
     }

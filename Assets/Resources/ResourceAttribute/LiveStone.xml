@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResourceAttribute xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Bodies />
   <Center>
     <x>0</x>
     <y>0</y>
@@ -19,14 +18,14 @@
   <DropRate />
   <Landform>Grassland</Landform>
   <Gm>Single</Gm>
-  <OnPickFinishedMode>Destory</OnPickFinishedMode>
-  <Name>Bush</Name>
-  <GatherTime>2</GatherTime>
-  <GrowthTime>2</GrowthTime>
-  <ResourceID>1</ResourceID>
-  <Max>20</Max>
-  <ToolId>0</ToolId>
+  <OnPickFinishedMode>Rest</OnPickFinishedMode>
+  <Name>LiveStone</Name>
+  <GatherTime>5</GatherTime>
+  <GrowthTime>15</GrowthTime>
+  <ResourceID>4</ResourceID>
+  <Max>3</Max>
+  <ToolId>10</ToolId>
   <Width>3</Width>
-  <Height>5</Height>
-  <IsNeedTool>false</IsNeedTool>
+  <Height>3</Height>
+  <IsNeedTool>true</IsNeedTool>
 </ResourceAttribute>
