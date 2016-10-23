@@ -53,7 +53,18 @@ public class ObjDisplay : MonoBehaviour, IPointerClickHandler
             Role.MoveToTarget(transform.position);
         }
     }
-    
+
+    public void OnClick()
+    {
+        Debug.Log("normally click");
+    }
+
+    public void OnTriggerEnter(Collider c)
+    {
+        Debug.Log("trigger enter");
+    }
+
+
     public float OnPick()
     {
         ra.OnPickeds[od.State](od);
