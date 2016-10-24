@@ -30,7 +30,7 @@ public class Inventory : InventoryManager {
     // Use this for initialization
     void Start () {
         eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-        itemManager = GameObject.Find("ItemManager").GetComponent<ItemManager>();
+        //itemManager = GameObject.Find("ItemManager").GetComponent<ItemManager>();
         CreateInventoryLayout();
     }
     void Update()
@@ -47,7 +47,7 @@ public class Inventory : InventoryManager {
                     float angle = Random.Range(0.0f, Mathf.PI * 2);
                     Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0.0f);
 
-                    itemManager.dropItem(dropItem, from.items.Count, player.transform.position - 3 * v);
+                    ItemManager.dropItem(dropItem, from.items.Count, player.transform.position - 3 * v);
 
                 }
                 //from.transform.parent.GetComponent<Inventory>().emptySlot++;
@@ -68,7 +68,7 @@ public class Inventory : InventoryManager {
                 float angle = Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f );
 
-                itemManager.dropItem(dropItem, movingSlot.items.Count, player.transform.position - 3 * v);
+                ItemManager.dropItem(dropItem, movingSlot.items.Count, player.transform.position - 3 * v);
 
                 movingSlot.clearSlot();
                 Destroy(hoverObj);

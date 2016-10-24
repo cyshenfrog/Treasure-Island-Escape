@@ -150,7 +150,12 @@ public class ObjectDisplayController : MonoBehaviour
     void DestroyPickFinished(ObjData od)
     {
         //to drop items??
-
+        
+        foreach(int i in od.RA.DropItems)
+        {
+            //ItemManager.dropItem(((itemType)i).ToString(), 1, od.Position);
+        }
+        
         //to destory
         allList[od.RA.Type][od.RA.Kind].RemoveAt(od.OID);
         Destroy(od.Odis.gameObject);
