@@ -1,19 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResourceAttribute xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Center>
-    <x>0</x>
-    <y>0</y>
-    <z>0</z>
-  </Center>
-  <Position>
-    <x>0</x>
-    <y>0</y>
-    <z>0</z>
-  </Position>
-  <State>0</State>
-  <OID>0</OID>
-  <Type>0</Type>
-  <Kind>0</Kind>
   <DropItems />
   <DropRate />
   <Landform>Grassland</Landform>
@@ -22,8 +8,10 @@
   <Name>LiveStone</Name>
   <GatherTime>5</GatherTime>
   <GrowthTime>15</GrowthTime>
-  <ResourceID>4</ResourceID>
+  <Type>0</Type>
+  <Kind>3</Kind>
   <Max>3</Max>
+  <StateCount>2</StateCount>
   <ToolId>10</ToolId>
   <Width>3</Width>
   <Height>3</Height>

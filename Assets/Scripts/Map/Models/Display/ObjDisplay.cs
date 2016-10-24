@@ -46,24 +46,13 @@ public class ObjDisplay : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData e)
     {
-        Debug.Log("Click");
         if (e.button == PointerEventData.InputButton.Left)
         {
             //to let role come here
             Role.MoveToTarget(transform.position);
+            OnPick();
         }
     }
-
-    public void OnClick()
-    {
-        Debug.Log("normally click");
-    }
-
-    public void OnTriggerEnter(Collider c)
-    {
-        Debug.Log("trigger enter");
-    }
-
 
     public float OnPick()
     {

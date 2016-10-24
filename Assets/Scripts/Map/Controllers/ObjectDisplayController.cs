@@ -15,20 +15,22 @@ public class ObjectDisplayController : MonoBehaviour
 
     void Start()
     {
+        //to get some info
         cellWidthInWC = GroundController.CellWidthInWC;
         cellHeightInWC = GroundController.CellHeightInWC;
-        ObjDisplay.Init();
-
-        landformList = GroundRandomer.Self.LandformList;
-
-        resourceList = new List<ObjDisplay>[] { bushList };
-
-        allList = new List<ObjDisplay>[][] { resourceList };
-        
         resourceAttributeCount = (int)ResourceType.Count;
+        ObjDisplay.Init();
+        landformList = GroundRandomer.Self.LandformList;
+        
+        //to init some info
+        resourceList = new List<ObjDisplay>[resourceAttributeCount];
+        for(int i = 0; i < resourceAttributeCount; ++i)
+        {
+            resourceList[i] = new List<ObjDisplay>();
+        }
+        allList = new List<ObjDisplay>[][] { resourceList };
 
-        GetResourceAttributes();
-        InitResourceAction();
+        resourceAttributes = GetResourceAttributes();
 
         for (int i = 0; i < resourceAttributeCount; ++i)
         {
@@ -56,6 +58,35 @@ public class ObjectDisplayController : MonoBehaviour
         texture.SetPixels32(newPixels);
         texture.Apply();
         return newPixels;
+        
+        /*等比例??
+        float oldWidth = t.width, oldHeight = t.height;
+        float widthRatio = oldWidth / width, heightRatio = oldHeight / height;
+        Debug.Log(oldWidth + " " + oldHeight + " " + widthRatio + " " + heightRatio);
+
+        Color32[] colors = t.GetPixels32();
+        Color32[] newColors = new Color32[width * height];
+
+        for (int k = 0; k < height; ++k)
+        {
+            for(int l = 0; l < width; ++l)
+            {
+                try
+                {
+                    newColors[k * width + l] = colors[(int)(k * heightRatio * oldWidth) + (int)(l * widthRatio)];
+                }
+                catch
+                {
+                    Debug.LogError("k = " + k + " l = " + l);
+                    break;
+                }
+            }
+        }
+
+        t.Resize(width, height);
+        t.SetPixels32(newColors);
+        t.Apply();
+        */
     }
 
     private static Color32[] ResizeCanvas(IList<Color32> pixels, int oldWidth, int oldHeight, int width, int height)
@@ -85,111 +116,27 @@ public class ObjectDisplayController : MonoBehaviour
         return newPixels;
     }
 
-    void GetResourceAttributes()
+    Sprite[] GetResourceSprites(ResourceAttribute ra)
     {
-        string resourcePath = DataConstant.ResourceAttributePath;
+        Vector2 pivot = .5f * Vector2.right;
 
-        resourceAttributes = new ResourceAttribute[resourceAttributeCount];
+        //to get their sprites
+        Sprite[] sprites = Resources.LoadAll<Sprite>(loadResourceAttributeImagePath + ((ResourceType)ra.Kind).ToString());
 
-        for (int i = 0; i < resourceAttributeCount; ++i)
+        //to revise those sprites
+        int length = sprites.Length;
+
+        //to plus 1 to ensure that the value is correct
+        int width = (int)(ra.Width * cellWidthInWC * 100) + 1, height = (int)(ra.Height * cellHeightInWC * 100) + 1;
+
+        for (int i = 0; i < length; ++i)
         {
-            string file = resourceAttributePath + ((ResourceType)i).ToString() + ".xml";
-
-            if (File.Exists(file))
-            {
-                //to read the file
-                var serializer = new XmlSerializer(typeof(ResourceAttribute));
-
-                using (var stream = new FileStream(file, FileMode.Open))
-                {
-                    resourceAttributes[i] = (ResourceAttribute)serializer.Deserialize(stream);
-                }
-
-                //to get their sprites
-                resourceAttributes[i].Sprites = Resources.LoadAll<Sprite>(loadResourceAttributeImagePath + ((ResourceType)i).ToString());
-
-                //to revise those sprites
-                int length = resourceAttributes[i].Sprites.Length;
-                int width = (int)(resourceAttributes[i].Width * cellWidthInWC * 100) + 1, height = (int)(resourceAttributes[i].Height * cellHeightInWC * 100) + 1;
-
-                for (int j = 0; j < length; ++j)
-                {
-                    Texture2D t = resourceAttributes[i].Sprites[j].texture;
-                    ResizeCanvas(t, width, height);
-
-                    /*
-                     * 等比例??
-                    float oldWidth = t.width, oldHeight = t.height;
-                    float widthRatio = oldWidth / width, heightRatio = oldHeight / height;
-                    Debug.Log(oldWidth + " " + oldHeight + " " + widthRatio + " " + heightRatio);
-                    
-                    Color32[] colors = t.GetPixels32();
-                    Color32[] newColors = new Color32[width * height];
-                    
-                    for (int k = 0; k < height; ++k)
-                    {
-                        for(int l = 0; l < width; ++l)
-                        {
-                            try
-                            {
-                                newColors[k * width + l] = colors[(int)(k * heightRatio * oldWidth) + (int)(l * widthRatio)];
-                            }
-                            catch
-                            {
-                                Debug.LogError("k = " + k + " l = " + l);
-                                break;
-                            }
-                        }
-                    }
-                    
-                    t.Resize(width, height);
-                    t.SetPixels32(newColors);
-                    t.Apply();
-                    */
-
-                    resourceAttributes[i].Sprites[j] = Sprite.Create(t, new Rect(0f, 0f, width, height), pivot);
-                }
-            }
-            else
-            {
-#if UNITY_EDITOR
-                Debug.LogError("The file name " + ((ResourceType)i).ToString() + " is not existed");
-#endif
-                break;
-            }
+            Texture2D t = sprites[i].texture;
+            ResizeCanvas(t, width, height);
+            sprites[i] = Sprite.Create(t, new Rect(0f, 0f, width, height), pivot);
         }
-    }
 
-    //purely handmade??
-    void InitResourceAction()
-    {
-        resourcesOnPickedList = new List<Action<ObjData>>[resourceAttributeCount];
-        resourcesOnPickFinishedList = new List<Action<ObjData>>[resourceAttributeCount];
-
-        
-        for(int i = 0; i < resourceAttributeCount; ++i)
-        {
-            ResourceAttribute ra = resourceAttributes[i];
-
-            switch(ra.OnPickFinishedMode)
-            {
-                case ResourceAttribute.PickFinishedMode.Destory:
-                    ra.OnPickeds = new Action<ObjData>[] { DestroyPicked };
-                    ra.OnPickFinisheds = new Action<ObjData>[] { DestroyPickFinished };
-                    break;
-
-                case ResourceAttribute.PickFinishedMode.Rest:
-                    ra.OnPickeds = new Action<ObjData>[] { RestPicked, InRestPicked };
-                    ra.OnPickFinisheds = new Action<ObjData>[] { RestPickFinished, Nothing };
-                    break;
-
-                default:
-#if UNITY_EDITOR
-                    Debug.LogError("ResourceAttribute Action Error");
-#endif
-                    break;
-            }
-        }
+        return sprites;
     }
 
     //for resource OnPicked
@@ -212,7 +159,7 @@ public class ObjectDisplayController : MonoBehaviour
         //to delete the od??
 
         //to tell the deletion info to controller
-        if(allIsGenerating[od.RA.Type][od.RA.Kind])
+        if (allIsGenerating[od.RA.Type][od.RA.Kind])
         {
             //during generating
         }
@@ -220,7 +167,8 @@ public class ObjectDisplayController : MonoBehaviour
         {
             //to start generating
             allIsGenerating[od.RA.Type][od.RA.Kind] = true;
-            StartCoroutine("ReGenerateResource", od.RA);
+            Debug.Log("start regenerate");
+            StartCoroutine("ReGenerateResource", od);
         }
     }
 
@@ -252,29 +200,93 @@ public class ObjectDisplayController : MonoBehaviour
         {
             //to start generating
             allIsGenerating[od.RA.Type][od.RA.Kind] = true;
-            StartCoroutine("ReGenerateResource", od.RA);
+            StartCoroutine("ReGenerateResource", od);
         }
     }
 
     void Nothing(ObjData od)
     {
-
     }
 
+    //purely handmade??
+    void InitResourceAction(ResourceAttribute ra)
+    {
+        //resourcesOnPickedList = new List<Action<ObjData>>[resourceAttributeCount];
+        //resourcesOnPickFinishedList = new List<Action<ObjData>>[resourceAttributeCount];
+
+        switch (ra.OnPickFinishedMode)
+        {
+            case ResourceAttribute.PickFinishedMode.Destory:
+                ra.OnPickeds = new Action<ObjData>[] { DestroyPicked };
+                ra.OnPickFinisheds = new Action<ObjData>[] { DestroyPickFinished };
+                break;
+
+            case ResourceAttribute.PickFinishedMode.Rest:
+                ra.OnPickeds = new Action<ObjData>[] { RestPicked, InRestPicked };
+                ra.OnPickFinisheds = new Action<ObjData>[] { RestPickFinished, Nothing };
+                break;
+
+            default:
+#if UNITY_EDITOR
+                Debug.LogError("ResourceAttribute Action Error");
+#endif
+                break;
+        }
+    }
+
+    ResourceAttribute[] GetResourceAttributes()
+    {
+        string resourcePath = DataConstant.ResourceAttributePath;
+
+        ResourceAttribute[] ras = new ResourceAttribute[resourceAttributeCount];
+
+        //to get the resource attribute file
+        for (int i = 0; i < resourceAttributeCount; ++i)
+        {
+            string file = resourceAttributePath + ((ResourceType)i).ToString() + ".xml";
+
+            if (File.Exists(file))
+            {
+                //to read the file
+                var serializer = new XmlSerializer(typeof(ResourceAttribute));
+
+                using (var stream = new FileStream(file, FileMode.Open))
+                {
+                    ras[i] = (ResourceAttribute)serializer.Deserialize(stream);
+                }
+
+                ras[i].Sprites = GetResourceSprites(ras[i]);
+                InitResourceAction(ras[i]);
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.LogError("The file name " + ((ResourceType)i).ToString() + " is not existed");
+#endif
+                break;
+            }
+        }
+
+        return ras;
+    }
 
     IEnumerator ReGenerateResource(ObjData od)
     {
         ResourceAttribute ra = od.RA;
-        yield return ra.GrowthTime;
+        Debug.Log("wait growthtime");
+        yield return new WaitForSeconds(ra.GrowthTime);
 
         switch(ra.OnPickFinishedMode)
         {
             case ResourceAttribute.PickFinishedMode.Destory:
+                Debug.Log(ra.Kind.ToString() + " " + allList[ra.Type][ra.Kind].Count + " " + ra.Max);
                 while (allList[ra.Type][ra.Kind].Count < ra.Max)
                 {
                     GenerateResource(ra);
+                    Debug.Log("re is completed");
                     yield return ra.GrowthTime;
                 }
+                Debug.Log("regenerate end");
                 break;
 
             case ResourceAttribute.PickFinishedMode.Rest:
@@ -350,14 +362,13 @@ public class ObjectDisplayController : MonoBehaviour
 
     Dictionary<Vector2, TileData>[] landformList;
     ResourceAttribute[] resourceAttributes;
-    List<Action<ObjData>>[] resourcesOnPickedList, resourcesOnPickFinishedList;
+    //List<Action<ObjData>>[] resourcesOnPickedList, resourcesOnPickFinishedList;
     ///ResourceDisplay[]
-    Vector2 pivot = .5f * Vector2.right;
 
     //to manager things
     List<ObjDisplay>[][] allList;
     List<ObjDisplay>[] resourceList;
-    List<ObjDisplay> bushList = new List<ObjDisplay>();
+    //List<ObjDisplay> bushList = new List<ObjDisplay>();
 
 
     bool[][] allIsGenerating;
