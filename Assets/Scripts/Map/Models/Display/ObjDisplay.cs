@@ -46,25 +46,41 @@ public class ObjDisplay : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData e)
     {
-        Debug.Log("Click");
         if (e.button == PointerEventData.InputButton.Left)
         {
             //to let role come here
             Role.MoveToTarget(transform.position);
+
+            //to set gather time
+            //Role.stay(gather time)
+            
+            //to pass this to role
+            //, gameobject
+
+
+            OnPick();
         }
     }
-    
-    public float OnPick()
+
+    public void Interrupt()
+    {
+        //to end the animation
+    }
+
+    public void OnPick()
     {
         ra.OnPickeds[od.State](od);
         
+
+        /*
         Invoke("OnPickFinished", ra.GatherTime);
 
         //should return something??
         return ra.GatherTime;
+        */
     }
 
-    void OnPickFinished()
+    public void OnPickFinished()
     {
         ra.OnPickFinisheds[od.State](od);
     }

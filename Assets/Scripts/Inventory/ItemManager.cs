@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ItemManager : MonoBehaviour {
 
-    public void dropItem(GameObject item, int count, Vector3 position) {
+    static public void dropItem(GameObject item, int count, Vector3 position) {
         GameObject dropItems = createDropItemsParent(position);
 
         for (int i = 0; i < count; ++i)
@@ -18,7 +18,7 @@ public class ItemManager : MonoBehaviour {
         }
     }
 
-    private GameObject createDropItemsParent(Vector3 position)
+    static private GameObject createDropItemsParent(Vector3 position)
     {
         GameObject dropItems = new GameObject("Drop");
         dropItems.transform.position = position;

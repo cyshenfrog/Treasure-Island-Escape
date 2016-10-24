@@ -16,20 +16,23 @@ public class ResourceAttributeEditor : EditorWindow
 
     void WriteType()
     {
-        //to get all fileNames
-        string[] fileNames = Directory.GetFiles(filePath, "*.xml");
+        //to get all file names
+        string[] fileNames = null;
+        
+        //only first use
+        fileNames = Directory.GetFiles(filePath, "*.xml");
 
         //to correct the fileName
         int length = fileNames.Length;
-        for(int i = 0; i < length; ++i)
+        for (int i = 0; i < length; ++i)
         {
             StringBuilder sb = new StringBuilder();
             string s = fileNames[i];
             int pathLength = s.Length;
 
-            for(int j = pathLength - 5; j >= 0; --j)
+            for (int j = pathLength - 5; j >= 0; --j)
             {
-                if(s[j] != '\\')
+                if (s[j] != '\\')
                     sb.Insert(0, s[j]);
                 else
                     break;
@@ -37,12 +40,17 @@ public class ResourceAttributeEditor : EditorWindow
 
             fileNames[i] = sb.ToString();
         }
-        
+
+        //        string resourceTypePath = 
+
+        //to write the ResourceType file
         StreamWriter sw = new FileInfo(scriptPath).CreateText();
 
         sw.WriteLine("public enum ResourceType\r\n{");
         for(int i = 0; i < length; ++i)
+        {
             sw.WriteLine('\t' + fileNames[i] + ',');
+        }
         sw.WriteLine("\tCount\r\n}");
 
         sw.Close();
@@ -52,7 +60,7 @@ public class ResourceAttributeEditor : EditorWindow
     {
         string file = filePath + fileName + ".xml";
 
-        if(File.Exists(file))
+        if(dontRewrite = File.Exists(file))
         {
             //to read the file
             var serializer = new XmlSerializer(typeof(ResourceAttribute));
@@ -73,6 +81,7 @@ public class ResourceAttributeEditor : EditorWindow
             //first loading
             try
             {
+                //only first use
                 //to detect if the filepath is legal => to create the filepath
                 if (!Directory.Exists(filePath))
                     Directory.CreateDirectory(filePath);
@@ -83,12 +92,13 @@ public class ResourceAttributeEditor : EditorWindow
                 EditorUtility.DisplayDialog("迷之音", "查無此檔!\n自動產生新檔案!", "好");
 
                 rd = new ResourceAttribute(fileName);
-                
                 Save();
             }
             catch(Exception e)
             {
+#if UNITY_EDITOR
                 Debug.LogError("The creation of directoryPath is fail: " + e.ToString());
+#endif
             }
         }
     }
@@ -182,7 +192,8 @@ public class ResourceAttributeEditor : EditorWindow
             serializer.Serialize(stream, rd);
         }
 
-        WriteType();
+        if(!dontRewrite)
+            WriteType();
 
         AssetDatabase.Refresh();
 
@@ -216,17 +227,17 @@ public class ResourceAttributeEditor : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
+    static string[] YesNoMode = new string[] { "否", "是" }, DisappearChangeMode = new string[] { "無", "消失", "休息" };
+    static string[] landformName = MapConstants.LandformName;
+
+    static ResourceAttribute rd = null;
+    static Vector2 scrollView = Vector2.zero;
     static string fileName = "", filePath = DataConstant.ResourceAttributePath, fileImagePath = DataConstant.ResourceAttributeImagePath;
     static string scriptPath = Application.dataPath + @"\Scripts\Map\Models\Data\ResourceData\ResourceType.cs";
-    static int id = 0;
-
-    ResourceAttribute rd = null;
-    Vector2 scrollView = Vector2.zero;
-    
-    string[] YesNoMode = new string[] { "否", "是" }, DisappearChangeMode = new string[] { "無", "消失", "休息" };
-    string[] landformName = MapConstants.LandformName;
+    static bool dontRewrite = false;
 
     //for data
-    List<int> items = new List<int>();
-    int isNeedTool = 0, gm = 1, landform = 0;
+    static List<int> items = new List<int>();
+
+    static int isNeedTool = 0, gm = 1, landform = 0;
 }
