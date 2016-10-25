@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum itemType {MANA, HEALTH, GreenPotion};
+public enum itemType {Mana, Health, GreenPotion};
 public enum Quality {NORMAL, RARE, EPIC, LEGENDARY};
 public class Item : MonoBehaviour {
 
@@ -21,10 +21,10 @@ public class Item : MonoBehaviour {
     {
         switch (type)
         {
-            case itemType.MANA:
+            case itemType.Mana:
                 Debug.Log("MANA");
                 break;
-            case itemType.HEALTH:
+            case itemType.Health:
                 Debug.Log("HEALTH");
                 break;
             default:
