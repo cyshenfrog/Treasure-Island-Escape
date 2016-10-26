@@ -132,6 +132,36 @@ public class CookingSystem : InventoryManager
             //show tool tip
             tooltip.text = itemToolTip;
         }
+        else
+        {
+            itemCrafting = string.Empty;
+            putBackMaterial();
+
+            //change craft inventory title
+            title.text = string.Empty;
+
+            //show necessary items
+            for (int i = 0; i < 2; ++i)
+            {
+                if (!necessarySlots[i].isEmpty)
+                {
+                    necessarySlots[i].clearSlot();
+                }
+                necessarySlots[i].changeSlotColorToWhite();
+                necessarySlots[i].owned_need.text = "0/0";
+            }
+            
+            if (!resultSlot.isEmpty)
+            {
+                resultSlot.clearSlot();
+            }
+            
+            resultSlot.changeSlotColorToWhite();
+
+
+            //show tool tip
+            tooltip.text = string.Empty;
+        }
     }
     
     public void moveResultItem(GameObject clicked)
@@ -168,7 +198,7 @@ public class CookingSystem : InventoryManager
                     return;
             }
 
-            //delete used material
+            //delete used necessary material
             for (int j = 0; j < 3; ++j)
             {
                 for (int k = 0; k < 10; ++k)
@@ -196,16 +226,39 @@ public class CookingSystem : InventoryManager
                 }
             }
 
+            //delete used optional material
+
             resultSlot.changeSlotColorToWhite();
 
             searchItemsInBag();
-            //allSlots[5].GetComponent<Image>().color = Color.white;
         }
 
     }
 
     void putBackMaterial()
     {
+        foreach(Slot slot in optionalSlots)
+        {
+            if (!slot.isEmpty)
+            {
+                if (BagIsAvailiable(slot.currentItem, slot.items.Count))
+                {
+                    foreach (Item item in slot.Items)
+                    {
+                        bag.pickUpItem(slot.currentItem);
+                    }
+                    slot.clearSlot();
+                }
+                else
+                {
+                    float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
+                    Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
+                    ItemManager.dropItem(slot.currentItem.dropItem, slot.items.Count, player.transform.position - 3 * v);
+                    slot.clearSlot();
+                }
+            }
+        }
+        
         if (resultSlot.GetComponent<Image>().color == Color.white && !resultSlot.isEmpty)
         {
             if ( BagIsAvailiable( resultSlot.currentItem, resultSlot.items.Count ) )
@@ -217,14 +270,11 @@ public class CookingSystem : InventoryManager
                 resultSlot.clearSlot();
             }
             else
-            {/*
+            {
                 float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
-                foreach (Item item in resultSlot.Items)
-                {
-                    Instantiate(resultSlot.currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
-                }
-                resultSlot.clearSlot();*/
+                ItemManager.dropItem(resultSlot.currentItem.dropItem, resultSlot.items.Count, player.transform.position - 3 * v);
+                resultSlot.clearSlot();
             }
         }
     }
@@ -338,6 +388,14 @@ public class CookingSystem : InventoryManager
             }
             searchItemsInBag();
             resultSlot.removeItem();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (resultSlot != null)
+        {
+            ShowCookingFormula(string.Empty, string.Empty);
         }
     }
 }

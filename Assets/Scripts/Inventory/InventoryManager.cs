@@ -22,8 +22,6 @@ public class InventoryManager : MonoBehaviour {
     public static int maxStackCount;
     public static Slot movingSlot;
     
-    //test
-
     // Use this for initialization
     void Start () {
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
