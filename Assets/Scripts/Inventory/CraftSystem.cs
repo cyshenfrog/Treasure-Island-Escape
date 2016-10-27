@@ -106,6 +106,36 @@ public class CraftSystem : InventoryManager
             //show tool tip
             tooltip.text = itemToolTip;
         }
+        else
+        {
+            itemCrafting = string.Empty;
+            putBackMaterial();
+
+            //change craft inventory title
+            title.text = string.Empty;
+
+            //show formula
+
+            for (int i = 0; i < 5; ++i)
+            {
+                if (!allSlots[i].isEmpty)
+                {
+                    allSlots[i].clearSlot();
+                    allSlots[i].changeSlotColorToWhite();
+                }
+                allSlots[i].owned_need.text = "0/0";
+            }
+
+            if (!resultSlot.isEmpty)
+            {
+                resultSlot.clearSlot();
+            }
+            
+            resultSlot.changeSlotColorToWhite();
+
+            //show tool tip
+            tooltip.text = string.Empty;
+        }
     }
     public new void moveItem(GameObject clicked)
     {
@@ -209,14 +239,11 @@ public class CraftSystem : InventoryManager
                 resultSlot.clearSlot();
             }
             else
-            {/*
+            {
                 float angle = UnityEngine.Random.Range(0.0f, Mathf.PI * 2);
                 Vector3 v = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0f);
-                foreach (Item item in resultSlot.Items)
-                {
-                    Instantiate(resultSlot.currentItem.dropItem, player.transform.position - 3 * v, Quaternion.identity);
-                }
-                resultSlot.clearSlot();*/
+                ItemManager.dropItem(resultSlot.currentItem.dropItem, resultSlot.items.Count, player.transform.position - 3 * v);
+                resultSlot.clearSlot();
             }
         }
     }
@@ -328,6 +355,13 @@ public class CraftSystem : InventoryManager
             }
             searchItemsInBag();
             resultSlot.removeItem();
+        }
+    }
+    void OnDisable()
+    {
+        if (resultSlot != null)
+        {
+            ShowCraftFormula(string.Empty, string.Empty);
         }
     }
 }

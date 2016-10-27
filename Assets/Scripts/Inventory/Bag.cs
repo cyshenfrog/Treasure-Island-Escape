@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Bag : MonoBehaviour {
 
+    public GameObject cookingWindow, makingWindow;
     public Inventory inventory1, inventory2, inventory3;
     private int affordableWeight = 500;
     private int currentWeight;
@@ -10,6 +11,10 @@ public class Bag : MonoBehaviour {
 
     void Start()
     {
+        if(cookingWindow == null)
+            cookingWindow = GameObject.Find("CookingWindow");
+        if (makingWindow == null)
+            makingWindow = GameObject.Find("MakingWindow");
         roleController = GameObject.Find("Role").GetComponent<RoleController>();
     }
     
@@ -121,10 +126,9 @@ public class Bag : MonoBehaviour {
     }
     void updateCraftInventory(Item item)
     {
-        GameObject temp = GameObject.Find("MakingWindow");
-        if (temp)
+        if (makingWindow.gameObject.activeSelf)
         {
-            CraftSystem craftSystem = temp.GetComponent<CraftSystem>();
+            CraftSystem craftSystem = makingWindow.GetComponent<CraftSystem>();
             for (int i = 0; i < 5; ++i)
             {
                 if (!craftSystem.AllSlots[i].isEmpty && craftSystem.AllSlots[i].currentItem.type == item.type)
@@ -137,10 +141,9 @@ public class Bag : MonoBehaviour {
     }
     void updateCookingInventory(Item item)
     {
-        GameObject temp = GameObject.Find("CookingWindow");
-        if (temp)
+        if (cookingWindow.gameObject.activeSelf)
         {
-            CookingSystem cookingSystem = temp.GetComponent<CookingSystem>();
+            CookingSystem cookingSystem = cookingWindow.GetComponent<CookingSystem>();
             for (int i = 0; i < 2; ++i)
             {
                 if (!cookingSystem.NecessarySlots[i].isEmpty && cookingSystem.NecessarySlots[i].currentItem.type == item.type)
