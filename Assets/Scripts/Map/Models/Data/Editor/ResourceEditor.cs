@@ -177,7 +177,7 @@ public class ResourceAttributeEditor : EditorWindow
                 item.type = (itemType)items[i];
                 rd.Items.Add(item);
                 */
-                rd.DropItems.Add(items[i]);
+                rd.DropItems.Add((itemType)items[i]);
             }
 
         rd.IsNeedTool = isNeedTool == 1 ? true : false;

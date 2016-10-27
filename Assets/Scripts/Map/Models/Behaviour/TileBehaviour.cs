@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TileEnableAction : MonoBehaviour
+public class TileBehaviour : MonoBehaviour
 {
     public void OnEnable()
     {
@@ -16,4 +16,7 @@ public class TileEnableAction : MonoBehaviour
 
         //do something
     }
+
+    
+    TileData td;
 }

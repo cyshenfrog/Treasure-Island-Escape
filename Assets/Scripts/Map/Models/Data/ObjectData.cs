@@ -81,7 +81,7 @@ public class ObjData
     */
     
     [XmlIgnore]
-    public ObjDisplay Odis = null;
+    public ObjBehaviour Odis = null;
     [XmlIgnore]
     public ResourceAttribute RA;
 

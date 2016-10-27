@@ -19,16 +19,16 @@ public class ObjectDisplayController : MonoBehaviour
         cellWidthInWC = GroundController.CellWidthInWC;
         cellHeightInWC = GroundController.CellHeightInWC;
         resourceAttributeCount = (int)ResourceType.Count;
-        ObjDisplay.Init();
+        ObjBehaviour.Init();
         landformList = GroundRandomer.Self.LandformList;
         
         //to init some info
-        resourceList = new List<ObjDisplay>[resourceAttributeCount];
+        resourceList = new List<ObjBehaviour>[resourceAttributeCount];
         for(int i = 0; i < resourceAttributeCount; ++i)
         {
-            resourceList[i] = new List<ObjDisplay>();
+            resourceList[i] = new List<ObjBehaviour>();
         }
-        allList = new List<ObjDisplay>[][] { resourceList };
+        allList = new List<ObjBehaviour>[][] { resourceList };
 
         resourceAttributes = GetResourceAttributes();
 
@@ -334,7 +334,7 @@ public class ObjectDisplayController : MonoBehaviour
 
                 int id = resourceList[ra.Kind].Count;
                 ObjData od = ObjData.Create(ra, id, td.Position);
-                ObjDisplay odis = Instantiate(objGameObject).GetComponent<ObjDisplay>();
+                ObjBehaviour odis = Instantiate(objGameObject).GetComponent<ObjBehaviour>();
                 odis.Init(od);
                 odis.Role = Role;
                 odis.transform.name = ra.Name + id.ToString();
@@ -371,8 +371,8 @@ public class ObjectDisplayController : MonoBehaviour
     ///ResourceDisplay[]
 
     //to manager things
-    List<ObjDisplay>[][] allList;
-    List<ObjDisplay>[] resourceList;
+    List<ObjBehaviour>[][] allList;
+    List<ObjBehaviour>[] resourceList;
     //List<ObjDisplay> bushList = new List<ObjDisplay>();
 
 

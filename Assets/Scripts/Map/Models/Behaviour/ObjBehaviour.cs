@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(BoxCollider))]
-public class ObjDisplay : MonoBehaviour, IPointerClickHandler
+public class ObjBehaviour : MonoBehaviour
 {
     public static void Init()
     {
@@ -40,26 +40,31 @@ public class ObjDisplay : MonoBehaviour, IPointerClickHandler
     
     public void Collision(Transform collision) { }
 
-    public void Enable() { }
+    public void OnEnable()
+    {
+        //to do something
+    }
 
     public void Updated() { }
 
-    public void OnPointerClick(PointerEventData e)
+    public void OnMouseDown()
     {
-        if (e.button == PointerEventData.InputButton.Left)
-        {
-            //to let role come here
-            Role.MoveToTarget(transform.position);
+        //to check whether there is something over this
+        //something over this => return
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
 
-            //to set gather time
-            //Role.stay(gather time)
-            
-            //to pass this to role
-            //, gameobject
+        //to let role come here
+        Role.MoveToTarget(transform.position);
+
+        //to set gather time
+        //Role.stay(gather time)
+
+        //to pass this to role
+        //, gameobject
 
 
-            OnPick();
-        }
+        OnPick();
     }
 
     public void Interrupt()
@@ -85,20 +90,18 @@ public class ObjDisplay : MonoBehaviour, IPointerClickHandler
         ra.OnPickFinisheds[od.State](od);
     }
 
-
     public RoleController Role;
-
-    protected ObjData od;
-    protected SpriteRenderer sr;
-    protected BoxCollider bc;
-
-    protected Action<Transform> CollisionAction;
-    protected Action<int> IdleAction;
-    protected Action ClickAction, EnableAction, UpdatedAction;
-
-    protected bool isUsed = false;
 
     static float cellWidthInWC, cellHeightInWC;
 
+    ObjData od;
+    SpriteRenderer sr;
+    BoxCollider bc;
     ResourceAttribute ra;
+
+    Action<Transform> CollisionAction;
+    Action<int> IdleAction;
+    Action ClickAction, EnableAction, UpdatedAction;
+
+    bool isUsed = false;
 }

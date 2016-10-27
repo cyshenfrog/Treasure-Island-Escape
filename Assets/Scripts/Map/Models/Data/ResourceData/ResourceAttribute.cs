@@ -57,7 +57,7 @@ public class ResourceAttribute
         set { sprites = value; }
     }
 
-    public List<int> DropItems
+    public List<itemType> DropItems
     {
         get { return dropItems; }
         set { dropItems = value; }
@@ -154,7 +154,7 @@ public class ResourceAttribute
     }
 
     Action<ObjData>[] onPickeds = null, onPickFinisheds = null;
-    List<int> dropItems = new List<int>();
+    List<itemType> dropItems = new List<itemType>();
     List<float> dropRate = new List<float>();
     Sprite[] sprites;
 
