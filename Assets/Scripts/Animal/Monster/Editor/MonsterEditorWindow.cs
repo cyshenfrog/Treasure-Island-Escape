@@ -40,9 +40,7 @@ public class MonsterEditorWindow : EditorWindow {
 
     void OnGUI() {
         
-        
-        style.fontSize = 12; 
-
+        style.fontSize = 12;
         GUILayout.BeginVertical();
 
         if (GUILayout.Button("開啟檔案", GUILayout.Width(100))) {
