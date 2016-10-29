@@ -68,8 +68,8 @@ public class MController_8 : MController_2 {
             }
         }
 
-        Debug.Log(GetComponent<SpriteRenderer>().sprite.rect);
-        Debug.Log(GetComponent<SpriteRenderer>().sprite.pivot);
+        //Debug.Log(GetComponent<SpriteRenderer>().sprite.rect);
+        //Debug.Log(GetComponent<SpriteRenderer>().sprite.pivot);
     }
 
     protected override void Update() {

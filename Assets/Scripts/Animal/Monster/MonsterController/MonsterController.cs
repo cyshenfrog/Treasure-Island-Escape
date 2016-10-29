@@ -15,7 +15,6 @@ public class MonsterController : MonoBehaviour {
     protected int lastTimes = 0;
     protected Vector2 randomUnit;
     protected int randomAction;
-    protected int randomDirection;
 
     protected virtual void Awake() {
         //data = Monster.Load(id);
@@ -82,8 +81,9 @@ public class MonsterController : MonoBehaviour {
     /// moving according to randomUnit
     /// </summary>
     public virtual void Move() {
-
-        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit, DirectionSwitcher.DirectionType.Axis);
+        //TileDataManager.RegisterTileData();
+        
+        Vector2 direction = DirectionSwitcher.DirectionSwitch(randomUnit);
         transform.Translate(direction * Data.Speed * Time.deltaTime);
         lastTimes--;
     }
