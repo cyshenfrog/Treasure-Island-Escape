@@ -23,29 +23,19 @@ public class SpriteBound {
 
         vertex[0] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
         vertex[1] = new Vector2(-Extend.x, (Height - 0.5f) * 2 * Extend.y);
-        vertex[1] = new Vector2(-Extend.x, -(Height - 0.5f) * 2 * Extend.y);
-        vertex[1] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
+        vertex[2] = new Vector2(-Extend.x, -(Height - 0.5f) * 2 * Extend.y);
+        vertex[3] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
     }
 
-    /// <summary>
-    /// 0 for quadrant 1, 1 for quadrant 2 ...
-    /// </summary>
-    /// <param name="spriteCenter"></param>
-    /// <param name="quadrant"></param>
-    /// <returns></returns>
+    
     public Vector2 GetVertex(Vector2 spriteCenter, int quadrant) {
         return spriteCenter + vertex[quadrant];
     }
-
-    /// <summary>
-    /// Return IsRunable for a sprite
-    /// </summary>
-    /// <param name="spriteCenter"></param>
-    /// <returns></returns>
-    public bool CheckTile(Vector2 spriteCenter, Vector2 delta) {
-        Vector2 point = GetVertex(spriteCenter + delta, 0);
+    
+    public bool CheckTile(Vector2 spriteCenter) {
+        Vector2 point = GetVertex(spriteCenter, 0);
         for (int i = 0; i < 4; i++) {
-            Vector2 next = GetVertex(spriteCenter + delta, (i + 1) % 4);
+            Vector2 next = GetVertex(spriteCenter, (i + 1) % 4);
             while (point.x != next.x || point.y != next.y) {
                 if (!GroundController.GetTileDataByWorldPosition(point).IsRunable)
                     return false;
@@ -53,7 +43,7 @@ public class SpriteBound {
                 Vector2.MoveTowards(
                     point, 
                     next, 
-                    i == 1 || i == 3 ? GroundController.StaticWorldHeightInWC : GroundController.StaticWorldWidthInWC);
+                    i == 1 || i == 3 ? GroundController.CellHeightInWC : GroundController.CellWidthInWC);
             }
             point = GetVertex(spriteCenter, i + 1);
         }       
@@ -61,7 +51,9 @@ public class SpriteBound {
     }
 
     public void RegisterTile(Vector2 spriteCenter) {
-        if (CheckTile(spriteCenter, Vector2.zero)) {
+        if (CheckTile(spriteCenter)) {
+            
+            //TileDataManager.RegisterTileData
         }
     }
 }
