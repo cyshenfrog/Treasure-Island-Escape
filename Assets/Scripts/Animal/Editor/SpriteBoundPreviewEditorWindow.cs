@@ -13,18 +13,15 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
     }
 
     Texture2D select;
+    Texture2D show;
     Sprite[] cut;
     string[] spriteName = { "None" };
     int spriteIndex = 0;
 
-    float top = 0;
-    float bottom = 0;
-    float right = 0;
-    float left = 0;
+    float top, bottom, left, right;
+    Vector3 q1, q2, q3, q4;
 
     void OnGUI() {
-
-        GUILayout.BeginHorizontal();
 
         GUILayout.BeginVertical();
 
@@ -45,34 +42,41 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
 
         GUILayout.Label("Bottom");
         bottom = EditorGUILayout.Slider(bottom, 0, 1, GUILayout.Width(200));
+       
+        GUILayout.Label("Left");
+        left = EditorGUILayout.Slider(left, 0, 1, GUILayout.Width(200));
 
         GUILayout.Label("Right");
         right = EditorGUILayout.Slider(right, 0, 1, GUILayout.Width(200));
 
-        GUILayout.Label("Left");
-        left = EditorGUILayout.Slider(left, 0, 1, GUILayout.Width(200));
-
         GUILayout.EndVertical();
-
-
-        GUILayout.BeginVertical();
 
         if (spriteIndex != 0) {
-            Texture2D show = spriteToTexture(cut[spriteIndex - 1]);
-            GUILayout.Label(show);
+            show = spriteToTexture(cut[spriteIndex - 1]);
+            GUI.Label(new Rect(250, 50, show.width, show.height), show);
+            
         }
 
-        GUILayout.EndVertical();
-
-        GUILayout.EndHorizontal();
-
-        /*Handles.BeginGUI();
-        Handles.color = Color.red;
-        Handles.DrawLine(new Vector3(0, 0), new Vector3(300, 300));
-        Handles.EndGUI();*/
-
         if (select != null && spriteIndex != 0) {
+
+            //handle vector
+            float extentWidth = cut[spriteIndex - 1].bounds.extents.x * 100;
+            float extentHeight = cut[spriteIndex - 1].bounds.extents.y * 100;
+            Vector3 center = new Vector2(250, 50) + cut[spriteIndex - 1].rect.center - cut[spriteIndex - 1].rect.position;
+
+            q1 = center + new Vector3(extentWidth * (0.5f - right), -extentHeight * (0.5f - top)) * 2;
+            q2 = center + new Vector3(-extentWidth * (0.5f - left), -extentHeight * (0.5f - top)) * 2;
+            q3 = center + new Vector3(-extentWidth * (0.5f - left), extentHeight * (0.5f - bottom)) * 2;
+            q4 = center + new Vector3(extentWidth * (0.5f - right), extentHeight * (0.5f - bottom)) * 2;
+
             //draw line
+            Handles.BeginGUI();
+            Handles.color = Color.red;
+            Handles.DrawLine(q1, q2);
+            Handles.DrawLine(q1, q4);
+            Handles.DrawLine(q3, q2);
+            Handles.DrawLine(q3, q4);
+            Handles.EndGUI();
         }
 
     }
@@ -80,8 +84,7 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
 
     Sprite[] cutSprite(Texture2D t) {
         string path = AssetDatabase.GetAssetPath(t);
-        Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToArray();
-        return sprites;
+        return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToArray();
     }
 
     Texture2D spriteToTexture(Sprite s) {
