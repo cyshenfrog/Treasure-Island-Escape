@@ -26,7 +26,6 @@ public class RoleController : MonoBehaviour {
     }
 	void Start () {
         State = RoleState.IDLE;
-        SpriteBound sb = new SpriteBound(transform.GetChild(0).GetComponent<SpriteRenderer>().sprite);
     }
 
 	void Update () { 

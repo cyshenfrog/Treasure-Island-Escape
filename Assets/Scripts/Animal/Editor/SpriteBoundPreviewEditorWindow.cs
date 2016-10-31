@@ -26,7 +26,13 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
         GUILayout.BeginVertical();
 
         if (GUILayout.Button("README", GUILayout.Width(200))) {
-            EditorUtility.DisplayDialog("README", "Make sure the mode of the image you want to preview is \"advanced\", and \"Read/Write Enabled\" is clicked.", "OK");
+            EditorUtility.DisplayDialog("README",
+                "Make sure the mode of the image you want to preview is \"advanced\", and \"Read/Write Enabled\" is clicked." +
+                "\n\nUsage :" +
+                "\n1. select image" +
+                "\n2. click convert button" +
+                "\n3. select sprite"
+                , "OK");
         }
 
         select = EditorGUILayout.ObjectField("Select Image", select, typeof(Texture), true, GUILayout.Width(200))as Texture2D;
