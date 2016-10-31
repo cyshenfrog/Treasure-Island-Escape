@@ -27,7 +27,7 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
 
         if (GUILayout.Button("README", GUILayout.Width(200))) {
             EditorUtility.DisplayDialog("README",
-                "Make sure the mode of the image you want to preview is \"advanced\", and \"Read/Write Enabled\" is clicked." +
+                "Make sure the mode of the image you want to preview is \"Advanced\", and \"Read/Write Enabled\" is clicked." +
                 "\n\nUsage :" +
                 "\n1. select image" +
                 "\n2. click convert button" +
