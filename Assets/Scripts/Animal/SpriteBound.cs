@@ -3,57 +3,54 @@ using System.Collections.Generic;
 
 public class SpriteBound {
 
-    public float Height {
-        private set {
-            if (value > 1) Height = 1;
-            else if (value < 0) Height = 0;
-            else Height = value;
-        }
-        get { return Height; }
-    }
-    public Vector2 Extend { private set; get; }
+    //height
+    //width
+    //center
+    //extent
 
-    private Sprite Render;
-    private Vector2[] vertex = new Vector2[4];
+    public float Top { private set; get; }
+    public float Bottom { private set; get; }
+    public float Left { private set; get; }
+    public float Right { private set; get; }
 
-    public SpriteBound(Sprite render, float height = 1) {
-        Height = height;
-        Render = render;
-        Extend = Render.bounds.extents;
+    private Sprite sprite;
+    private Bounds bounds;
 
-        vertex[0] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
-        vertex[1] = new Vector2(-Extend.x, (Height - 0.5f) * 2 * Extend.y);
-        vertex[2] = new Vector2(-Extend.x, -(Height - 0.5f) * 2 * Extend.y);
-        vertex[3] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
+    public SpriteBound(Sprite sprite) {
+        this.sprite = sprite;
+        bounds = sprite.bounds;
+        Top = Bottom = Left = Right = 0;
     }
 
-    
-    public Vector2 GetVertex(Vector2 spriteCenter, int quadrant) {
-        return spriteCenter + vertex[quadrant];
-    }
-    
-    public bool CheckTile(Vector2 spriteCenter) {
-        Vector2 point = GetVertex(spriteCenter, 0);
-        for (int i = 0; i < 4; i++) {
-            Vector2 next = GetVertex(spriteCenter, (i + 1) % 4);
-            while (point.x != next.x || point.y != next.y) {
-                if (!GroundController.GetTileDataByWorldPosition(point).IsRunable)
-                    return false;
-
-                Vector2.MoveTowards(
-                    point, 
-                    next, 
-                    i == 1 || i == 3 ? GroundController.CellHeightInWC : GroundController.CellWidthInWC);
-            }
-            point = GetVertex(spriteCenter, i + 1);
-        }       
-        return true;
+    public SpriteBound(SpriteRenderer spriteRenderer) {
+        sprite = spriteRenderer.sprite;
+        bounds = sprite.bounds;
+        Top = Bottom = Left = Right = 0;
     }
 
-    public void RegisterTile(Vector2 spriteCenter) {
-        if (CheckTile(spriteCenter)) {
-            
-            //TileDataManager.RegisterTileData
-        }
+    /// <summary>
+    /// set is a Vector4(top, bottom, left, right)
+    /// </summary>
+    /// <param name="sprite"></param>
+    /// <param name="set"></param>
+    public SpriteBound(Sprite sprite, Vector4 set) : this(sprite) {
+        Top = set.x;
+        Bottom = set.y;
+        Left = set.z;
+        Right = set.w;
     }
+
+    /// <summary>
+    /// set is a Vector4(top, bottom, left, right)
+    /// </summary>
+    /// <param name="spriteRenderer"></param>
+    /// <param name="set"></param>
+    public SpriteBound(SpriteRenderer spriteRenderer, Vector4 set) : this(spriteRenderer) {
+        Top = set.x;
+        Bottom = set.y;
+        Left = set.z;
+        Right = set.w;
+    }
+
+
 }

@@ -30,8 +30,6 @@ public class MonsterController : MonoBehaviour {
     }
 
     protected virtual void Start() {
-        Bounds b = transform.GetChild(0).GetComponent<SpriteRenderer>().bounds;
-        Debug.Log(b.ToString());
         State = MonsterState.IDlE;
         //GroundController.StaticCellWidth;
     }
