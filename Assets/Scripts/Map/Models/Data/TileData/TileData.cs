@@ -14,7 +14,7 @@ public class TileData
         center = this;
         materialTypes[0] = lm;
 
-        looseObj = null;
+        looseObj = new List<object>();
         rdList = new List<ResourceAttribute>();
     }
 
@@ -98,7 +98,7 @@ public class TileData
         get { return buildingCenter; }
     }
 
-    public Monster LooseObj
+    public List<object> LooseObj
     {
         get { return looseObj; }
         set { looseObj = value; }
@@ -166,7 +166,7 @@ public class TileData
     //unknown
     protected MapConstants.BuildingType buildingType;
     protected TileData center, fromTile, buildingCenter;
-    protected Monster looseObj;
+    protected List<object> looseObj;
     protected Vector2 position, buildingPosition;
     protected Action<TileData> mtChanged;
     protected ObjBehaviour fixedObj = null;

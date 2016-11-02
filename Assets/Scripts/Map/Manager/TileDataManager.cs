@@ -408,19 +408,30 @@ public static class TileDataManager
         }
     }
 
-    public static void RegisterTileData(Vector3 position, Monster m)
+    public static void RegisterLooseObj(Bounds b, object obj)
     {
-        TileData td = GroundController.GetTileDataByWorldPosition(position);
+        /*
+        List<TileData> tds = new List<TileData>();
+        Vector3 center = b.center;
+        float cellWidthInWC = GroundController.CellWidthInWC;
+        float cellHeightInWC = GroundController.CellHeightInWC;
 
-        if(td.LooseObj == null)
-        {
-            //can be register
-            td.LooseObj = m;
-        }
-        else
-        {
-            Debug.LogError("RegisterTileData Error: Attemp to register more than two looseObjs in a tiledata");
-        }
+        float externsX = b.extents.x - cellWidthInWC * .5f;
+        float externsY = b.extents.y - cellHeightInWC * .5f;
+
+        Debug.Log(externsX + " " + externsY);
+
+        TileData centerTd = GroundController.GetTileDataByWorldPosition(center);
+        tds.Add(centerTd);
+        Vector3 leftBottom = (center.x - externsX) * Vector3.right + (center.y - externsY) * Vector3.up;
+
+
+        for()
+        
+
+        //can be register
+        tds[0].LooseObj.Add(obj);
+        */
     }
 
     /*

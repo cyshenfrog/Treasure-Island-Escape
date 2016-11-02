@@ -32,7 +32,7 @@ public class ObjectDisplayController : MonoBehaviour
 
         resourceAttributes = GetResourceAttributes();
 
-        for (int i = 0; i < resourceAttributeCount; ++i)
+        for (int i = 0; i < 1; ++i)
         {
             int max = resourceAttributes[i].Max;
             for(int j = 0; j < max; ++j)
@@ -340,6 +340,7 @@ public class ObjectDisplayController : MonoBehaviour
                 odis.transform.name = ra.Name + id.ToString();
                 resourceList[ra.Kind].Add(odis);
                 td.FixedObj = odis;
+                TileDataManager.RegisterLooseObj(odis.GetComponent<SpriteRenderer>().bounds, odis);
 
                 //to refresh
                 //GroundController.GetMapPoolByTileData(td).GetComponent<TileEnableAction>().OnEnable();
