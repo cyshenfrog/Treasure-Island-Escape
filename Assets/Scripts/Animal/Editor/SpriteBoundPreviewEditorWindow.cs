@@ -25,6 +25,16 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
 
         GUILayout.BeginVertical();
 
+        if (GUILayout.Button("README", GUILayout.Width(200))) {
+            EditorUtility.DisplayDialog("README",
+                "Make sure the mode of the image you want to preview is \"Advanced\", and \"Read/Write Enabled\" is clicked." +
+                "\n\nUsage :" +
+                "\n1. select image" +
+                "\n2. click convert button" +
+                "\n3. select sprite"
+                , "OK");
+        }
+
         select = EditorGUILayout.ObjectField("Select Image", select, typeof(Texture), true, GUILayout.Width(200))as Texture2D;
         if (GUILayout.Button("Convert", GUILayout.Width(200))) {
             if (select != null) {
@@ -32,7 +42,7 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
                 spriteName = new string[cut.Length + 1];
                 spriteName[0] = "None";
                 for (int i = 1; i <= cut.Length; i++)
-                    spriteName[i] = cut[i - 1].name;     
+                    spriteName[i] = cut[i - 1].name;
             }
         }
         spriteIndex = EditorGUILayout.Popup(spriteIndex, spriteName, GUILayout.Width(200));
@@ -53,8 +63,7 @@ public class SpriteBoundPreviewEditorWindow : EditorWindow {
 
         if (spriteIndex != 0) {
             show = spriteToTexture(cut[spriteIndex - 1]);
-            GUI.Label(new Rect(250, 50, show.width, show.height), show);
-            
+            GUI.Label(new Rect(250, 50, show.width, show.height), show);            
         }
 
         if (select != null && spriteIndex != 0) {

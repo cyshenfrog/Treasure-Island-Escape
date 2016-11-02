@@ -3,57 +3,63 @@ using System.Collections.Generic;
 
 public class SpriteBound {
 
-    public float Height {
-        private set {
-            if (value > 1) Height = 1;
-            else if (value < 0) Height = 0;
-            else Height = value;
-        }
-        get { return Height; }
-    }
-    public Vector2 Extend { private set; get; }
+    public float Top { private set; get; }
+    public float Bottom { private set; get; }
+    public float Left { private set; get; }
+    public float Right { private set; get; }
 
-    private Sprite Render;
-    private Vector2[] vertex = new Vector2[4];
+    public Vector2 Center { private set; get; }
+    public Vector2 Extent { private set; get; }
 
-    public SpriteBound(Sprite render, float height = 1) {
-        Height = height;
-        Render = render;
-        Extend = Render.bounds.extents;
+    private Sprite sprite;
 
-        vertex[0] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
-        vertex[1] = new Vector2(-Extend.x, (Height - 0.5f) * 2 * Extend.y);
-        vertex[2] = new Vector2(-Extend.x, -(Height - 0.5f) * 2 * Extend.y);
-        vertex[3] = new Vector2(Extend.x, (Height - 0.5f) * 2 * Extend.y);
+    public SpriteBound(SpriteRenderer spr) {
+        sprite = spr.sprite;
+        Top = Bottom = Left = Right = 0;
+        Center = spr.bounds.center;
+        Extent = spr.bounds.extents;
     }
 
-    
-    public Vector2 GetVertex(Vector2 spriteCenter, int quadrant) {
-        return spriteCenter + vertex[quadrant];
-    }
-    
-    public bool CheckTile(Vector2 spriteCenter) {
-        Vector2 point = GetVertex(spriteCenter, 0);
-        for (int i = 0; i < 4; i++) {
-            Vector2 next = GetVertex(spriteCenter, (i + 1) % 4);
-            while (point.x != next.x || point.y != next.y) {
-                if (!GroundController.GetTileDataByWorldPosition(point).IsRunable)
-                    return false;
+    /// <summary>
+    /// opt is a Vector4(top, bottom, left, right)
+    /// </summary>
+    /// <param name="spr"></param>
+    /// <param name="opt"></param>
+    public SpriteBound(SpriteRenderer spr, Vector4 opt) : this(spr) {
+        Top = opt.x;
+        Bottom = opt.y;
+        Left = opt.z;
+        Right = opt.w;
 
-                Vector2.MoveTowards(
-                    point, 
-                    next, 
-                    i == 1 || i == 3 ? GroundController.CellHeightInWC : GroundController.CellWidthInWC);
-            }
-            point = GetVertex(spriteCenter, i + 1);
-        }       
-        return true;
+        handlePoint();
     }
 
-    public void RegisterTile(Vector2 spriteCenter) {
-        if (CheckTile(spriteCenter)) {
-            
-            //TileDataManager.RegisterTileData
-        }
+    private void handlePoint() {
+
+        Vector2 q1, q2, q4;
+        Vector2 extents = sprite.bounds.extents;
+
+        q1 = new Vector3(extents.x * (0.5f - Right), extents.y * (0.5f - Top)) * 2;
+        q2 = new Vector3(-extents.x * (0.5f - Left), extents.y * (0.5f - Top)) * 2;
+        q4 = new Vector3(extents.x * (0.5f - Right), -extents.y * (0.5f - Bottom)) * 2;
+
+        Extent = new Vector2(q1.x - q2.x, q1.y - q4.y) / 2;
+        Center += new Vector2((Left - Right) * extents.x, (Bottom - Top) * extents.y);
+
     }
+
+    /// <summary>
+    /// update data when spriteRenderer change
+    /// </summary>
+    /// <param name="spr"></param>
+    /// <returns></returns>
+    public SpriteBound Update(SpriteRenderer spr) {
+        sprite = spr.sprite;
+        Center = spr.bounds.center;
+        Extent = spr.bounds.extents;
+        handlePoint();
+        return this;
+    }
+
+
 }
