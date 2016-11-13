@@ -28,22 +28,13 @@ public class MController_2 : MonsterController {
     }
 
     public override void Attack() {
-        if (attackSpace <= 0 && Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange) {
-            base.Attack();
-            attackSpace = Data.AttackSpace;
-        }
-        else if (attackSpace > 0 && Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange) {
-            attackSpace -= Time.deltaTime;
-        }
-        else if (Vector2.Distance(transform.position, role.transform.position) > Data.AttackRange && Vector2.Distance(transform.position, role.transform.position) <= AnimalConstant.ChaseDistance) {
+        base.Attack();
+        if (Vector2.Distance(transform.position, role.transform.position) > Data.AttackRange && Vector2.Distance(transform.position, role.transform.position) <= AnimalConstant.ChaseDistance) {
             chase();
         }
         else if (Vector2.Distance(transform.position, role.transform.position) > AnimalConstant.ChaseDistance) {
             State = MonsterState.IDlE;
             lastTimes = 40;
-        }
-
-        
-        
+        }    
     }
 }

@@ -23,7 +23,7 @@ public class MonsterController : MonoBehaviour {
         Data.MaxHp = 1000;
         Data.Hp = 1000;
         Data.Speed = 0;
-        Data.AttackSpace = 1;
+        Data.AttackSpace = 3;
         Data.AttackRange = 3;
         Data.Attack = 100;
 
@@ -105,7 +105,13 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Attack() {
-        role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
+        if (Data.AttackSpace <= 0 && Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange) {
+            animator.SetTrigger("Attack");
+            role.GetComponent<RoleController>().BeAttacked((int)Data.Attack, transform.position);
+            Data.AttackSpace = Data.AttackSpace;
+        }
+        else if (Vector2.Distance(transform.position, role.transform.position) <= Data.AttackRange)
+            Data.AttackSpace -= Time.deltaTime;
     }
 
     public virtual void BeAttacked() {
