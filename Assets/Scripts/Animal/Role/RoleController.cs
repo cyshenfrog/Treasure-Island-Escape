@@ -192,7 +192,6 @@ public class RoleController : MonoBehaviour {
 
         if(index != -1)
             MoveToTarget(objPosition[index]);
-           //test manual merge
     }
 
     public void CancelMoveToTarget() {
@@ -222,7 +221,7 @@ public class RoleController : MonoBehaviour {
         if (State != RoleState.TYRANTS || Data.Hp <= 0) {
             Data.Hp -= attack;
             Debug.Log("Role Hp : " + Data.Hp + "/" + Data.MaxHp);
-            State = RoleState.BEATTACK;
+            State = RoleState.TYRANTS;
             if (Data.Hp <= 0) {
                 Die();
             }

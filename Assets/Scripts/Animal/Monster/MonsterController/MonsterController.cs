@@ -9,8 +9,9 @@ public class MonsterController : MonoBehaviour {
     //basic
     public Monster Data { set; get; }
     public MonsterState State { set; get; }
-    protected GameObject role; 
-    
+    protected GameObject role;
+    protected Animator animator;
+
     //idle and move parameters
     protected int lastTimes = 0;
     protected Vector2 randomUnit;
@@ -21,12 +22,13 @@ public class MonsterController : MonoBehaviour {
         Data = new Monster();
         Data.MaxHp = 1000;
         Data.Hp = 1000;
-        Data.Speed = 1;
+        Data.Speed = 0;
         Data.AttackSpace = 1;
-        Data.AttackRange = 5;
+        Data.AttackRange = 3;
         Data.Attack = 100;
 
         role = GameObject.Find(AnimalConstant.RolePrefab);
+        animator = transform.GetChild(0).GetComponent<Animator>();
     }
 
     protected virtual void Start() {
@@ -98,6 +100,7 @@ public class MonsterController : MonoBehaviour {
     }
 
     public virtual void Idle() {
+        animator.SetTrigger("Idle");
         lastTimes--;
     }
 
